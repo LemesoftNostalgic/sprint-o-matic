@@ -50,7 +50,7 @@ executable" of the Windows Defender was simultaneously running at high
 priority in the background. I waited patiently for about a half a minute and
 the jamming ended by itself.
 
-In addition to the ready-build binaries, it is also quite easy to build
+In addition to the ready-built binaries, it is also quite easy to build
 the application from sources using dopyinstaller.sh (Linux) or
 dopyinstaller.bat (Windows) at the root folder of this repository.
 That is also considered the safe alternative.
@@ -62,7 +62,7 @@ Requirements for the build:
 4. matplotlib.path
 5. argparse, pickle (only with command-line usage)
 
-Later on there migh be also an Android version. If anyone is interested in
+Later on there might be also an Android version. If anyone is interested in
 debugging the Android build, be my guest.
 The current attempt of a buildozer script dobuildozer.sh is at the root
 folder of this repository. It currently stops at the following error:
@@ -78,7 +78,7 @@ The first thing you see when you start the application is the home screen.
 It allows for the basic setting of track and leg length, play modes and map selection. The home screen can be used from keyboard (arrow keys to move the blue pointer, enter/space to select, esc to exit) or
 with a mouse (left/right button to move the blue pointer and middle button to select. The mouse usage might sound unintuitive, but I want to be able to use the application when the mouse is not at the desk surface.
 
-When you have selected all the setting, move the blue pointer to the finish circle and select it. The game you just configured will then begin.
+When you have selected all the settings, move the blue pointer to the finish circle and select it. The game you just configured will then begin.
 
 ### Gameplay
 
@@ -119,7 +119,7 @@ There are two different categories of maps in Sprint-O-Matic.
 
 ![Sprint-O-Matic gameplay map with an external map by Jyrki Leskelä](/doc/tartu/ExternalMapWithRouteAnalysis.png)
 
-The Sprint-O-Matic can also link to **external** maps. All you have to do is to send necessary details of a map to sprint-o-matic at gmail com. If the license of the map is permissive enough, I will then list it at [https://github.com/LemesoftNostalgic/sprint-o-matic-external-map-links](https://github.com/LemesoftNostalgic/sprint-o-matic-external-map-links) and it will become playable. I can even grant some teams a permission to maintain their own list of maps, if there is interest. The application will check the lists every time it starts, and show the map selection one-by-one when user toggles the "external/team" and "external/map" buttons of the home screen. In the beginning there is one example team with some maps already. I hope more is coming.
+The Sprint-O-Matic can also link to **external** maps. All you have to do is to send necessary details of a map to sprint-o-matic at gmail com. If the license of the map is permissive enough, I will then list it at [https://github.com/LemesoftNostalgic/sprint-o-matic-external-map-links](https://github.com/LemesoftNostalgic/sprint-o-matic-external-map-links) and it will become playable. I can even grant some teams a permission to maintain their own list of maps, if there is interest. The application checks the lists every time it starts, and shows the map selection one-by-one when user toggles the "external/team" and "external/map" buttons of the home screen. In the beginning there is one example team with some maps already. I hope more is coming.
 
 See the following chapter for the data that is needed, to make a map playable in Sprint-O-Matic.
 
@@ -299,7 +299,7 @@ at gmail com if your treadmill vendor shows green light for this use-case.
 ### Support
 
 Map proposals, team proposals, and application improvement
-ideas can be sent to Sprint-o-matic at gmail com.
+ideas can be sent to sprint-o-matic at gmail com.
 
 ## Command-line usage
 
@@ -337,7 +337,7 @@ These options are useful if you want to play with your own map:
 
 **--mapFileName** sprint orienteering map, png format
 
-**--lookupPngName** pre-calculated terrain description for the API, png format
+**--lookupPngName** pre-calculated terrain description for the map, png format
 
 **--metersPerPixel** How many meters per map pixel
 
