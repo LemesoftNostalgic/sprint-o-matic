@@ -75,10 +75,10 @@ src_c/_sdl2/sdl2.c:211:12: fatal error: 'longintrepr.h' file not found.
 ![Sprint-O-Matic Home Screen by Jyrki Leskela](/doc/InitialDisplay.png)
 
 The first thing you see when you start the application is the home screen.
-It allows for the basic setting of track and leg length, play modes and map selection. The home screen can be used from keyboard (arrows to move the blue arrow, enter/space to select, esc to exit) or
-with a mouse (left/right button to move the blue arrow and middle button to select. The mouse usage might sound unintuitive, but I want to be able to use the application when the mouse is not at the desk surface.
+It allows for the basic setting of track and leg length, play modes and map selection. The home screen can be used from keyboard (arrow keys to move the blue pointer, enter/space to select, esc to exit) or
+with a mouse (left/right button to move the blue pointer and middle button to select. The mouse usage might sound unintuitive, but I want to be able to use the application when the mouse is not at the desk surface.
 
-When you have selected all the setting, move the arrow to the finish circle and select it. The game you just configured will then begin.
+When you have selected all the setting, move the blue pointer to the finish circle and select it. The game you just configured will then begin.
 
 ### Gameplay
 
