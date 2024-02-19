@@ -109,6 +109,11 @@ def setTheStageForNewRound(cfg):
     global pacemakerStep
     global aiCounter
 
+    # effects initialization
+    uiControlEffectRestart()
+    startEffect()
+    uiStartControlEffect(0)
+
     # Ensure we have a list of controls
     ctrls = []
     numAttempts = 3
@@ -245,11 +250,6 @@ if __name__ == "__main__":
                 zoom = gameSettings.zoom
                 angle = defaultAngle()
 
-                # effect initailization
-                uiControlEffectRestart()
-                startEffect()
-                uiStartControlEffect(0)
-
                 # initializations specific to a particular track
                 controls = setTheStageForNewRound(config)
 
@@ -262,7 +262,8 @@ if __name__ == "__main__":
         # main loop of the gameplay itself:
         while running and not quitting:
             # Keep on running (sound)
-            maintainRunningStepEffect()
+            if datetime.now() - startTime > timedelta(seconds=gameMovingStartThreshold):
+                maintainRunningStepEffect()
 
             # If we just moved or not
             movement = False

@@ -64,6 +64,31 @@ def pruneEnsureLineOfSight(ptA, ptB, lookup):
     return testPtList
 
 
+# Check if decent direct route between point A and B
+slowCheckPeriod = 4
+def pruneEnsureGoodShortcut(ptA, ptB, lookup1, lookup2, lookup3):
+    testPtList = []
+    if ptA == ptB:
+        return testPtList
+    steps = max(abs(ptA[0]- ptB[0]), abs(ptA[1] - ptB[1]))
+    incr = (float(ptB[0] - ptA[0]) / float(steps), float(ptB[1] - ptA[1]) / float(steps))
+    incrDist = distanceBetweenPoints((0.0, 0.0), incr)
+    start = (float(ptA[0]), float(ptA[1]))
+
+    for ind in range(steps):
+        testPt = (int(start[0] + ind * incr[0]), int(start[1] + ind * incr[1]))
+        testPtList.append(testPt)
+        if lookup1 and testPt in lookup1:
+            return None
+        elif ind % 4 == 0:
+            if lookup2 and testPt in lookup2:
+                return None
+            if lookup3 and testPt in lookup3:
+                return None
+
+    return testPtList
+
+
 # check if a line crosses forbidden areas or not
 def pruneCheckLineOfSight(ptA, ptB, ptMid, forbiddenLookup, slowLookup, semiSlowLookup, verySlowLookup):
     origScore = pruneWeightedDistance(ptA, ptMid, slowLookup, semiSlowLookup, verySlowLookup) + pruneWeightedDistance(ptMid, ptB, slowLookup, semiSlowLookup, verySlowLookup)

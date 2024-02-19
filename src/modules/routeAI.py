@@ -23,7 +23,7 @@ from random import randrange
 
 import sys
 
-from .pathPruning import pruneShortestRoute, pruneEnsureLineOfSight
+from .pathPruning import pruneShortestRoute, pruneEnsureGoodShortcut
 from .mathUtils import getBoundingBox, getNearestPointOfList
 from .utils import getSlowdownFactor, getSemiSlowdownFactor, getVerySlowdownFactor, getAiPoolMaxTimeLimit
 
@@ -149,7 +149,7 @@ def calculateShortestRoute(setupList):
                         elif nextPruning and backPoints:
                             nextPruning = True if randrange(refreshCtr) == 0 else False
                             backPoint = getNearestPointOfList(backPoints, newPoint)
-                            pointsInBetween = pruneEnsureLineOfSight(backPoint, newPoint, forbiddenLookup)
+                            pointsInBetween = pruneEnsureGoodShortcut(backPoint, newPoint, forbiddenLookup, slowLookup, verySlowLookup)
                             if pointsInBetween != None:
                                 stop = True
                                 intersectionPointBack = backPoint

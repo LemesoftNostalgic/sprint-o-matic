@@ -236,6 +236,9 @@ def uiEvent(showInfoTexts):
             if pygame.mouse.get_pressed()[0]:
                 events.append("left")
                 mousePressed = True
+            if pygame.mouse.get_pressed()[1]:
+                events.append("quit")
+                mousePressed = True
             elif pygame.mouse.get_pressed()[2]:
                 events.append("right")
                 mousePressed = True

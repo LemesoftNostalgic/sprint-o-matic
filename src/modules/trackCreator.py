@@ -24,6 +24,7 @@ import time
 from .mathUtils import angleBetweenLineSegments, distanceBetweenPoints
 from .pathPruning import pruneEnsureLineOfSight
 
+firstControlMinDistance = 100
 
 def pickLegLen(distribution, metersPerPixel):
     a = random.random()
@@ -62,6 +63,10 @@ def pickDistAutoControl(cfg, ctrls, distribution, metersPerPixel, faLookup):
     isDifficultControl = True
     while True:
         minlen, maxlen = pickLegLen(distribution, metersPerPixel)
+        if len(ctrls) == 1:
+            lenadjust =  max(minlen, firstControlMinDistance) - minlen
+            maxlen = maxlen + lenadjust
+            minlen = minlen + lenadjust
         for index in range(0,50):
             candidate = pickAutoControl(cfg, ctrls)
             if candidate is None:

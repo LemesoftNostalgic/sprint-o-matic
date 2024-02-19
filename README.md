@@ -25,6 +25,14 @@ idea:
 * [Trying out Sprint-O-Matic route analysis mode with a fantasy map](https://youtu.be/rI9zinYGOmc)
 * [Using a real sprint orienteering map with Sprint-O-Matic. Fast mode.](https://youtu.be/Kn53WGpEUgo)
 
+## Table of Contents
+
+  * [Installation](#installation)
+  * [Usage](#usage)
+  * [Linking external maps to Sprint-O-Matic](#linking-external-maps-to-sprint-o-matic)
+  * [Software developent and license](#software-developent-and-license)
+  * [Misc topics](#misc-topics)
+  * [Command-line usage](#command-line-usage)
 
 ## Installation
 
@@ -42,7 +50,7 @@ executable" of the Windows Defender was simultaneously running at high
 priority in the background. I waited patiently for about a half a minute and
 the jamming ended by itself.
 
-In addition to the ready-build binaries, is also quite easy to build
+In addition to the ready-build binaries, it is also quite easy to build
 the application from sources using dopyinstaller.sh (Linux) or
 dopyinstaller.bat (Windows) at the root folder of this repository.
 That is also considered the safe alternative.
@@ -54,9 +62,11 @@ Requirements for the build:
 4. matplotlib.path
 5. argparse, pickle (only with command-line usage)
 
-If anyone is interested in debugging the Android build, be my guest.
-The current attempt of a buildozer script dobuildozer.sh is also at the root
-folder of this repository.
+Later on there migh be also an Android version. If anyone is interested in
+debugging the Android build, be my guest.
+The current attempt of a buildozer script dobuildozer.sh is at the root
+folder of this repository. It currently stops at the following error:
+src_c/_sdl2/sdl2.c:211:12: fatal error: 'longintrepr.h' file not found.
 
 ## Usage
 
@@ -98,6 +108,9 @@ In the pacemaker mode, you complete the track together with a pacemaker,
 your personal virtual coach. The pacemaker waits you at each control,
 and competes against/with you in between the controls.
 
+In some rare circumstances, the pacemaker decides to skip a control,
+and wait at the next one. In that case, don't worry. Shit happens.
+
 ### Map types (Infinite Oulu / External)
 
 There are two different categories of maps in Sprint-O-Matic.
@@ -106,9 +119,9 @@ There are two different categories of maps in Sprint-O-Matic.
 
 ![Sprint-O-Matic gameplay map with an external map by Jyrki Leskelä](/doc/tartu/ExternalMapWithRouteAnalysis.png)
 
-The Sprint-O-Matic can also link to **external** maps. All you have to do is to send necessary details of a map to sprint-o-matic at gmail com. If the license of the map is permissive enough, I will then list it at [https://github.com/LemesoftNostalgic/sprint-o-matic-external-map-links](https://github.com/LemesoftNostalgic/sprint-o-matic-external-map-links) and it will become playable. I can even grant some teams a permission to maintain their own list of maps, if there is interest. The application will check the lists every time it starts, and show the map selection one-by-one when user toggles the "external/team" and "external/map" buttons of the home screen. In the beginning there is one example team two example maps already and I hope more is coming soon.
+The Sprint-O-Matic can also link to **external** maps. All you have to do is to send necessary details of a map to sprint-o-matic at gmail com. If the license of the map is permissive enough, I will then list it at [https://github.com/LemesoftNostalgic/sprint-o-matic-external-map-links](https://github.com/LemesoftNostalgic/sprint-o-matic-external-map-links) and it will become playable. I can even grant some teams a permission to maintain their own list of maps, if there is interest. The application will check the lists every time it starts, and show the map selection one-by-one when user toggles the "external/team" and "external/map" buttons of the home screen. In the beginning there is one example team and two example maps already. I hope more is coming.
 
-See the following chapter for the data that is needed to make a map playable in Sprint-O-Matic.
+See the following chapter for the data that is needed, to make a map playable in Sprint-O-Matic.
 
 ## Linking external maps to Sprint-O-Matic
 
@@ -141,18 +154,23 @@ Here is an example of an entry in the [https://github.com/LemesoftNostalgic/spri
 
 The two main things to pay attention is a) license of the map and b) creating the terrain description e.g "lookup-png".
 
-a) Regarding the license, it is possible to include map images with relatively permissive license only. In practice, the map image will become visible to all the Sprint-O-Matic users when included into this listing. The best way would be to license an
-image of a candidate map with one of the creative commons license types. This will probably limit the selection to older maps but that does not matter. New maps are meant for live sprint orienteering events anyway.
+a) Regarding the license, it is only possible to include map images
+with relatively permissive license to the listing. In practice, the map
+image will become visible to all the Sprint-O-Matic users when included.
+The best way would be to license an
+image of a candidate map with one of the creative commons license types.
+This will probably limit the selection to older maps that have no more use
+for live sprint orienteering events. For me, that sounds a good trade-off.
 
-The only way
-to use fully proprietary maps is via command line options, and keeping the
-map content in your own computer. This way it is not shown to the other application users.
+There is also a way to use the app with your private maps.
+In that case you have to rely on the command line options, and keep the
+map content in your own computer.
 
 b) A bit more involved is the creation of the terrain description
 e.g. "lookup-png".
 Basically, you have to create equally sized image as the map image.
-The easiest for me has been to make a copy of the map image and re-paint
-each terrain type with the correct color code and save the result as png.
+One easy method is to make a copy of the original map image, re-paint
+each terrain type with a correct color code and save the result as png.
 
 The color codes are the following:
 
@@ -160,22 +178,23 @@ The color codes are the following:
 
 Please use an editor where you can choose the colors accurately. The
 terrain markings must represent exactly the color codes shown in the image
-above. Then you need to review the edits. Especially the black color is
-difficult: usually it marks an area that you cannot run through in a
-sprint map, but some black features such as forest paths and fence symbol
+above. Then you need to review the edits. Especially the black color of
+sprint map notation is
+difficult: usually it marks an area that you cannot run through,
+but some black features such as forest paths and fence symbol
 slashes are actually runnable, so do not mark them forbidden.
 
-See the [examples repository](https://github.com/LemesoftNostalgic/sprint-o-matic-map-image-example) for two examples of a map image and the
+See the [examples repository](https://github.com/LemesoftNostalgic/sprint-o-matic-map-image-example) for some examples of a map image and the
 corresponding terrain description. I have also [a YouTube video showing
 how to do the edits with GIMP](https://youtu.be/_n0IRG1GfLI).
 The best working resolutions for map images and terrain descriptions are
 between 1024-2048 pixels (width). The game engine is designed for
 sprint map scales approximately from 1:3000 to 1:5000.
 
-If you have an excellent map you wish to be used, but have no time or
+If you have an excellent map you wish to be included, but have no time or
 skills to create the terrain description, please propose it via sprint-o-matic
-at gmail com anyway. I can create a couple of terrain images myself as a pro-bono
-effort to get things rolling.
+at gmail com anyway. I can create a couple of terrain images myself as a
+pro-bono effort to get things rolling.
 
 ## Software developent and license
 
@@ -212,15 +231,19 @@ the black color is a problem. It is used for symbols that you can run through
 and symbols that you can't run through. There is even some variation from map
 to map, which makes it difficult for a computer program to determine the
 meaning of the markings.
+* Integration to a geographical database. Exercise "everywhere".
 
-## About the player characters
+
+## Misc topics
+
+### About the player characters
 
 The pixelated runners of the game may look tiny, but if you think
 about the scale of the maps, one meter per pixel in the
 "infinite Oulu" map, for example, you get the picture. The runners are actually
-7 meter tall monsters. But there is a story.
+5-7 meter tall monsters. But there is a story.
 
-The runners are living in distant future, an era where people spend their
+The runners are living in a distant future, an era where people spend their
 time in virtual environments. In this dystopian world, things have gone
 south, and the government
 has started to ration the amount of pixels allowed for the regular citizen.
@@ -233,22 +256,22 @@ half Native American.
 
 **Aino Inkeri (A.I.) Kiburtz** A pacemaker, and an a proud artificial
 intelligence loosely based on the ancient documentation found on
-Matthias Kiburtz, a distinguished sprint orienteer. A teetering bulb
-of dread and dream. The best friend of Sprint-O-Man.
+Matthias Kiburtz, a distinguished sprint orienteer.
+The best friend of Sprint-O-Man.
 
 **Pertti-Uolevi (P.A.) Keinonen, e.v.v.k.** A pacemaker, and an avant-garde
 heavy metal afictionado, named after the best known heavy metal guitarist
 from the golden age of the genre, the one and only, Pertti Keinonen, RIP.
 
-**Lex Martin Luthoer, Chem. Engr.** A pacemaker, and and an extremely vivid
+**Lex Martin Luthoer, Chem. Engr.** A pacemaker, and an extremely vivid
 runner. The most controversial figure due to his specialty in chemical
 engineering. Under suspicion on doping, but never got caught.
 
-## About the creator of this application
+### About the creator of this application
 
 You may wonder about LemesoftNostalgic, the nickname of this github account.
 I used to develop games for 8-bit computers in the
-80's, using a pseudonym Lemesoft. At the present day, there exist at least one
+80's, using a pseudonym Lemesoft. At the present day, there exists at least one
 Lemesoft (company) in Spain so I chose a new alias LemesoftNostalgic for this
 hobby project, to avoid the name conflict.
 
@@ -258,7 +281,14 @@ find some bugs or awkward programming patterns, it is probably due to
 the scarcity of time more than anything else. I still try to be awake
 regarding the biggest issues, if reported to the sprint-o-matic gmail com.
 
-## Advisory: Usage of interactive applications while running in a treadmill
+### About the track generator
+
+By default, the Sprint-O-Matic generates a new track for every run.
+Usually the tracks are decent, but not every time. If you happen to get a
+poor track, just hit the esc-button and start again. There is no good
+reason to run without a proper track.
+
+### Advisory: Usage of interactive applications while running in a treadmill
 
 The Sprint-O-Matic is an interactive application similar to games.
 Warning: the Sprint-O-Matic has not been properly tested for safety regarding
@@ -269,13 +299,18 @@ at gmail com if your treadmill vendor shows green light for this use-case.
 ## Command-line usage
 
 For the advanced users, there are more detailed options in the form of
-command-line options. Here is a brief listing:
+command-line options.
 
-**--mapFileName** sprint orienteering map, png format
+These are basically the same options you get from the home screen,
+with a bit more details:
 
-**--lookupPngName** pre-calculated lookup tables for the API, png format
+**--infiniteOulu** Whether to use the automatic Oulu-style map generator
 
-**--routeFileName** pickled ordered list of tuples (track control points)
+**--infiniteOuluTerrain** Select from one of the terrain types
+
+**--externalExampleTeam** The team selection from the listing
+
+**--externalExample** The map selection from the listing
 
 **--trackLength** the minimum track length in meters
 
@@ -289,27 +324,31 @@ command-line options. Here is a brief listing:
 
 **--extraLongLegProbability** probability of extra long legs (0.0-0.99)
 
-**--zoom** zoom factor (1, 2 or 4)
-
-**--speed** The speed of the player
-
 **--continuous** Continuous game loop (or one-shot play)
 
 **--pacemaker** A pacemaker runner to compete against (1-3, 0 for none)
 
+These options are useful if you want to play with your own map:
+
+**--mapFileName** sprint orienteering map, png format
+
+**--lookupPngName** pre-calculated terrain description for the API, png format
+
 **--metersPerPixel** How many meters per map pixel
 
+And in case you want to maintain your own routes or map listings:
+
+**--routeFileName** pickled ordered list of tuples (track control points)
+
+**--ownMasterListing** Override the default web listing with other URL
+
+These may be a little bit less useful, but still available:
+
+**--zoom** zoom factor (1, 2 or 4)
+
+**--speed** The speed of the player
+
 **--fullScreen** Whether to use a full-screen mode or not
-
-**--infiniteOulu** Whether to use the automatic Oulu-style map generator
-
-**--infiniteOuluTerrain** Select from one of the terrain types
-
-**--ownMasterListing** Override the default web listing
-
-**--externalExampleTeam** The team selection from the listing
-
-**--externalExample** The map selection from the listing
 
 These are just R&D features, not useful for application users:
 
