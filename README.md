@@ -296,6 +296,11 @@ the treadmill use. Therefore I have to advice against it, even though it is
 technically possible with a wireless mouse. Please inform me via sprint-o-matic
 at gmail com if your treadmill vendor shows green light for this use-case.
 
+### Support
+
+Map proposals, team proposals, and application improvement
+ideas can be sent to Sprint-o-matic at gmail com.
+
 ## Command-line usage
 
 For the advanced users, there are more detailed options in the form of
