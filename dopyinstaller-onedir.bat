@@ -21,7 +21,7 @@ cd src
 pyinstaller main-onedir.spec --distpath ../bin
 cd ..
 cd bin
-ren main-win sprint-o-matic-win
+ren main sprint-o-matic-win
 tar -a -c -f sprint-o-matic-win.zip sprint-o-matic-win
 certutil -hashfile sprint-o-matic-win.zip MD5 > sprint-o-matic-win-zip.md5
 cd ..
