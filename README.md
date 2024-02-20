@@ -37,6 +37,12 @@ idea:
 ## Installation
 
 The [Release folder](https://github.com/LemesoftNostalgic/sprint-o-matic/releases/latest) contains pre-built applications for Linux and Windows.
+Linux has only the onefile-variant but Windows has both --onefile and
+--onedir variants. The reason for this is that Windows Defender sometimes
+falsely alarms on python code when packaged to --onefile by pyinstaller.
+If that is the case for you, then use the --onedir variant or just
+install the necessary dependecies and run the source code directly.
+
 As of writing, the application has been verified against Ubuntu 20.04 and
 Windows 10. Running the Sprint-O-Matic requires relatively modern PC due to
 its search algorithms that run in separate processes.
@@ -45,10 +51,6 @@ The application can sometimes be a little bit unresponsive on the way to the
 first control especially in Windows environment. That is caused mostly by
 the garbage collection of Python programming language, so there is not much
 I can do about it. The lag, if any, should stabilize later in the course.
-In my case the longest jam happened when "Anti-malware service
-executable" of the Windows Defender was simultaneously running at high
-priority in the background. I waited patiently for about a half a minute and
-the jamming ended by itself.
 
 In addition to the ready-built binaries, it is also quite easy to build
 the application from sources using dopyinstaller.sh (Linux) or
