@@ -33,6 +33,7 @@ from modules.gameUIUtils import uiEarlyInit, uiLateQuit, uiFlushEvents
 from modules.initScreenUI import initScreen
 from modules.gameUI import uiInit, uiInitStartTriangle, uiStartControlEffect, uiControlEffectEnded, uiCenterTurnZoomTheMap, uiAnimatePlayer, uiAnimatePacemaker, uiRenderRoutes, uiRenderControls, uiCompleteRender, uiEvent, uiClearCanvas, raiseControlApproachZoom, lowerControlApproachZoom, uiRenderPacemakerText, uiRenderAIText, uiControlEffectRestart, uiRenderExternalMapInfo
 from modules.gameEngine import startOverPlayerRoute, playerRoute, calculateNextStep, closeToControl, quiteCloseToControl, longLapEveryOther, generateAngleStep, normalizeAngleStep, defaultAngle, getPlayerRoute, getPacemakerThreshold, getPacemakerPos
+from modules.pathPruning import calculatePathWeightedDistance
 from modules.gameSounds import initSounds, stopSounds, maintainRunningStepEffect, startMelody, stopMelody, startBirds, stopBirds, shoutEffect, pacemakerShoutEffect, finishEffect, startEffect, stopEffects
 from modules.imageDownloader import downloadExternalImageData
 
@@ -56,6 +57,8 @@ startTime = None
 totalTime = None
 shortestDistance = None
 playerDistance = None
+shortestWeightedDistance = None
+playerWeightedDistance = None
 finishTexts = ["", "", ""]
 
 # pacemaker parameters
@@ -100,6 +103,8 @@ def setTheStageForNewRound(cfg):
     global playerRoutes
     global shortestDistance
     global playerDistance
+    global shortestWeightedDistance
+    global playerWeightedDistance
     global autoControls
     global pacemakerPath
     global pacemakerSteps
@@ -142,6 +147,8 @@ def setTheStageForNewRound(cfg):
         finishTexts = ["", "", ""]
         shortestDistance = 0.0
         playerDistance = 0.0
+        shortestWeightedDistance = 0.0
+        playerWeightedDistance = 0.0
         state = "running"
         pacemakerPath = None
         pacemakerSteps = 0
@@ -166,11 +173,12 @@ def controlApproached(ctrls, pos, ctrl):
 def finishFound(ctrls, pos, ctrl):
     return ctrl and closeToControl(pos, ctrls[ctrl]) and ctrl + 1 >= len(controls)
 
-def generateFinishTexts(totTime, shortestDist, playerDist):
+def generateFinishTexts(totTime, shortestDistance, shortestWeightedDistance, playerWeightedDistance):
     percentage = 0
-    if shortestDist != 0:
-        percentage = int(100.0 * (playerDist - shortestDist) / shortestDist)
-    return [str(totTime).split('.', 2)[0], str(int(shortestDist * gameSettings.metersPerPixel)), str(percentage)]
+    print(shortestWeightedDistance, playerWeightedDistance)
+    if shortestWeightedDistance != 0:
+        percentage = int(100.0 * (playerWeightedDistance - shortestWeightedDistance) / shortestWeightedDistance)
+    return [str(totTime).split('.', 2)[0], str(int(shortestDistance * gameSettings.metersPerPixel)), str(percentage)]
 
 
 def startControlFanfare(nextC):
@@ -197,6 +205,8 @@ def updateRoutesAndDistances():
     global playerRoutes
     global playerDistance
     global shortestDistance
+    global shortestWeightedDistance
+    global playerWeightedDistance
     global shortestRoutesArray
     global shortestRoutes
     global futureShortestRoutes
@@ -208,6 +218,8 @@ def updateRoutesAndDistances():
     uiFlushEvents()
     if shortestRoutes:
         shortestDistance = shortestDistance + calculatePathDistance(shortestRoutes[0])
+        shortestWeightedDistance = shortestWeightedDistance + calculatePathWeightedDistance(shortestRoutes[0], saLookup, ssaLookup, vsaLookup)
+        playerWeightedDistance = playerWeightedDistance + calculatePathWeightedDistance(playerRoutes[0], saLookup, ssaLookup, vsaLookup)
     startOverPlayerRoute()
 
 
@@ -227,7 +239,7 @@ if __name__ == "__main__":
                 running = False
             stopBirds()
         if not quitting:
-            config, controls, faLookup, saLookup, ssaLookup, vsaLookup, generatedMap, tmpMetersPerPixel = returnConfig(gameSettings, externalImageData)
+            config, controls, faLookup, saLookup, ssaLookup, vsaLookup, generatedOrDownloadedMap, tmpMetersPerPixel = returnConfig(gameSettings, externalImageData)
 
             # scale from multiple sources...
             if gameSettings.infiniteOulu:
@@ -238,13 +250,13 @@ if __name__ == "__main__":
                     gameSettings.metersPerPixel = tmpMetersPerPixel
 
             # Special case: in case external map selected but network down
-            if generatedMap is None and not controls:
+            if generatedOrDownloadedMap is None and not gameSettings.mapFileName:
                 running = False
             else:
                 # Ok for init...
 
                 # generic default unless modified when setting the stage
-                position = uiInit(gameSettings.mapFileName, generatedMap, gameSettings.metersPerPixel)
+                position = uiInit(gameSettings.mapFileName, generatedOrDownloadedMap, gameSettings.metersPerPixel)
 
                 trackLengthInPixels = gameSettings.trackLength / gameSettings.metersPerPixel
                 zoom = gameSettings.zoom
@@ -374,7 +386,7 @@ if __name__ == "__main__":
                                 totalTime = datetime.now() - startTime - timedelta(seconds=gameMovingStartThreshold)
                             else:
                                 totalTime = timedelta(seconds=0)
-                            finishTexts = generateFinishTexts(totalTime, shortestDistance, playerDistance)
+                            finishTexts = generateFinishTexts(totalTime, shortestDistance, shortestWeightedDistance, playerWeightedDistance)
                             # at the finish, this is also a good time to collect some garbage
                             gc.collect()
 

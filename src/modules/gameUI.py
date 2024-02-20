@@ -36,7 +36,7 @@ metersPerPixel = 1
 finishTextStr =      "Finish time: "
 finishTextStr2 =     "    Distance: "
 finishTextStr3 =     " m"
-finishTextStr4 =     "    Runner extra distance: "
+finishTextStr4 =     "    Runner error: "
 finishTextStr5 =     " %"
 pacemakerTextStr =    ["", "Pacemaker: Aino Inkeri (A.I.) Kiburtz", "Pertti-Uolevi (P.A.) Keinonen, e.v.v.k.", "Lex Martin Luthoer, Chem. Engr."]
 pacemakerInitTextStr =    "Prepare, a pacemaker waiting in 1st control!"
@@ -236,11 +236,11 @@ def uiEvent(showInfoTexts):
             if pygame.mouse.get_pressed()[0]:
                 events.append("left")
                 mousePressed = True
-            if pygame.mouse.get_pressed()[1]:
-                events.append("quit")
-                mousePressed = True
             elif pygame.mouse.get_pressed()[2]:
                 events.append("right")
+                mousePressed = True
+            elif pygame.mouse.get_pressed()[1]:
+                events.append("quit")
                 mousePressed = True
             else:
                 if mousePressed:

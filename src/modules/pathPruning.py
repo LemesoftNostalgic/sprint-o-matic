@@ -23,27 +23,46 @@ from .mathUtils import distanceBetweenPoints
 from .utils import getSlowdownFactor, getSemiSlowdownFactor, getVerySlowdownFactor
 
 
+def pruneDistanceWeighter(testPt, lookup, semilookup, verylookup):
+    testPtInt = (int(testPt[0]), int(testPt[1]))
+    if lookup and testPtInt in lookup:
+        return getSlowdownFactor()
+    elif semilookup and testPtInt in semilookup:
+        return getSemiSlowdownFactor()
+    elif verylookup and testPtInt in verylookup:
+        return getVerySlowdownFactor()
+    else:
+        return 1.0
+
+
 # Distance between A and B when weighted with slowness
 def pruneWeightedDistance(ptA, ptB, lookup, semilookup, verylookup):
     if ptA == ptB:
         return 0.0
-    steps = max(abs(ptA[0]- ptB[0]), abs(ptA[1] - ptB[1]))
-    incr = (float(ptB[0] - ptA[0]) / float(steps), float(ptB[1] - ptA[1]) / float(steps))
-    incrDist = distanceBetweenPoints((0.0, 0.0), incr)
+    steps = int(max(abs(ptA[0]- ptB[0]), abs(ptA[1] - ptB[1])))
     start = (float(ptA[0]), float(ptA[1]))
+    testPt = start
     newScore = 0.0
 
-    for ind in range(steps):
-        testPt = (int(start[0] + ind * incr[0]), int(start[1] + ind * incr[1]))
-        if lookup and testPt in lookup:
-            newScore = newScore + incrDist * getSlowdownFactor()
-        elif semilookup and testPt in semilookup:
-            newScore = newScore + incrDist * getSemiSlowdownFactor()
-        elif verylookup and testPt in verylookup:
-            newScore = newScore + incrDist * getVerySlowdownFactor()
-        else:
-            newScore = newScore + incrDist
+    if steps:
+        incr = (float(ptB[0] - ptA[0]) / float(steps), float(ptB[1] - ptA[1]) / float(steps))
+        incrDist = distanceBetweenPoints((0.0, 0.0), incr)
+
+        for ind in range(steps):
+            testPt = (start[0] + ind * incr[0], start[1] + ind * incr[1])
+            newScore = newScore + incrDist * pruneDistanceWeighter(testPt, lookup, semilookup, verylookup)
+
+    incrDistLast = distanceBetweenPoints(testPt, ptB)
+    newScore = newScore + incrDistLast * pruneDistanceWeighter(ptB, lookup, semilookup, verylookup)
+
     return newScore
+
+
+def calculatePathWeightedDistance(path, lookup, semilookup, verylookup):
+    dist = 0.0
+    for index in range(len(path) - 1):
+        dist = dist + pruneWeightedDistance(path[index], path[index + 1], lookup, semilookup, verylookup)
+    return dist
 
 
 # Ensure there is no forbidden areas between point A and B

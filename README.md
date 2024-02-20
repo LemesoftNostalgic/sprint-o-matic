@@ -194,7 +194,10 @@ sprint map scales approximately from 1:3000 to 1:5000.
 If you have an excellent map you wish to be included, but have no time or
 skills to create the terrain description, please propose it via sprint-o-matic
 at gmail com anyway. I can create a couple of terrain images myself as a
-pro-bono effort to get things rolling.
+pro-bono effort to get things rolling. A good map for Sprint-O-Matic is
+one that has enough fences and other obstacles to pose a challenge.
+Also slow green terrain is good but not mandatory.
+
 
 ## Software developent and license
 
@@ -213,24 +216,24 @@ project, all help is appreciated. An initial wishlist is the following:
 Low hanging fruits:
 
 * more external maps linked to the map listing (see above)
+* Allow publication of a set of fixed track designs for a map
 * Android (buildozer spec exists, does not fully work yet)
 * gradient slow terrain, for better modeling of staircases and hills
-* marking for sheds and tunnels
-* artificial forbidden area (purple symbol)
+* marking for sheds and tunnels, so that you can run under the surface
 * graphics beautification
-* allow 3rd parties such as teams to host their own map listing
-* sprint rogaining mode (collect contols in any order, time limit)
+* Score-O mode (collect contols with score in any order, time limit)
 
 A bit more involved:
 
-* 3d (human eye is more sensitive to quality when the content is 3d,
-therefore this requires more polishing than 2d)
-* multiplayer (might have to be a paid subcription to cover the server costs)
+* events/multiplayer support (might have to be a paid subcription to cover the
+server costs)
 * automatic creation of terrain descriptions. With sprint orienteering maps,
 the black color is a problem. It is used for symbols that you can run through
 and symbols that you can't run through. There is even some variation from map
 to map, which makes it difficult for a computer program to determine the
 meaning of the markings.
+* 3d (human eye is more sensitive to quality when the content is 3d,
+therefore this requires more polishing than 2d)
 * Integration to a geographical database. Exercise "everywhere".
 
 
@@ -306,8 +309,9 @@ ideas can be sent to sprint-o-matic at gmail com.
 For the advanced users, there are more detailed options in the form of
 command-line options.
 
-These are basically the same options you get from the home screen,
-with a bit more details:
+
+These are the options you can activate from the home screen,
+with a bit more detail:
 
 **--infiniteOulu** Whether to use the automatic Oulu-style map generator
 
@@ -333,6 +337,7 @@ with a bit more details:
 
 **--pacemaker** A pacemaker runner to compete against (1-3, 0 for none)
 
+
 These options are useful if you want to play with your own map:
 
 **--mapFileName** sprint orienteering map, png format
@@ -341,11 +346,13 @@ These options are useful if you want to play with your own map:
 
 **--metersPerPixel** How many meters per map pixel
 
+
 And in case you want to maintain your own routes or map listings:
 
 **--routeFileName** pickled ordered list of tuples (track control points)
 
 **--ownMasterListing** Override the default web listing with other URL
+
 
 These may be a little bit less useful, but still available:
 
@@ -354,15 +361,3 @@ These may be a little bit less useful, but still available:
 **--speed** The speed of the player
 
 **--fullScreen** Whether to use a full-screen mode or not
-
-These are just R&D features, not useful for application users:
-
-**--autoTest** An automatic test mode
-
-**--noUiTest** DO not show UI during automatic test mode
-
-**--infoBox** An info box feature
-
-**--soundRoot** Root folder of the sound resources
-
-**--imageRoot** Root folder of the image resources

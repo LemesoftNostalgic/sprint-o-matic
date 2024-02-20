@@ -96,7 +96,7 @@ def returnConfig(gameSettings, externalImageData):
 
         faLookup, saLookup, ssaLookup, vsaLookup, config = extractPngLookups(pngMask)
 
-    elif gameSettings.externalExampleTeam and gameSettings.externalExample:
+    elif not gameSettings.lookupPngName and (gameSettings.externalExampleTeam and gameSettings.externalExample):
         for item in externalImageData:
             if gameSettings.externalExampleTeam == item["team-name"]:
                 for subitem in item["sub-listing"]:
@@ -109,7 +109,7 @@ def returnConfig(gameSettings, externalImageData):
         #pngMask = None
         faLookup, saLookup, ssaLookup, vsaLookup, config = extractPngLookups(pngMask)
 
-    else: # map given at command line
+    if gameSettings.lookupPngName: # map given at command line
         faLookup, saLookup, ssaLookup, vsaLookup, config = extractPngLookupsFromFile(gameSettings.lookupPngName)
         metersPerPixel = gameSettings.metersPerPixel
 
