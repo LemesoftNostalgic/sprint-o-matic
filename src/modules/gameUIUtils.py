@@ -35,6 +35,9 @@ pacemakerColor = [pygame.Color(255, 0, 0), pygame.Color(255, 0, 0), pygame.Color
 def getApplicationTitle():
     return "Sprint-O-Matic"
 
+def getAnalysisResultsFileBase():
+    return getApplicationTitle() + "-analysis-"
+
 def getMasterFont():
     font = os.path.join('fonts', 'Aclonica-Regular.ttf')
     if getPackagePath():
@@ -102,6 +105,10 @@ def getGreyColor():
 
 def convertXCoordinate(xCoord):
     return int((xCoord * xCurrent) / xReference)
+
+def convertXCoordinateSpecificSurface(specificSurface, xCoord):
+    xSpecificSurface, yDummy = specificSurface.get_size()
+    return int((xCoord * xSpecificSurface) / xReference)
 
 def convertYCoordinate(yCoord):
     return int((yCoord * yCurrent) / yReference)

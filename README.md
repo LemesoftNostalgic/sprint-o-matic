@@ -307,19 +307,18 @@ ideas can be sent to sprint-o-matic at gmail com.
 ## Command-line usage
 
 For the advanced users, there are more detailed options in the form of
-command-line options.
+command-line options. These are not as well tested and the home screen.
 
+These options are useful if you want to play with your own map:
 
-These are the options you can activate from the home screen,
+**--mapFileName** sprint orienteering map, png format
+
+**--lookupPngName** pre-calculated terrain description for the map, png format
+
+**--metersPerPixel** How many meters per map pixel
+
+These are similar options that you can activate from the home screen,
 with a bit more detail:
-
-**--infiniteOulu** Whether to use the automatic Oulu-style map generator
-
-**--infiniteOuluTerrain** Select from one of the terrain types
-
-**--externalExampleTeam** The team selection from the listing
-
-**--externalExample** The map selection from the listing
 
 **--trackLength** the minimum track length in meters
 
@@ -337,27 +336,21 @@ with a bit more detail:
 
 **--pacemaker** A pacemaker runner to compete against (1-3, 0 for none)
 
-
-These options are useful if you want to play with your own map:
-
-**--mapFileName** sprint orienteering map, png format
-
-**--lookupPngName** pre-calculated terrain description for the map, png format
-
-**--metersPerPixel** How many meters per map pixel
-
-
 And in case you want to maintain your own routes or map listings:
 
 **--routeFileName** pickled ordered list of tuples (track control points)
 
 **--ownMasterListing** Override the default web listing with other URL
 
+**--externalExampleTeam** The team selection from the listing
 
-These may be a little bit less useful, but still available:
+**--externalExample** The map selection from the listing
 
-**--zoom** zoom factor (1, 2 or 4)
 
-**--speed** The speed of the player
+It is also possible to write the route analyses to a file:
 
-**--fullScreen** Whether to use a full-screen mode or not
+**--analysis** Whether to write the route analyses into a file
+
+
+There are also some other options that are mainly for application
+testing. They are documented only in the code.

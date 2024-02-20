@@ -19,7 +19,8 @@
 
 import pygame
 import math
-from .gameUIUtils import getMasterFont, getStopKey, getLeftKey, getRightKey, getPlayerColor, getTrackColor, getCreditColor, getPacemakerColor, getPlayerRouteColor, getFinishTextColor, getWhiteColor, convertXCoordinate, convertYCoordinate, getBigScreen, getTimerStep
+from datetime import datetime
+from .gameUIUtils import getMasterFont, getStopKey, getLeftKey, getRightKey, getPlayerColor, getTrackColor, getCreditColor, getPacemakerColor, getPlayerRouteColor, getFinishTextColor, getWhiteColor, convertXCoordinate, convertXCoordinateSpecificSurface, convertYCoordinate, getBigScreen, getTimerStep, getAnalysisResultsFileBase
 
 from .mathUtils import rotatePoint, fromRadiansToDegrees, distanceBetweenPoints, triangleCreator
 from .infoBox import showInfoBoxTxt, updateInfoTxtByEvent
@@ -84,18 +85,18 @@ def uiInit(fileName, generatedMap, metersPerPixerInput):
     return me
 
 
-def uiShowFinishText(finishTexts):
+def uiShowFinishText(someSurface, finishTexts):
     timeConsumed = finishTexts[0]
     distance = finishTexts[1]
     error = finishTexts[2]
 
     if timeConsumed and distance and error:
-        middle = tuple(ti/2.0 for ti in getBigScreen().get_size())
+        middle = tuple(ti/2.0 for ti in someSurface.get_size())
         finishTextCenter = (middle[0], middle[1] * 0.05)
-        finishText = pygame.font.Font(getMasterFont(), convertXCoordinate(32)).render(finishTextStr + timeConsumed + finishTextStr2 + distance + finishTextStr3 + finishTextStr4 + error + finishTextStr5, True, getFinishTextColor())
+        finishText = pygame.font.Font(getMasterFont(), convertXCoordinateSpecificSurface(someSurface, 32)).render(finishTextStr + timeConsumed + finishTextStr2 + distance + finishTextStr3 + finishTextStr4 + error + finishTextStr5, True, getFinishTextColor())
         finishTextRect = finishText.get_rect()
         finishTextRect.center = finishTextCenter
-        getBigScreen().blit(finishText, finishTextRect)
+        someSurface.blit(finishText, finishTextRect)
 
 
 def uiRenderPacemakerText(pacemakerInd):
@@ -199,7 +200,7 @@ def uiCompleteRender(finishTexts, mapInfoTextList):
     xShift = (getBigScreen().get_size()[0] - screen.get_size()[0]) / 2
     yShift = (getBigScreen().get_size()[1] - screen.get_size()[1]) / 2
     getBigScreen().blit(screen, (xShift, yShift))
-    uiShowFinishText(finishTexts)
+    uiShowFinishText(getBigScreen(), finishTexts)
     if mapInfoTextList:
         uiRenderExternalMapInfo(mapInfoTextList)
     showInfoBoxTxt(getBigScreen())
@@ -318,16 +319,44 @@ def uiClearCanvas():
     oMapCopy = oMap.copy()
 
 
-def uiRenderRoute(shortestRoute, color):
-    # keep visible a little while
-    if effectStep:
-        for i in range(len(shortestRoute) - 1):
-            pointA = shortestRoute[i]
-            pointB = shortestRoute[i + 1]
-            pygame.draw.line(oMapCopy, color, pointA, pointB, width = max(2, int(2/metersPerPixel)))
+def uiRenderRoute(whichmap, shortestRoute, color):
+    for i in range(len(shortestRoute) - 1):
+        pointA = shortestRoute[i]
+        pointB = shortestRoute[i + 1]
+        pygame.draw.line(whichmap, color, pointA, pointB, width = max(2, int(2/metersPerPixel)))
 
 
 def uiRenderRoutes(shortestRoutes, whoami):
     colorMapping = { "shortest": getPacemakerColor(1), "player": getPlayerRouteColor() }
-    for shortestRoute in shortestRoutes:
-        uiRenderRoute(shortestRoute, colorMapping[whoami])
+    if effectStep:
+        for shortestRoute in shortestRoutes:
+            uiRenderRoute(oMapCopy, shortestRoute, colorMapping[whoami])
+
+
+def uiDrawControlCircles(theMap, controls):
+    for control in controls:
+        if control == controls[0]:
+            pygame.draw.line(theMap, getTrackColor(), triangle[0], triangle[1], width = max(2, int(2/metersPerPixel)))
+            pygame.draw.line(theMap, getTrackColor(), triangle[1], triangle[2], width = max(2, int( 2/metersPerPixel)))
+            pygame.draw.line(theMap, getTrackColor(), triangle[2], triangle[0], width = max(2, int(2/metersPerPixel)))
+        else:
+            pygame.draw.circle(theMap, getTrackColor(), control, circleRadius/metersPerPixel, width = max(2, int(2/metersPerPixel)))
+            if control == controls[-1]:
+                pygame.draw.circle(theMap, getTrackColor(), control, (circleRadius - circleSpacing)/metersPerPixel, width = max(2, int(2/metersPerPixel)))
+    
+            
+def uiStoreAnalysis(shortestRoutesArray, playerRoutesArray, controls, finishTexts):
+    theMap = oMap.copy()
+    for shortestRoutes in shortestRoutesArray:
+        for shortestRoute in shortestRoutes:
+            uiRenderRoute(theMap, shortestRoute, getPacemakerColor(1))
+    for playerRoutes in playerRoutesArray:
+        for playerRoute in playerRoutes:
+            uiRenderRoute(theMap, playerRoute, getPlayerColor())
+    uiDrawControlCircles(theMap, controls)
+    uiShowFinishText(theMap, finishTexts)
+
+    try:
+        pygame.image.save(theMap, getAnalysisResultsFileBase() + datetime.now().strftime("%m-%d-%Y__%H-%M-%S") + ".png")
+    except Exception as err:
+        print(f"Cannot save analysis results: {err=}, {type(err)=}")

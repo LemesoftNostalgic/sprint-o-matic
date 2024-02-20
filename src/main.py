@@ -31,7 +31,7 @@ from modules.mathUtils import angleOfLine, calculatePathDistance
 from modules.trackCreator import createAutoControls
 from modules.gameUIUtils import uiEarlyInit, uiLateQuit, uiFlushEvents
 from modules.initScreenUI import initScreen
-from modules.gameUI import uiInit, uiInitStartTriangle, uiStartControlEffect, uiControlEffectEnded, uiCenterTurnZoomTheMap, uiAnimatePlayer, uiAnimatePacemaker, uiRenderRoutes, uiRenderControls, uiCompleteRender, uiEvent, uiClearCanvas, raiseControlApproachZoom, lowerControlApproachZoom, uiRenderPacemakerText, uiRenderAIText, uiControlEffectRestart, uiRenderExternalMapInfo
+from modules.gameUI import uiInit, uiInitStartTriangle, uiStartControlEffect, uiControlEffectEnded, uiCenterTurnZoomTheMap, uiAnimatePlayer, uiAnimatePacemaker, uiRenderRoutes, uiRenderControls, uiCompleteRender, uiEvent, uiClearCanvas, raiseControlApproachZoom, lowerControlApproachZoom, uiRenderPacemakerText, uiRenderAIText, uiControlEffectRestart, uiRenderExternalMapInfo, uiStoreAnalysis
 from modules.gameEngine import startOverPlayerRoute, playerRoute, calculateNextStep, closeToControl, quiteCloseToControl, longLapEveryOther, generateAngleStep, normalizeAngleStep, defaultAngle, getPlayerRoute, getPacemakerThreshold, getPacemakerPos
 from modules.pathPruning import calculatePathWeightedDistance
 from modules.gameSounds import initSounds, stopSounds, maintainRunningStepEffect, startMelody, stopMelody, startBirds, stopBirds, shoutEffect, pacemakerShoutEffect, finishEffect, startEffect, stopEffects
@@ -50,6 +50,7 @@ externalImageData = downloadExternalImageData(gameSettings.ownMasterListing)
 
 # statistics and route display initial values
 shortestRoutesArray = []
+playerRoutesArray = []
 shortestRoutes = []
 futureShortestRoutes = []
 playerRoutes = []
@@ -175,7 +176,6 @@ def finishFound(ctrls, pos, ctrl):
 
 def generateFinishTexts(totTime, shortestDistance, shortestWeightedDistance, playerWeightedDistance):
     percentage = 0
-    print(shortestWeightedDistance, playerWeightedDistance)
     if shortestWeightedDistance != 0:
         percentage = int(100.0 * (playerWeightedDistance - shortestWeightedDistance) / shortestWeightedDistance)
     return [str(totTime).split('.', 2)[0], str(int(shortestDistance * gameSettings.metersPerPixel)), str(percentage)]
@@ -211,6 +211,7 @@ def updateRoutesAndDistances():
     global shortestRoutes
     global futureShortestRoutes
     playerRoutes = [ getPlayerRoute() ]
+    playerRoutesArray.append(playerRoutes)
     playerDistance = playerDistance + calculatePathDistance(playerRoutes[0])
     shortestRoutesArray = getReadyShortestRoutes()
     shortestRoutes = shortestRoutesArray[reachedControl - 1] if reachedControl > 0 else []
@@ -387,6 +388,8 @@ if __name__ == "__main__":
                             else:
                                 totalTime = timedelta(seconds=0)
                             finishTexts = generateFinishTexts(totalTime, shortestDistance, shortestWeightedDistance, playerWeightedDistance)
+                            if gameSettings.analysis:
+                                uiStoreAnalysis(shortestRoutesArray, playerRoutesArray, controls, finishTexts)
                             # at the finish, this is also a good time to collect some garbage
                             gc.collect()
 
