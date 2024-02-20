@@ -39,59 +39,6 @@ from modules.imageDownloader import downloadExternalImageData
 
 from modules.autoTest import fakeInitScreen, fakeCalculateNextStep, fakeUiEvent, fakeResetAgain
 
-# start AI processes
-initializeAITables()
-
-# all the initialization that happens only once at the startup
-gameSettings = returnSettings()
-uiEarlyInit(gameSettings.fullScreen)
-initSounds(gameSettings.soundRoot)
-externalImageData = downloadExternalImageData(gameSettings.ownMasterListing)
-
-# statistics and route display initial values
-shortestRoutesArray = []
-playerRoutesArray = []
-shortestRoutes = []
-futureShortestRoutes = []
-playerRoutes = []
-startTime = None
-totalTime = None
-shortestDistance = None
-playerDistance = None
-shortestWeightedDistance = None
-playerWeightedDistance = None
-finishTexts = ["", "", ""]
-
-# pacemaker parameters
-pacemakerSteps = 0
-pacemakerStartThreshold = 0
-pacemakerPosition = None
-pacemakerPath = None
-pacemakerAngle = 0
-pacemakerPrepareForShout = True
-pacemakerStep = -5
-
-# some counters to time the flushing/progressing the AI pools
-aiCounter = 0
-aiCounterThreshold = 30
-
-# threshold for the game to really start
-gameMovingStartThreshold = 5
-
-# the choice between specific route file and an automatic route
-autoControls = True
-if gameSettings.routeFileName:
-    autoControls = False
-
-# Show init screen only if no specific map file provided in command line
-showInitScreen = False 
-if not gameSettings.mapFileName:
-    showInitScreen = True
-    
-# these basically contain the game state
-nextControl = None
-reachedControl = None
-quitting = False
 
 # Re-initialize the game state, done each time a new run is started
 def setTheStageForNewRound(cfg):
@@ -226,6 +173,62 @@ def updateRoutesAndDistances():
 
 # This is the main loop
 if __name__ == "__main__":
+
+    # start AI processes
+    initializeAITables()
+
+    # all the initialization that happens only once at the startup
+    gameSettings = returnSettings()
+    uiEarlyInit(gameSettings.fullScreen)
+    initSounds(gameSettings.soundRoot)
+    externalImageData = downloadExternalImageData(gameSettings.ownMasterListing)
+
+    # statistics and route display initial values
+    shortestRoutesArray = []
+    playerRoutesArray = []
+    shortestRoutes = []
+    futureShortestRoutes = []
+    playerRoutes = []
+    startTime = None
+    totalTime = None
+    shortestDistance = None
+    playerDistance = None
+    shortestWeightedDistance = None
+    playerWeightedDistance = None
+    finishTexts = ["", "", ""]
+
+    # pacemaker parameters
+    pacemakerSteps = 0
+    pacemakerStartThreshold = 0
+    pacemakerPosition = None
+    pacemakerPath = None
+    pacemakerAngle = 0
+    pacemakerPrepareForShout = True
+    pacemakerStep = -5
+
+    # some counters to time the flushing/progressing the AI pools
+    aiCounter = 0
+    aiCounterThreshold = 30
+
+    # threshold for the game to really start
+    gameMovingStartThreshold = 5
+
+    # the choice between specific route file and an automatic route
+    autoControls = True
+    if gameSettings.routeFileName:
+        autoControls = False
+
+    # Show init screen only if no specific map file provided in command line
+    showInitScreen = False 
+    if not gameSettings.mapFileName:
+        showInitScreen = True
+    
+    # these basically contain the game state
+    nextControl = None
+    reachedControl = None
+    quitting = False
+
+    # This is the main loop
     while not quitting:
         running = True
         if showInitScreen:

@@ -37,11 +37,8 @@ idea:
 ## Installation
 
 The [Release folder](https://github.com/LemesoftNostalgic/sprint-o-matic/releases/latest) contains pre-built applications for Linux and Windows.
-Linux has only the onefile-variant but Windows has both --onefile and
---onedir variants. The reason for this is that Windows Defender sometimes
-falsely alarms on python code when packaged to --onefile by pyinstaller.
-If that is the case for you, then use the --onedir variant or just
-install the necessary dependecies and run the source code directly.
+The application can also be run directly from source code if python and
+the packages listed below are installed.
 
 As of writing, the application has been verified against Ubuntu 20.04 and
 Windows 10. Running the Sprint-O-Matic requires relatively modern PC due to
@@ -55,14 +52,22 @@ I can do about it. The lag, if any, should stabilize later in the course.
 In addition to the ready-built binaries, it is also quite easy to build
 the application from sources using dopyinstaller.sh (Linux) or
 dopyinstaller.bat (Windows) at the root folder of this repository.
-That is also considered the safe alternative.
 Requirements for the build:
 
-1. pyinstaller
-2. python3.10
-3. pygame
-4. matplotlib.path
-5. argparse, pickle (only with command-line usage)
+1. python3.10 (python.org/Downloads)
+2. pygame (python -m pip install pygame)
+3. matplotlib (python -m pip install matplotlib)
+4. argparse (python -m pip install argparse)
+5. picle (python -m pip install picle)
+6. requests (python -m pip install requests)
+7. pyinstaller (python -m pip install pyinstaller)
+
+
+In case the ready-built Windows package gives false virus alarms, like it sometimes does with
+pyinstaller-built applications, you can also just install the correct
+python version (actually Python3.12 worked fine in Windows) and the other
+listed requirements, download the source code, and click the python program
+icon (main.py) from the src folder of the source code.
 
 Later on there might be also an Android version. If anyone is interested in
 debugging the Android build, be my guest.
