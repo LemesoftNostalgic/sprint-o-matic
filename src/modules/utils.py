@@ -46,6 +46,9 @@ def getVerySlowAreaMask():
 def getForbiddenAreaMask():
     return (255, 0, 255)
 
+def getTunnelMask():
+    return (0, 0, 0)
+
 def getControlMask():
     return (255, 0, 0)
 

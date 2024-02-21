@@ -61,7 +61,7 @@ def stepAdvancer(saLookup, ssaLookup, vsaLookup, pos, angle, speed, speedupFacto
 
 
 # tries to behave naturally with buildings, bushes, etc.
-def calculateNextStep(faLookup, saLookup, ssaLookup, vsaLookup, pos, angle, movement, speed, metersPerPixel):
+def calculateNextStep(faLookup, saLookup, ssaLookup, vsaLookup, tunnelLookup, pos, angle, movement, speed, metersPerPixel):
     global angleStep
     dangles = [0, -math.pi/32, math.pi/32, -math.pi/16, math.pi/16, -math.pi/8, math.pi/8, -math.pi/4, math.pi/4, -(math.pi/4 + math.pi/8), (math.pi/4 + math.pi/8)]
     safeToRun = True
@@ -87,7 +87,9 @@ def calculateNextStep(faLookup, saLookup, ssaLookup, vsaLookup, pos, angle, move
         pos = stepAdvancer(saLookup, ssaLookup, vsaLookup, pos, angle, speed, 1.0 / metersPerPixel)
 
     playerRoute.append(pos)
-    return pos, angle
+
+    
+    return pos, angle, lookupContains(tunnelLookup, pos)
 
 
 def closeToControl(pos, ctrl):
@@ -115,7 +117,7 @@ def getPacemakerThreshold(inputPath, pacemakerInd):
     return max(minPacemakerThresholds[pacemakerInd], int(calculatePathDistance(inputPath) * pacemakerHandicapFraction[pacemakerInd]))
 
 
-def getPacemakerPos(saLookup, ssaLookup, vsaLookup, inputPath, steps, speed, metersPerPixel, pacemakerInd):
+def getPacemakerPos(saLookup, ssaLookup, vsaLookup, tunnelLookup, inputPath, steps, speed, metersPerPixel, pacemakerInd):
     index = 0
     path = inputPath.copy()
     path.reverse()
@@ -131,7 +133,8 @@ def getPacemakerPos(saLookup, ssaLookup, vsaLookup, inputPath, steps, speed, met
                 break
             dist = distanceBetweenPoints(path[index], path[index + 1])
             angle = angleOfLine([path[index], path[index + 1]])
-    return pos, angle
+
+    return pos, angle, lookupContains(tunnelLookup, pos)
 
 
 def generateAngleStep():

@@ -85,6 +85,7 @@ def setTheStageForNewRound(cfg):
         uiInitStartTriangle(angle, position)
         nextControl = 1
         reachedControl = 0
+        inTunnel = False
         playerRoutes = []
         startOverPlayerRoute()
         initializeAINextTrack(ctrls, faLookup, saLookup, ssaLookup, vsaLookup, gameSettings.pacemaker)
@@ -98,6 +99,7 @@ def setTheStageForNewRound(cfg):
         shortestWeightedDistance = 0.0
         playerWeightedDistance = 0.0
         state = "running"
+        inTunnelPacmaker = False
         pacemakerPath = None
         pacemakerSteps = 0
         pacemakerStartThreshold = 0
@@ -191,6 +193,7 @@ if __name__ == "__main__":
     playerRoutes = []
     startTime = None
     totalTime = None
+    inTunnel = False
     shortestDistance = None
     playerDistance = None
     shortestWeightedDistance = None
@@ -202,6 +205,7 @@ if __name__ == "__main__":
     pacemakerStartThreshold = 0
     pacemakerPosition = None
     pacemakerPath = None
+    inTunnelPacemaker = False
     pacemakerAngle = 0
     pacemakerPrepareForShout = True
     pacemakerStep = -5
@@ -243,7 +247,7 @@ if __name__ == "__main__":
                 running = False
             stopBirds()
         if not quitting:
-            config, controls, faLookup, saLookup, ssaLookup, vsaLookup, generatedOrDownloadedMap, tmpMetersPerPixel = returnConfig(gameSettings, externalImageData)
+            config, controls, faLookup, saLookup, ssaLookup, vsaLookup, tunnelLookup, generatedOrDownloadedMap, tmpMetersPerPixel = returnConfig(gameSettings, externalImageData)
 
             # scale from multiple sources...
             if gameSettings.infiniteOulu:
@@ -326,7 +330,7 @@ if __name__ == "__main__":
                         if gameSettings.autoTest:
                             position, angle = fakeCalculateNextStep(controls)
                         else:
-                            position, angle = calculateNextStep(faLookup, saLookup, ssaLookup, vsaLookup, position, angle, movement, gameSettings.speed, gameSettings.metersPerPixel)
+                            position, angle, inTunnel = calculateNextStep(faLookup, saLookup, ssaLookup, vsaLookup, tunnelLookup, position, angle, movement, gameSettings.speed, gameSettings.metersPerPixel)
 
                         # Progress the pacemaker position
                         if pacemakerPath is not None:
@@ -334,7 +338,7 @@ if __name__ == "__main__":
                             pacemakerAdvancement = 0
                             if pacemakerSteps > pacemakerStartThreshold:
                                 pacemakerAdvancement = pacemakerSteps - pacemakerStartThreshold
-                            pacemakerPosition, pacemakerAngle = getPacemakerPos(saLookup, ssaLookup, vsaLookup, pacemakerPath, pacemakerAdvancement, gameSettings.speed, gameSettings.metersPerPixel, gameSettings.pacemaker)
+                            pacemakerPosition, pacemakerAngle, inTunnelPacemaker = getPacemakerPos(saLookup, ssaLookup, vsaLookup, tunnelLookup, pacemakerPath, pacemakerAdvancement, gameSettings.speed, gameSettings.metersPerPixel, gameSettings.pacemaker)
 
                     # Flush the AI pools every now and then
                     aiCounter = aiCounter + 1
@@ -412,7 +416,7 @@ if __name__ == "__main__":
                         uiRenderControls(controls, gameSettings.pacemaker)
                         if gameSettings.pacemaker != 0 and pacemakerPath is not None and pacemakerPosition is not None:
                             if pacemakerPosition == pacemakerPath[-1]:
-                                uiAnimatePacemaker(pacemakerPosition, pacemakerAngle, 1.0, gameSettings.pacemaker)
+                                uiAnimatePacemaker(pacemakerPosition, pacemakerAngle, 1.0, gameSettings.pacemaker, inTunnelPacemaker)
                                 pacemakerPrepareForShout = True
                                 pacemakerStep = -5
                             elif pacemakerPosition == pacemakerPath[0]:
@@ -439,7 +443,7 @@ if __name__ == "__main__":
 
                     # After that it is ok to draw to "big screen"
                     moveLegs = True if datetime.now() - startTime > timedelta(seconds=gameMovingStartThreshold) else False
-                    uiAnimatePlayer(moveLegs)
+                    uiAnimatePlayer(moveLegs, inTunnel)
                     if gameSettings.pacemaker != 0:
                         if (len(futureShortestRoutes) == 0 or len(futureShortestRoutes[0]) == 0) and (reachedControl > 0 and reachedControl < len(controls) - 1):
                             uiRenderAIText()

@@ -24,7 +24,7 @@ from random import randrange
 import pygame
 
 from .pathPruning import pruneWeightedDistance
-from .utils import getForbiddenAreaMask, getSlowAreaMask, getSemiSlowAreaMask, getVerySlowAreaMask, getControlMask
+from .utils import getForbiddenAreaMask, getSlowAreaMask, getSemiSlowAreaMask, getVerySlowAreaMask, getControlMask, getTunnelMask
 
 
 def getTfs():
@@ -37,9 +37,10 @@ def extractPngLookups(oMapMask):
     saLookup = {}
     ssaLookup = {}
     vsaLookup = {}
+    tunnelLookup = {}
     controls = []
     if oMapMask == None:
-        return faLookup, saLookup, ssaLookup, vsaLookup, controls
+        return faLookup, saLookup, ssaLookup, vsaLookup, tunnelLookup, controls
 
     size = oMapMask.get_size()
 
@@ -48,6 +49,7 @@ def extractPngLookups(oMapMask):
         saLookup[tf] = {}
         ssaLookup[tf] = {}
         vsaLookup[tf] = {}
+        tunnelLookup[tf] = {}
 
     for y in range(0, size[1]):
         for x in range(0, size[0]):
@@ -55,6 +57,9 @@ def extractPngLookups(oMapMask):
             if col == getSlowAreaMask():
                 for tf in getTfs():
                     saLookup[tf][(int(x/tf), int(y/tf))] = True
+            elif col == getTunnelMask():
+                for tf in getTfs():
+                    tunnelLookup[tf][(int(x/tf), int(y/tf))] = True
             elif col == getSemiSlowAreaMask():
                 for tf in getTfs():
                     ssaLookup[tf][(int(x/tf), int(y/tf))] = True
@@ -67,7 +72,7 @@ def extractPngLookups(oMapMask):
             elif col == getControlMask():
                 controls.append((x, y))
 
-    return faLookup, saLookup, ssaLookup, vsaLookup, controls
+    return faLookup, saLookup, ssaLookup, vsaLookup, tunnelLookup, controls
 
 
 def extractPngLookupsFromFile(pngFileName):
@@ -75,7 +80,7 @@ def extractPngLookupsFromFile(pngFileName):
         oMapMask = pygame.image.load(pngFileName)
     except Exception as err:
         print(f"Cannot load map from file: {err=}, {type(err)=}")
-        return {}, {}, {}, {}, []
+        return {}, {}, {}, {}, {}, []
 
     faLookup, saLookup, ssaLookup, vsaLookup, controls = extractPngLookups(oMapMask)
-    return faLookup, saLookup, ssaLookup, vsaLookup, controls
+    return faLookup, saLookup, ssaLookup, vsaLookup, tunnelLookup, controls

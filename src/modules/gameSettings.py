@@ -110,7 +110,7 @@ def returnConfig(gameSettings, externalImageData):
         png = preGenResult[0]
         pngMask = preGenResult[1]
 
-        faLookup, saLookup, ssaLookup, vsaLookup, config = extractPngLookups(pngMask)
+        faLookup, saLookup, ssaLookup, vsaLookup, tunnelLookup, config = extractPngLookups(pngMask)
 
     elif not gameSettings.lookupPngName and (gameSettings.externalExampleTeam and gameSettings.externalExample):
         for item in externalImageData:
@@ -123,10 +123,10 @@ def returnConfig(gameSettings, externalImageData):
         # I use these to test lost internet connection
         #png = None
         #pngMask = None
-        faLookup, saLookup, ssaLookup, vsaLookup, config = extractPngLookups(pngMask)
+        faLookup, saLookup, ssaLookup, vsaLookup, tunnelLookup, config = extractPngLookups(pngMask)
 
     if gameSettings.lookupPngName: # map given at command line
-        faLookup, saLookup, ssaLookup, vsaLookup, config = extractPngLookupsFromFile(gameSettings.lookupPngName)
+        faLookup, saLookup, ssaLookup, vsaLookup, tunnelLookup, config = extractPngLookupsFromFile(gameSettings.lookupPngName)
         metersPerPixel = gameSettings.metersPerPixel
 
     controls = []
@@ -135,4 +135,4 @@ def returnConfig(gameSettings, externalImageData):
             with open(gameSettings.routeFileName, 'rb') as f:
                 controls = pickle.load(f)
 
-    return config, controls, faLookup, saLookup, ssaLookup, vsaLookup, png, metersPerPixel
+    return config, controls, faLookup, saLookup, ssaLookup, vsaLookup, tunnelLookup, png, metersPerPixel

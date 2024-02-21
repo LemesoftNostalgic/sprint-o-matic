@@ -230,7 +230,6 @@ Low hanging fruits:
 * Allow publication of a set of fixed track designs for a map
 * Android (buildozer spec exists, does not fully work yet)
 * gradient slow terrain, for better modeling of staircases and hills
-* marking for sheds and tunnels, so that you can run under the surface
 * graphics beautification
 * Score-O mode (collect contols with score in any order, time limit)
 

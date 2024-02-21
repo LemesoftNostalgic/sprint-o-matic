@@ -24,7 +24,7 @@ import math
 
 from .mathUtils import rotateVector, rotatePoint, getBoundingBox, polygonCreate, polygonContainsWithLookup
 from .lookupPngReader import getTfs
-from .utils import getSlowAreaMask, getSemiSlowAreaMask, getVerySlowAreaMask, getForbiddenAreaMask, getControlMask, getNoMask, getAiPoolMaxTimeLimit
+from .utils import getSlowAreaMask, getSemiSlowAreaMask, getVerySlowAreaMask, getForbiddenAreaMask, getControlMask, getNoMask, getAiPoolMaxTimeLimit, getTunnelMask
 
 # types
 FOREST = '.'
@@ -236,7 +236,9 @@ def dumpArea(area, title):
 def areaSetAt(area, png, mask, y, x, filltype):
     area[int(y)][int(x)] = filltype
     png.fill(colors[filltype], ((x, y), (1, 1)))
-    if filltype in forbidden:
+    if filltype in SHELTERINTERNAL:
+        mask.fill(getTunnelMask(), ((x, y), (1, 1)))
+    elif filltype in forbidden:
         mask.fill(getForbiddenAreaMask(), ((x, y), (1, 1)))
     elif filltype in slowing:
         mask.fill(getSlowAreaMask(), ((x, y), (1, 1)))

@@ -162,38 +162,40 @@ def uiCenterTurnZoomTheMap(pos, zoom, angle):
     getBigScreen().fill(getWhiteColor())
 
 
-def uiAnimateCharacter(where, origin, angle, color, scale, feetPlus):
+def uiAnimateCharacter(where, origin, angle, color, scale, feetPlus, inTunnel):
     feetPlus = feetPlus - 1.0
     if feetPlus <= -feetPlusStart:
         feetPlus = feetPlusStart
 
-    leftFootStart = rotatePoint(origin, (origin[0] - 2 * scale, origin[1]), angle)
-    rightFootStart = rotatePoint(origin, (origin[0] + 2 * scale, origin[1]), angle)
-    leftFootEnd = rotatePoint(origin, (origin[0] - 2 * scale, origin[1] + scale  * (3 + feetPlusStart - abs(feetPlus*1.5))), angle)
-    rightFootEnd = rotatePoint(origin, (origin[0] + 3 * scale, origin[1] + scale * (3 + abs(feetPlus*1.5))), angle)
-    leftHand = (origin[0] - 5 * scale, origin[1] + scale * (-feetPlusStart/2 + abs(feetPlus)))
-    rightHand = rotatePoint(origin, (origin[0] + 5 * scale, origin[1] + scale * (-feetPlusStart/2 + (feetPlusStart - abs(feetPlus)))), angle)
+    if not inTunnel:
+        leftFootStart = rotatePoint(origin, (origin[0] - 2 * scale, origin[1]), angle)
+        rightFootStart = rotatePoint(origin, (origin[0] + 2 * scale, origin[1]), angle)
+        leftFootEnd = rotatePoint(origin, (origin[0] - 2 * scale, origin[1] + scale  * (3 + feetPlusStart - abs(feetPlus*1.5))), angle)
+        rightFootEnd = rotatePoint(origin, (origin[0] + 3 * scale, origin[1] + scale * (3 + abs(feetPlus*1.5))), angle)
+        leftHand = (origin[0] - 5 * scale, origin[1] + scale * (-feetPlusStart/2 + abs(feetPlus)))
+        rightHand = rotatePoint(origin, (origin[0] + 5 * scale, origin[1] + scale * (-feetPlusStart/2 + (feetPlusStart - abs(feetPlus)))), angle)
 
-    pygame.draw.line(where, color, leftFootStart, leftFootEnd, width=int(3 * scale))
-    pygame.draw.line(where, color, rightFootStart, rightFootEnd, width=int(3 * scale))
-    pygame.draw.line(where, color, leftHand, rightHand, width=int(3 * scale))
+        pygame.draw.line(where, color, leftFootStart, leftFootEnd, width=int(3 * scale))
+        pygame.draw.line(where, color, rightFootStart, rightFootEnd, width=int(3 * scale))
+        pygame.draw.line(where, color, leftHand, rightHand, width=int(3 * scale))
+
     pygame.draw.circle(where, color, origin, int(3 * scale))
     return feetPlus
 
 
 feetPlusPlayer = feetPlusStart
-def uiAnimatePlayer(legsMoving):
+def uiAnimatePlayer(legsMoving, inTunnel):
     global feetPlusPlayer
     if not legsMoving:
-        uiAnimateCharacter(screen, me, 0, getPlayerColor(), 1, 0)
+        uiAnimateCharacter(screen, me, 0, getPlayerColor(), 1, 0, inTunnel)
     else:
-        feetPlusPlayer = uiAnimateCharacter(screen, me, 0, getPlayerColor(), 1, feetPlusPlayer)
+        feetPlusPlayer = uiAnimateCharacter(screen, me, 0, getPlayerColor(), 1, feetPlusPlayer, inTunnel)
 
 
 feetPlusPacemaker = feetPlusStart
-def uiAnimatePacemaker(pos, angle, scale, pacemakerInd):
+def uiAnimatePacemaker(pos, angle, scale, pacemakerInd, inTunnel):
     global feetPlusPacemaker
-    feetPlusPacemaker = uiAnimateCharacter(oMapCopy, pos, math.pi - angle, getPacemakerColor(pacemakerInd), 0.5 * scale,feetPlusPacemaker)
+    feetPlusPacemaker = uiAnimateCharacter(oMapCopy, pos, math.pi - angle, getPacemakerColor(pacemakerInd), 0.5 * scale,feetPlusPacemaker, inTunnel)
 
 
 def uiCompleteRender(finishTexts, mapInfoTextList):
