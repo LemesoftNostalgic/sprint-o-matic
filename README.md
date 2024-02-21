@@ -37,8 +37,20 @@ idea:
 ## Installation
 
 The [Release folder](https://github.com/LemesoftNostalgic/sprint-o-matic/releases/latest) contains pre-built applications for Linux and Windows.
-The application can also be run directly from source code if python and
-the packages listed below are installed.
+The application can also be run directly from source code with the following instructions:
+
+1. Download and unzip the source code package
+2. Install python3.10 or higher: (python.org/Downloads)
+  * In windows installer package, ensure that python is set to path variable, by allowing environment variable modifications
+3. Install the required modules from command prompt
+  * python -m pip install pygame
+  * python -m pip install matplotlib
+  * python -m pip install argparse
+  * python -m pip install picle
+  * python -m pip install requests
+4. Start the "main" from src folder of sprint-o-matic
+  * In windows, clicking the "main" program from the window should work
+
 
 As of writing, the application has been verified against Ubuntu 20.04 and
 Windows 10. Running the Sprint-O-Matic requires relatively modern PC due to
@@ -52,22 +64,14 @@ I can do about it. The lag, if any, should stabilize later in the course.
 In addition to the ready-built binaries, it is also quite easy to build
 the application from sources using dopyinstaller.sh (Linux) or
 dopyinstaller.bat (Windows) at the root folder of this repository.
-Requirements for the build:
+This requires the installation of the pyinstaller (ensure that
+the pyinstaller is in the path:
 
-1. python3.10 (python.org/Downloads)
-2. pygame (python -m pip install pygame)
-3. matplotlib (python -m pip install matplotlib)
-4. argparse (python -m pip install argparse)
-5. picle (python -m pip install picle)
-6. requests (python -m pip install requests)
-7. pyinstaller (python -m pip install pyinstaller)
+* python -m pip install pyinstaller
 
 
-In case the ready-built Windows package gives false virus alarms, like it sometimes does with
-pyinstaller-built applications, you can also just install the correct
-python version (actually Python3.12 worked fine in Windows) and the other
-listed requirements, download the source code, and click the python program
-icon (main.py) from the src folder of the source code.
+I have heard that pyinstaller-built executables can sometimes give false virus alarms
+in Windows. In that case, use directly the source code package as instructed above.
 
 Later on there might be also an Android version. If anyone is interested in
 debugging the Android build, be my guest.
