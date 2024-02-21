@@ -1,7 +1,5 @@
 # Sprint-O-Matic
 
-<meta name="google-site-verification" content="sC_OZ3ndipHC004esU8AZz_I4Q99xuLXnanFPRPTUxw" />
-
 ![Sprint-O-Matic logo by Jyrki Leskela](/doc/logo.png)
 
 ## Introduction
