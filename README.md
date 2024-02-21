@@ -15,7 +15,7 @@ sport arranged usually in urban environments. More description can be found
 from the [Wikipedia article on sprint orienteering](https://en.wikipedia.org/wiki/Orienteering#Sprint) or [sprint orienteering content in YouTube](https://www.youtube.com/results?search_query=sprint+orienteering).
 
 The discipline of sprint orienteering requires not only the running speed
-but ability to rapidly choose the best route from one control to another.
+but the ability to rapidly choose the best route from one control to another.
 This is the place where the Sprint-O-Matic comes into the picture.
 It provides you an infinite number of sprint orienteering route selection challenges in a
 form of an entertaining 2D game. See the following YouTube videos to get an
@@ -210,23 +210,21 @@ Also slow green terrain is good but not mandatory.
 ## Software developent and license
 
 The application internals are written in python, using the pygame library.
-It is a hobby project, so the quality is at the level of a casual indie
-game. However, there is a hidden automatic test suite that can be
-activated from the home screen by typing "autotest". I run it every now and
-then to catch the biggest issues, you can do it too, and report issues in
-sprint-o-matic at gmail com.
+It is a hobby project, so the quality is perhaps at the level of a casual indie
+game.
 
 The software is licensed under Apache-2.0 license. You are therefore free to
-branch it for extra development or propose changes under the terms of the
-license. Due to the nature of a hobby
-project, all help is appreciated. An initial wishlist is the following:
+branch it for extra development or propose pull requests for it.
+Due to the nature of a hobby project, all help is of course appreciated.
+An initial to-do list is the following:
 
 Low hanging fruits:
 
 * more external maps linked to the map listing (see above)
-* Allow publication of a set of fixed track designs for a map
+* Allow publication of hand-crafted track designs for a given map
 * Android (buildozer spec exists, does not fully work yet)
 * gradient slow terrain, for better modeling of staircases and hills
+* Add control numbering, control descriptions, etc.
 * graphics beautification
 * Score-O mode (collect contols with score in any order, time limit)
 
