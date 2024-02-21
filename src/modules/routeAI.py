@@ -56,18 +56,6 @@ def lookupContains(lookups, point):
     return contains
 
 
-def dropPriorityWhenInWindows():
-    try:
-        sys.getwindowsversion()
-    except AttributeError:
-        pass
-    else:
-        import win32api,win32process,win32con
-        pid = win32api.GetCurrentProcessId()
-        handle = win32api.OpenProcess(win32con.PROCESS_ALL_ACCESS, True, pid)
-        win32process.SetPriorityClass(handle, win32process.BELOW_NORMAL_PRIORITY_CLASS)
-
-
 # This shortest route finder is my genuine creation.
 # Finding a fast enough algorithm was not easy, so I decided to take the
 # time and think this through. Not the most beautiful one, but does the
@@ -75,8 +63,6 @@ def dropPriorityWhenInWindows():
 
 # Calculate shortest route between A and B, using pre-submitted lookups
 def calculateShortestRoute(setupList):
-
-    dropPriorityWhenInWindows()
 
     pointA = setupList[0]
     pointB = setupList[1]
