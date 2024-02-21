@@ -42,7 +42,7 @@ run the application directly from source code - that is also quite easy:
 
 1. Download and unzip the source code package
 2. Install python3.10 or higher: (python.org/Downloads)
-  * In Windows installer package, ensure that python is set to path variable, by allowing environment variable modifications
+  * In the python installer package, ensure that python is set to path variable, by allowing environment variable modifications
 3. Install the required modules from command prompt
   * python -m pip install pygame
   * python -m pip install matplotlib
