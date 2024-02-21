@@ -6,7 +6,7 @@
 
 Sprint-O-Matic is a training application for sprint orienteering or
 Sprint-O for short.
-I created it initially for my own pleasure, and to give some variety to my
+I created it initially for my own use, to give some variety to my
 exercise during cold winter days in Finland. After a while, it came to my
 mind that someone else might be interested to try it out, so here it is.
 
@@ -41,15 +41,15 @@ The application can also be run directly from source code with the following ins
 
 1. Download and unzip the source code package
 2. Install python3.10 or higher: (python.org/Downloads)
-  * In windows installer package, ensure that python is set to path variable, by allowing environment variable modifications
+  * In Windows installer package, ensure that python is set to path variable, by allowing environment variable modifications
 3. Install the required modules from command prompt
   * python -m pip install pygame
   * python -m pip install matplotlib
   * python -m pip install argparse
   * python -m pip install picle
   * python -m pip install requests
-4. Start the "main" from src folder of sprint-o-matic
-  * In windows, clicking the "main" program from the window should work
+4. Start the "main.py" module from src folder of sprint-o-matic
+  * In Windows, clicking the "main" icon from the src folder should work
 
 
 As of writing, the application has been verified against Ubuntu 20.04 and
@@ -59,19 +59,19 @@ its search algorithms that run in separate processes.
 The application can sometimes be a little bit unresponsive on the way to the
 first control especially in Windows environment. That is caused mostly by
 the garbage collection of Python programming language, so there is not much
-I can do about it. The lag, if any, should stabilize later in the course.
+to do about it. The lag, if any, should stabilize in fifteen seconds.
 
-In addition to the ready-built binaries, it is also quite easy to build
-the application from sources using dopyinstaller.sh (Linux) or
-dopyinstaller.bat (Windows) at the root folder of this repository.
-This requires the installation of the pyinstaller (ensure that
-the pyinstaller is in the path:
+If you really want, you can re-buind the single-file executables from
+from sources using dopyinstaller.sh (Linux) or dopyinstaller.bat (Windows)
+at the root folder of this repository. The build requires the installation
+of the pyinstaller:
 
 * python -m pip install pyinstaller
+  * Ensure that the pyinstaller is in your PATH.
 
-
-I have heard that pyinstaller-built executables can sometimes give false virus alarms
-in Windows. In that case, use directly the source code package as instructed above.
+I have heard that pyinstaller-built executables can sometimes give false
+virus alarms in Windows. In this is the case with your setup, then use
+directly the source code package as instructed earlier.
 
 Later on there might be also an Android version. If anyone is interested in
 debugging the Android build, be my guest.
