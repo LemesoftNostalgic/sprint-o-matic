@@ -1090,12 +1090,12 @@ def recolorForbiddenPlaces(area, png, mask, region):
         maxY = len(area)
         maxX = len(area[0])
 
-    for x in range(2, len(area[0]) - 2):
+    for x in range(minX + 2, maxX - 2):
         if modified[minY][x] not in forbidden and modified[minY+1][x] not in forbidden:
             hole = True
         if modified[maxY-1][x] not in forbidden and modified[maxY-2][x] not in forbidden:
             hole = True
-    for y in range(2, len(area) - 2):
+    for y in range(minY + 2, maxY - 2):
         if modified[y][minX] not in forbidden and modified[y][minX+1] not in forbidden:
             hole = True
         if modified[y][maxX-1] not in forbidden and modified[y][maxX-2] not in forbidden:
