@@ -87,9 +87,7 @@ def returnSettings():
     gameSettings.analysis = True if gameSettings.analysis=="yes" else False
 
     setupPreGeneratedInfiniteOulu([
-        [(160, 160), (4, 5), 40 + randrange(0, 20), "shortLeg"],
-        [(160, 160), (5, 6), 40 + randrange(0, 20), "mediumLeg"],
-        [(160, 160), (6, 7), 40 + randrange(0, 20), "longLeg"]
+        [(160, 160), (4, 5), 40 + randrange(0, 20)]
         ])
 
     if (gameSettings.lookupPngName != '' and gameSettings.mapFileName == '') or (gameSettings.mapFileName != '' and gameSettings.lookupPngName == ''):
@@ -107,7 +105,7 @@ def returnConfig(gameSettings, externalImageData):
     png = None
 
     if gameSettings.infiniteOulu:
-        preGenResult = getPreGeneratedInfiniteOulu(gameSettings.infiniteOuluTerrain)
+        preGenResult = getPreGeneratedInfiniteOulu()
         png = preGenResult[0]
         pngMask = preGenResult[1]
 

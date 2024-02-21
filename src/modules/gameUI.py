@@ -39,7 +39,7 @@ finishTextStr2 =     "    Distance: "
 finishTextStr3 =     " m"
 finishTextStr4 =     "    Runner error: "
 finishTextStr5 =     " %"
-pacemakerTextStr =    ["", "Pacemaker: Aino Inkeri (A.I.) Kiburtz", "Pertti-Uolevi (P.A.) Keinonen, e.v.v.k.", "Lex Martin Luthoer, Chem. Engr."]
+pacemakerTextStr =    ["", "Pacemaker: Aino Inkeri (A.I.) Kiburtz", "Pacemaker: Pertti-Uolevi (P.A.) Keinonen, e.v.v.k.", "Pacemaker: Lex Martin Luthoer, Chem. Engr."]
 pacemakerInitTextStr =    "Prepare, a pacemaker waiting in 1st control!"
 aiTextStr =    "AI computing dilemma, sorry for the inconvenience..."
 

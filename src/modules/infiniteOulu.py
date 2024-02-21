@@ -79,6 +79,8 @@ holeDeltaMax = 4
 rotateOneOutOf = 2
 minMarkedLineSegment = 12
 
+terrains = ["shortLeg", "mediumLeg", "longLeg"]
+
 def terranizer(terrain):
     global forestBlockOneOutOf
     global lakeInForestOneOutOf
@@ -96,7 +98,7 @@ def terranizer(terrain):
     global maxNumCottages
     global maxHouseForms
 
-    if terrain == "shortLeg":
+    if terrain == terrains[0]:
         forestBlockOneOutOf = 12
         lakeInForestOneOutOf = 2
         pathInForestOneOutOf = 2
@@ -112,7 +114,7 @@ def terranizer(terrain):
         spotnessFactor = 4
         maxNumCottages = 4
         maxHouseForms = 6
-    elif terrain == "mediumLeg":
+    elif terrain == terrains[1]:
         forestBlockOneOutOf = 8
         lakeInForestOneOutOf = 20
         pathInForestOneOutOf = 8
@@ -128,7 +130,7 @@ def terranizer(terrain):
         spotnessFactor = 2
         maxNumCottages = 2
         maxHouseForms = 5
-    elif terrain == "longLeg":
+    elif terrain == terrains[0]:
         forestBlockOneOutOf = 6
         lakeInForestOneOutOf = 2
         pathInForestOneOutOf = 4
@@ -146,7 +148,7 @@ def terranizer(terrain):
         maxHouseForms = 2
 
 # some initial setting
-terranizer("shortLeg")
+terranizer(terrains[0])
 
 # categories
 fencekind = [SOLIDBLACK, SOLIDBLACK, SOLIDBLACK, NARROWBLACK, SOLIDGREEN]
@@ -1247,8 +1249,8 @@ def initOuluCreator(blockSize, gridSize, boundary):
     return png, mask
 
 
-def getInfiniteOulu(blockSize, gridSize, boundary, terrain):
-    terranizer(terrain)
+def getInfiniteOulu(blockSize, gridSize, boundary):
+    terranizer(terrains[randrange(len(terrains))])
     oulu, ouluMask = initOuluCreator(blockSize, gridSize, boundary)
     for x in range(gridSize[0]):
         for y in range(gridSize[1]):
@@ -1262,14 +1264,13 @@ preGenerated = []
 kBlockSizeSlot = 0
 kGridSizeSlot = 1
 kBoundarySlot = 2
-kTerrainSlot = 3
-kAiPoolSlot = 4
-kAiResultDescSlot = 5
-kAiResultArraySlot = 6
+kAiPoolSlot =  3
+kAiResultDescSlot = 4
+kAiResultArraySlot = 5
 
 def getInfiniteOuluArray(setupArray):
 
-    oulu, ouluMask = getInfiniteOulu(setupArray[0], setupArray[1], setupArray[2], setupArray[3])
+    oulu, ouluMask = getInfiniteOulu(setupArray[0], setupArray[1], setupArray[2])
     ouluStr = pygame.image.tostring(oulu, 'RGBA')
     ouluMaskStr = pygame.image.tostring(ouluMask, 'RGBA')
     ouluSize = oulu.get_size()
@@ -1304,15 +1305,11 @@ def deStringOuluResults(ouluSetup):
     return [oulu, ouluMask]
 
 
-def getPreGeneratedInfiniteOulu(selectedTerrain):
+def getPreGeneratedInfiniteOulu():
     global preGenerated
 
-    # find index of terrain
+    # find index of terrain, now only one in use
     ind = 0
-    for index in range(len(preGenerated)):
-        if preGenerated[index][kTerrainSlot] == selectedTerrain:
-            ind = index
-            break
 
     # if no map awailable yet, the wait
     if preGenerated[ind][kAiResultArraySlot] == []:
