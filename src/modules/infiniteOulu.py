@@ -250,8 +250,9 @@ def areaSetAt(area, png, mask, y, x, filltype):
         mask.fill(getNoMask(), ((x, y), (1, 1)))
 
 
-def areaSetAtVisualOnly(png, y, x, filltype):
-    png.fill(colors[filltype], ((x, y), (1, 1)))
+def areaSetAtVisualOnly(png, mask, y, x, filltype):
+    if mask.get_at((int(x), int(y))) != getForbiddenAreaMask():
+        png.fill(colors[filltype], ((x, y), (1, 1)))
 
 
 def queryForbiddenSpot(mask, y, x):
@@ -383,9 +384,9 @@ def addSolidFenceSegment(area, png, mask, outer, fenceStyle, xMin, xMax):
     if outer and xMax - xMin > minMarkedLineSegment:
         for delta in range(fenceDeltaMax):
             if fenceStyle == NARROWBLACK or fenceStyle == SOLIDBLACK:
-                areaSetAtVisualOnly(pngModified, 1 + delta, (xMin + xMax)//2 + delta, fenceStyle)
+                areaSetAtVisualOnly(pngModified, maskModified, 1 + delta, (xMin + xMax)//2 + delta, fenceStyle)
             if fenceStyle == SOLIDBLACK:
-                areaSetAtVisualOnly(pngModified, 1 + delta, (xMin + xMax)//2 + delta + fenceDeltaGap, fenceStyle)
+                areaSetAtVisualOnly(pngModified, maskModified, 1 + delta, (xMin + xMax)//2 + delta + fenceDeltaGap, fenceStyle)
 
     return modified, pngModified, maskModified
 
@@ -407,7 +408,7 @@ def addFenceHoleSegment(area, png, mask, outer, fenceHoleFiller, xMin, xMax):
     if outer:
         for delta in range(fenceDeltaMax):
             if fenceHoleFiller == NARROWBLACK:
-                areaSetAtVisualOnly(pngModified, 1 + delta, (xMin+xMax)//2 + delta + fenceDeltaGap, fenceHoleFiller)
+                areaSetAtVisualOnly(pngModified, maskModified, 1 + delta, (xMin+xMax)//2 + delta + fenceDeltaGap, fenceHoleFiller)
     markControlSpot(maskModified, y, xMin)
     if xMax - xMin > controlBend + 1:
         markControlSpot(maskModified, y, xMax - controlBend)
