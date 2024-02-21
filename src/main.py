@@ -247,7 +247,7 @@ if __name__ == "__main__":
                 running = False
             stopBirds()
         if not quitting:
-            config, controls, faLookup, saLookup, ssaLookup, vsaLookup, tunnelLookup, generatedOrDownloadedMap, tmpMetersPerPixel = returnConfig(gameSettings, externalImageData)
+            config, controls, faLookup, saLookup, ssaLookup, vsaLookup, tunnelLookup, generatedOrDownloadedMap, tmpMetersPerPixel, externalZoom = returnConfig(gameSettings, externalImageData)
 
             # scale from multiple sources...
             if gameSettings.infiniteOulu:
@@ -256,6 +256,12 @@ if __name__ == "__main__":
                 gameSettings.metersPerPixel = 1
                 if tmpMetersPerPixel > 0:
                     gameSettings.metersPerPixel = tmpMetersPerPixel
+
+            # if received externalZoom
+            angle = defaultAngle()
+            zoom = gameSettings.zoom
+            if externalZoom > 0:
+                zoom = externalZoom
 
             # Special case: in case external map selected but network down
             if generatedOrDownloadedMap is None and not gameSettings.mapFileName:
@@ -267,8 +273,6 @@ if __name__ == "__main__":
                 position = uiInit(gameSettings.mapFileName, generatedOrDownloadedMap, gameSettings.metersPerPixel)
 
                 trackLengthInPixels = gameSettings.trackLength / gameSettings.metersPerPixel
-                zoom = gameSettings.zoom
-                angle = defaultAngle()
 
                 # initializations specific to a particular track
                 controls = setTheStageForNewRound(config)
@@ -416,7 +420,7 @@ if __name__ == "__main__":
                         uiRenderControls(controls, gameSettings.pacemaker)
                         if gameSettings.pacemaker != 0 and pacemakerPath is not None and pacemakerPosition is not None:
                             if pacemakerPosition == pacemakerPath[-1]:
-                                uiAnimatePacemaker(pacemakerPosition, pacemakerAngle, 1.0, gameSettings.pacemaker, inTunnelPacemaker)
+                                uiAnimatePacemaker(pacemakerPosition, pacemakerAngle, 1.0, gameSettings.pacemaker, inTunnelPacemaker, True)
                                 pacemakerPrepareForShout = True
                                 pacemakerStep = -5
                             elif pacemakerPosition == pacemakerPath[0]:
@@ -424,31 +428,34 @@ if __name__ == "__main__":
                                 if pacemakerStep > 5:
                                     pacemakerStep = -5
                             
-                                uiAnimatePacemaker(pacemakerPosition, pacemakerAngle, 1.5 + abs(pacemakerStep) * 0.1, gameSettings.pacemaker)
+                                uiAnimatePacemaker(pacemakerPosition, pacemakerAngle, 1.5 + abs(pacemakerStep) * 0.1, gameSettings.pacemaker, inTunnelPacemaker, True)
                                 if pacemakerPrepareForShout:
                                     pacemakerShoutEffect()
                                     pacemakerPrepareForShout = False
                             else:
                                 pacemakerStep = -5
                                 pacemakerPrepareForShout = True
-                                uiAnimatePacemaker(pacemakerPosition, pacemakerAngle, 1.0, gameSettings.pacemaker)
+                                uiAnimatePacemaker(pacemakerPosition, pacemakerAngle, 1.0, gameSettings.pacemaker, inTunnelPacemaker, True)
                         elif gameSettings.pacemaker != 0 and pacemakerPath == None:
                             pacemakerStep = pacemakerStep + 1
                             if pacemakerStep > 5:
                                 pacemakerStep = -5
                             pacemakerPrepareForShout = True
-                            uiAnimatePacemaker(controls[nextControl], pacemakerAngle, 1.5 + abs(pacemakerStep) * 0.1, gameSettings.pacemaker)
+                            uiAnimatePacemaker(controls[nextControl], pacemakerAngle, 1.5 + abs(pacemakerStep) * 0.1, gameSettings.pacemaker, inTunnelPacemaker, True)
 
                     uiCenterTurnZoomTheMap(position, zoom, angle)
 
                     # After that it is ok to draw to "big screen"
                     moveLegs = True if datetime.now() - startTime > timedelta(seconds=gameMovingStartThreshold) else False
                     uiAnimatePlayer(moveLegs, inTunnel)
+                    aiTextNeeded = False
+                    pacemakerTextNeeded = False
                     if gameSettings.pacemaker != 0:
                         if (len(futureShortestRoutes) == 0 or len(futureShortestRoutes[0]) == 0) and (reachedControl > 0 and reachedControl < len(controls) - 1):
-                            uiRenderAIText()
+                            aiTextNeeded = True
                         else:
-                            uiRenderPacemakerText(gameSettings.pacemaker)
+                            pacemakerTextNeeded = True
+                            
                     externalMapInfoTexts = []
                     if gameSettings.externalExampleTeam and gameSettings.externalExample:
                         for item in externalImageData:
@@ -458,7 +465,7 @@ if __name__ == "__main__":
                                         externalMapInfoTexts = [stripMapName(subitem["map-url"]), subitem["map-license"], subitem["map-credits"], stripMapName(subitem["lookup-png-url"]), subitem["lookup-png-license"], subitem["lookup-png-credits"]]
                                         break
                     if gameSettings.noUiTest != "yes":
-                        uiCompleteRender(finishTexts, externalMapInfoTexts)
+                        uiCompleteRender(finishTexts, externalMapInfoTexts, gameSettings.pacemaker, pacemakerTextNeeded, aiTextNeeded)
 
     # Final freeing of resources
     stopSounds()

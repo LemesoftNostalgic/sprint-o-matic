@@ -162,12 +162,14 @@ def uiCenterTurnZoomTheMap(pos, zoom, angle):
     getBigScreen().fill(getWhiteColor())
 
 
-def uiAnimateCharacter(where, origin, angle, color, scale, feetPlus, inTunnel):
+def uiAnimateCharacter(where, origin, angle, color, scale, feetPlus, inTunnel, background):
     feetPlus = feetPlus - 1.0
     if feetPlus <= -feetPlusStart:
         feetPlus = feetPlusStart
 
     if not inTunnel:
+        if background:
+            pygame.draw.circle(where, getWhiteColor(), origin, int(7 * scale))
         leftFootStart = rotatePoint(origin, (origin[0] - 2 * scale, origin[1]), angle)
         rightFootStart = rotatePoint(origin, (origin[0] + 2 * scale, origin[1]), angle)
         leftFootEnd = rotatePoint(origin, (origin[0] - 2 * scale, origin[1] + scale  * (3 + feetPlusStart - abs(feetPlus*1.5))), angle)
@@ -187,21 +189,26 @@ feetPlusPlayer = feetPlusStart
 def uiAnimatePlayer(legsMoving, inTunnel):
     global feetPlusPlayer
     if not legsMoving:
-        uiAnimateCharacter(screen, me, 0, getPlayerColor(), 1, 0, inTunnel)
+        uiAnimateCharacter(screen, me, 0, getPlayerColor(), 1, 0, inTunnel, True)
     else:
-        feetPlusPlayer = uiAnimateCharacter(screen, me, 0, getPlayerColor(), 1, feetPlusPlayer, inTunnel)
+        feetPlusPlayer = uiAnimateCharacter(screen, me, 0, getPlayerColor(), 1, feetPlusPlayer, inTunnel, False)
 
 
 feetPlusPacemaker = feetPlusStart
-def uiAnimatePacemaker(pos, angle, scale, pacemakerInd, inTunnel):
+def uiAnimatePacemaker(pos, angle, scale, pacemakerInd, inTunnel, background):
     global feetPlusPacemaker
-    feetPlusPacemaker = uiAnimateCharacter(oMapCopy, pos, math.pi - angle, getPacemakerColor(pacemakerInd), 0.5 * scale,feetPlusPacemaker, inTunnel)
+    feetPlusPacemaker = uiAnimateCharacter(oMapCopy, pos, math.pi - angle, getPacemakerColor(pacemakerInd), 0.6 * scale,feetPlusPacemaker, inTunnel, background)
 
 
-def uiCompleteRender(finishTexts, mapInfoTextList):
+def uiCompleteRender(finishTexts, mapInfoTextList, pacemakerInd, pacemakerTextNeeded, aiTextNeeded):
     xShift = (getBigScreen().get_size()[0] - screen.get_size()[0]) / 2
     yShift = (getBigScreen().get_size()[1] - screen.get_size()[1]) / 2
     getBigScreen().blit(screen, (xShift, yShift))
+    if pacemakerTextNeeded:
+        uiRenderPacemakerText(pacemakerInd)
+    if aiTextNeeded:
+        uiRenderAiText()
+        
     uiShowFinishText(getBigScreen(), finishTexts)
     if mapInfoTextList:
         uiRenderExternalMapInfo(mapInfoTextList)

@@ -37,7 +37,8 @@ idea:
 ## Installation
 
 The [Release folder](https://github.com/LemesoftNostalgic/sprint-o-matic/releases/latest) contains pre-built applications for Linux and Windows.
-The application can also be run directly from source code with the following instructions:
+The Windows executable is not signed by Microsoft, so you might want to
+run the application directly from source code - that is also quite easy:
 
 1. Download and unzip the source code package
 2. Install python3.10 or higher: (python.org/Downloads)
@@ -46,32 +47,27 @@ The application can also be run directly from source code with the following ins
   * python -m pip install pygame
   * python -m pip install matplotlib
   * python -m pip install argparse
-  * python -m pip install picle
   * python -m pip install requests
 4. Start the "main.py" module from src folder of sprint-o-matic
   * In Windows, clicking the "main" icon from the src folder should work
+  * also works: "python main.py"
 
-
-As of writing, the application has been verified against Ubuntu 20.04 and
+As of writing, the application has been tested against Ubuntu 20.04 and
 Windows 10. Running the Sprint-O-Matic requires relatively modern PC due to
 its search algorithms that run in separate processes.
 
 The application can sometimes be a little bit unresponsive on the way to the
 first control especially in Windows environment. That is caused mostly by
-the garbage collection of Python programming language, so there is not much
-to do about it. The lag, if any, should stabilize in fifteen seconds.
+the garbage collection of Python programming language. The lag, if any,
+should stabilize in less than half a minute.
 
-If you really want, you can re-buind the single-file executables from
+If you really want, you can re-build the executables
 from sources using dopyinstaller.sh (Linux) or dopyinstaller.bat (Windows)
 at the root folder of this repository. The build requires the installation
 of the pyinstaller:
 
 * python -m pip install pyinstaller
   * Ensure that the pyinstaller is in your PATH.
-
-I have heard that pyinstaller-built executables can sometimes give false
-virus alarms in Windows. In this is the case with your setup, then use
-directly the source code package as instructed earlier.
 
 Later on there might be also an Android version. If anyone is interested in
 debugging the Android build, be my guest.
@@ -160,6 +156,7 @@ Here is an example of an entry in the [https://github.com/LemesoftNostalgic/spri
          "lookup-png-license": "CC BY-SA 4.0 Deed",
          "lookup-png-credits": "Jyrki Leskela, 2024",
          "meters-per-pixel": 0.5
+         "default-zoom": 1.0
     }
    ```
 
@@ -346,7 +343,7 @@ with a bit more detail:
 
 **--pacemaker** A pacemaker runner to compete against (1-3, 0 for none)
 
-And in case you want to maintain your own routes or map listings:
+And in case you want to maintain your private routes or map listings:
 
 **--routeFileName** pickled ordered list of tuples (track control points)
 

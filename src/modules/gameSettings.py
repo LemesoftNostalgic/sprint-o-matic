@@ -103,6 +103,7 @@ def returnSettings():
 def returnConfig(gameSettings, externalImageData):
 
     metersPerPixel = 0
+    defaultZoom = 1.0
     png = None
 
     if gameSettings.infiniteOulu:
@@ -120,6 +121,8 @@ def returnConfig(gameSettings, externalImageData):
                         png, pngMask = downloadMapSurfacesBasedOnUrl(subitem)
                         if "meters-per-pixel" in subitem:
                             metersPerPixel = subitem["meters-per-pixel"]
+                        if "default-zoom" in subitem:
+                            defaultZoom = subitem["default-zoom"]
         # I use these to test lost internet connection
         #png = None
         #pngMask = None
@@ -135,4 +138,4 @@ def returnConfig(gameSettings, externalImageData):
             with open(gameSettings.routeFileName, 'rb') as f:
                 controls = pickle.load(f)
 
-    return config, controls, faLookup, saLookup, ssaLookup, vsaLookup, tunnelLookup, png, metersPerPixel
+    return config, controls, faLookup, saLookup, ssaLookup, vsaLookup, tunnelLookup, png, metersPerPixel, defaultZoom

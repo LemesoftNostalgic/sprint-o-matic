@@ -21,6 +21,6 @@ cd src
 pyinstaller main.spec --distpath ../bin
 cd ..
 cd bin
-ren main.exe sprint-o-matic.exe
-certutil -hashfile sprint-o-matic.exe MD5 > sprint-o-matic.exe.md5
+ren main.exe sprint-o-matic-notsigned.exe
+certutil -hashfile sprint-o-matic-notsigned.exe MD5 > sprint-o-matic-notsigned.exe.md5
 cd ..
