@@ -48,11 +48,9 @@ run the application directly from source code - that is also quite easy:
   * python -m pip install matplotlib
   * python -m pip install argparse
   * python -m pip install requests
-4. Start the "main.py" module from src folder of sprint-o-matic
-  * In Windows, clicking the "main" icon from the src folder should work
-  * also works: "python main.py"
+4. Start the "main.py" from src folder of sprint-o-matic (click the "main" icon or use "python main.py" from the command line)
 
-As of writing, the application has been tested against Ubuntu 20.04 and
+The application has been tested against Ubuntu 20.04 and
 Windows 10. Running the Sprint-O-Matic requires relatively modern PC due to
 its search algorithms that run in separate processes.
 
