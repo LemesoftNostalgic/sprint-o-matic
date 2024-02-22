@@ -19,8 +19,9 @@
 
 import math
 import random
-import matplotlib.path as mpltPath
+import pygame
 
+from .utils import getNoMask, getForbiddenAreaMask
 
 longDistance = 10000000.0
 
@@ -109,24 +110,23 @@ def getBoundingBox(previousRect, pointList):
     return previousRect
 
 
-def polygonContains(areaPolygon, point):
-    try:
-        path = mpltPath.Path(areaPolygon)
-        retval = path.contains_points([point])
-    except Exception:
-        retval = False
-    return retval
-
-
 def polygonCreate(bbox, areaPolygon):
     polygonLookup = {}
     yStart = int(bbox[0][1])
     yEnd = int(bbox[1][1])
     xStart = int(bbox[0][0])
     xEnd = int(bbox[1][0])
+
+    surf = pygame.Surface((xEnd-xStart, yEnd-yStart))
+    surf.fill(getNoMask())
+    imagePolygon = []
+    for pos in areaPolygon:
+        imagePolygon.append((pos[0]-xStart, pos[1]-yStart))
+    pygame.draw.polygon(surf, getForbiddenAreaMask(), imagePolygon)    
+
     for y in range(yStart, yEnd):
         for x in range(xStart, xEnd):
-            if polygonContains(areaPolygon, (x,y)):
+            if surf.get_at((x - xStart, y - yStart)) == getForbiddenAreaMask():
                 polygonLookup[(x, y)] = True
     return polygonLookup
 

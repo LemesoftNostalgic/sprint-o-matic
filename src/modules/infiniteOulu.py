@@ -253,8 +253,11 @@ def areaSetAt(area, png, mask, y, x, filltype):
 
 
 def areaSetAtVisualOnly(png, mask, y, x, filltype):
-    if mask.get_at((int(x), int(y))) != getForbiddenAreaMask():
-        png.fill(colors[filltype], ((x, y), (1, 1)))
+    intx = int(x)
+    inty = int(y)
+    if intx > 0 and inty > 0 and intx < mask.get_size()[0] and inty < mask.get_size()[1]:
+        if mask.get_at((intx, inty)) != getForbiddenAreaMask():
+            png.fill(colors[filltype], ((x, y), (1, 1)))
 
 
 def queryForbiddenSpot(mask, y, x):

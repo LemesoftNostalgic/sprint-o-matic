@@ -197,7 +197,7 @@ def uiAnimatePlayer(legsMoving, inTunnel):
 feetPlusPacemaker = feetPlusStart
 def uiAnimatePacemaker(pos, angle, scale, pacemakerInd, inTunnel, background):
     global feetPlusPacemaker
-    feetPlusPacemaker = uiAnimateCharacter(oMapCopy, pos, math.pi - angle, getPacemakerColor(pacemakerInd), 0.6 * scale,feetPlusPacemaker, inTunnel, background)
+    feetPlusPacemaker = uiAnimateCharacter(oMapCopy, pos, math.pi - angle, getPacemakerColor(pacemakerInd), 0.6 * scale / metersPerPixel, feetPlusPacemaker, inTunnel, background)
 
 
 def uiCompleteRender(finishTexts, mapInfoTextList, pacemakerInd, pacemakerTextNeeded, aiTextNeeded):
@@ -305,7 +305,7 @@ def uiRenderControls(controls, usePacemaker):
             pygame.draw.line(oMapCopy, getTrackColor(), triangle[2], triangle[0], width = max(2, int(2/metersPerPixel)))
         else:
             if controlApproachZoomUsed:
-                pygame.draw.circle(oMapCopy, getTrackColor(), control, 2)
+                pygame.draw.circle(oMapCopy, getTrackColor(), control, int(2/metersPerPixel))
             pygame.draw.circle(oMapCopy, (255, tmpEffectStep * 3, tmpEffectStep * 2), control, circleRadius/metersPerPixel, width = max(2, int(2/metersPerPixel)))
             if control == controls[-1]:
                 pygame.draw.circle(oMapCopy, (255, tmpEffectStep * 3, tmpEffectStep * 2), control, (circleRadius - circleSpacing)/metersPerPixel, width = max(2, int(2/metersPerPixel)))

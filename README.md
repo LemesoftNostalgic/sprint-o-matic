@@ -36,42 +36,34 @@ idea:
 
 ## Installation
 
-The [Release folder](https://github.com/LemesoftNostalgic/sprint-o-matic/releases/latest) contains pre-built applications for Linux and Windows.
-The Windows executable is not signed by Microsoft, so you might want to
-run the application directly from source code - that is also quite easy:
+The recommended method is to run the software with python directly from
+source code, because it is easy and safe:
 
-1. Download and unzip the source code package
+1. Download and unzip the source code package from the [Release folder](https://github.com/LemesoftNostalgic/sprint-o-matic/releases/latest) to your machine
 2. Install python3.10 or higher: (python.org/Downloads)
   * In the python installer package, ensure that python is set to path variable, by allowing environment variable modifications
-3. Install the required modules from command prompt
+3. Install the required python modules from command prompt
   * python -m pip install pygame
-  * python -m pip install matplotlib
-  * python -m pip install argparse
   * python -m pip install requests
-4. Start the "main.py" from src folder of sprint-o-matic (click the "main" icon or use "python main.py" from the command line)
+4. Start the "main.py" from src folder of sprint-o-matic (click the "main" icon or use command "python main.py" from the command line)
 
-The application has been tested against Ubuntu 20.04 and
-Windows 10. Running the Sprint-O-Matic requires relatively modern PC due to
-its search algorithms that run in separate processes.
-
-The application can sometimes be a little bit unresponsive on the way to the
-first control especially in Windows environment. That is caused mostly by
-the garbage collection of Python programming language. The lag, if any,
-should stabilize in less than half a minute.
+The [Release folder](https://github.com/LemesoftNostalgic/sprint-o-matic/releases/latest) contains also pre-built applications for Linux and Windows as executables. The Windows PyInstaller executable is not signed by Microsoft so the [microsoft answer for cases when Pyinstaller-created executable is incorrectly flagged](https://answers.microsoft.com/en-us/windows/forum/all/where-executables-created-by-pyinstaller-are-being/09e58a6b-01f3-4e72-8765-6542ef7291f4) should be taken into account.
 
 If you really want, you can re-build the executables
 from sources using dopyinstaller.sh (Linux) or dopyinstaller.bat (Windows)
-at the root folder of this repository. The build requires the installation
-of the pyinstaller:
+that are provided with the source code. The usage requires the installation
+of pyinstaller:
 
 * python -m pip install pyinstaller
   * Ensure that the pyinstaller is in your PATH.
 
-Later on there might be also an Android version. If anyone is interested in
-debugging the Android build, be my guest.
-The current attempt of a buildozer script dobuildozer.sh is at the root
-folder of this repository. It currently stops at the following error:
-src_c/_sdl2/sdl2.c:211:12: fatal error: 'longintrepr.h' file not found.
+### Hardware requirements
+
+The application has been tested against Ubuntu 20.04 and
+Windows 10. Running the Sprint-O-Matic requires relatively modern PC due to
+its search algorithms that run in separate processes. There may be some
+lag on the way to the first control, as it often is the case with real life
+orienteering, but that lag should settle later on.
 
 ## Usage
 
@@ -104,6 +96,12 @@ modes to choose from:
 * repeat: loop random tracks with the same map over and over again
 * once: run the track once and return to the home screen
 * fast: doubles the runner speed to give a little bit more challenge
+
+It is also possible to get the analysis results as a file after the
+session, when using the [command line](#command-line-usage) parameter **--analysis**.
+The graphical analysis result looks like this:
+
+![Sprint-O-Matic Analysis result by Jyrki Leskela](/doc/Analysis.png)
 
 ### Pacemaker mode
 
@@ -180,7 +178,7 @@ each terrain type with a correct color code and save the result as png.
 
 The color codes are the following:
 
-![Sprint-O-Matic logo by Jyrki Leskelä](/doc/lookupcolors.png)
+![Sprint-O-Matic lookup colors by Jyrki Leskelä](/doc/lookupcolors.png)
 
 Please use an editor where you can choose the colors accurately. The
 terrain markings must represent exactly the color codes shown in the image
@@ -220,7 +218,8 @@ Low hanging fruits:
 
 * more external maps linked to the map listing (see above)
 * Allow publication of hand-crafted track designs for a given map
-* Android (buildozer spec exists, does not fully work yet)
+* Android (the current attempt of a buildozer script dobuildozer.sh is at the root folder of this repository. It currently stops at the following error: src_c/_sdl2/sdl2.c:211:12: fatal error: 'longintrepr.h' file not found.)
+* Web application with pygbag (might have to be a lightweight version)
 * gradient slow terrain, for better modeling of staircases and hills
 * Add control numbering, control descriptions, etc.
 * graphics beautification
@@ -311,6 +310,9 @@ ideas can be sent to sprint-o-matic at gmail com.
 
 For the advanced users, there are more detailed options in the form of
 command-line options. These are not as well tested as the home screen.
+For using them, also the following python module needs to be installed:
+
+  * python -m pip install argparse
 
 These options are useful if you want to play with your own map:
 
@@ -341,7 +343,7 @@ with a bit more detail:
 
 And in case you want to maintain your private routes or map listings:
 
-**--routeFileName** pickled ordered list of tuples (track control points)
+**--routeFileName** ordered list of tuples (track control points) in json
 
 **--ownMasterListing** Override the default web listing with other URL
 

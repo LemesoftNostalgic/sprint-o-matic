@@ -86,6 +86,7 @@ def setTheStageForNewRound(cfg):
         nextControl = 1
         reachedControl = 0
         inTunnel = False
+        playerRoutesArray = []
         playerRoutes = []
         startOverPlayerRoute()
         initializeAINextTrack(ctrls, faLookup, saLookup, ssaLookup, vsaLookup, gameSettings.pacemaker)
@@ -414,58 +415,59 @@ if __name__ == "__main__":
                                 controls = setTheStageForNewRound(config)
 
                         # Now the render phase, need to sort out the pacemaker code
-                        if gameSettings.pacemaker == 0:
-                            uiRenderRoutes(shortestRoutes, "shortest")
-                            uiRenderRoutes(playerRoutes, "player")
-                        uiRenderControls(controls, gameSettings.pacemaker)
-                        if gameSettings.pacemaker != 0 and pacemakerPath is not None and pacemakerPosition is not None:
-                            if pacemakerPosition == pacemakerPath[-1]:
-                                uiAnimatePacemaker(pacemakerPosition, pacemakerAngle, 1.0, gameSettings.pacemaker, inTunnelPacemaker, True)
-                                pacemakerPrepareForShout = True
-                                pacemakerStep = -5
-                            elif pacemakerPosition == pacemakerPath[0]:
+                        if running:
+                            if gameSettings.pacemaker == 0:
+                                uiRenderRoutes(shortestRoutes, "shortest")
+                                uiRenderRoutes(playerRoutes, "player")
+                            uiRenderControls(controls, gameSettings.pacemaker)
+                            if gameSettings.pacemaker != 0 and pacemakerPath is not None and pacemakerPosition is not None:
+                                if pacemakerPosition == pacemakerPath[-1]:
+                                    uiAnimatePacemaker(pacemakerPosition, pacemakerAngle, 1.0, gameSettings.pacemaker, inTunnelPacemaker, True)
+                                    pacemakerPrepareForShout = True
+                                    pacemakerStep = -5
+                                elif pacemakerPosition == pacemakerPath[0]:
+                                    pacemakerStep = pacemakerStep + 1
+                                    if pacemakerStep > 5:
+                                        pacemakerStep = -5
+                                
+                                    uiAnimatePacemaker(pacemakerPosition, pacemakerAngle, 1.5 + abs(pacemakerStep) * 0.1, gameSettings.pacemaker, inTunnelPacemaker, True)
+                                    if pacemakerPrepareForShout:
+                                        pacemakerShoutEffect()
+                                        pacemakerPrepareForShout = False
+                                else:
+                                    pacemakerStep = -5
+                                    pacemakerPrepareForShout = True
+                                    uiAnimatePacemaker(pacemakerPosition, pacemakerAngle, 1.0, gameSettings.pacemaker, inTunnelPacemaker, True)
+                            elif gameSettings.pacemaker != 0 and pacemakerPath == None:
                                 pacemakerStep = pacemakerStep + 1
                                 if pacemakerStep > 5:
                                     pacemakerStep = -5
-                            
-                                uiAnimatePacemaker(pacemakerPosition, pacemakerAngle, 1.5 + abs(pacemakerStep) * 0.1, gameSettings.pacemaker, inTunnelPacemaker, True)
-                                if pacemakerPrepareForShout:
-                                    pacemakerShoutEffect()
-                                    pacemakerPrepareForShout = False
-                            else:
-                                pacemakerStep = -5
                                 pacemakerPrepareForShout = True
-                                uiAnimatePacemaker(pacemakerPosition, pacemakerAngle, 1.0, gameSettings.pacemaker, inTunnelPacemaker, True)
-                        elif gameSettings.pacemaker != 0 and pacemakerPath == None:
-                            pacemakerStep = pacemakerStep + 1
-                            if pacemakerStep > 5:
-                                pacemakerStep = -5
-                            pacemakerPrepareForShout = True
-                            uiAnimatePacemaker(controls[nextControl], pacemakerAngle, 1.5 + abs(pacemakerStep) * 0.1, gameSettings.pacemaker, inTunnelPacemaker, True)
+                                uiAnimatePacemaker(controls[nextControl], pacemakerAngle, 1.5 + abs(pacemakerStep) * 0.1, gameSettings.pacemaker, inTunnelPacemaker, True)
 
-                    uiCenterTurnZoomTheMap(position, zoom, angle)
+                        uiCenterTurnZoomTheMap(position, zoom, angle)
 
-                    # After that it is ok to draw to "big screen"
-                    moveLegs = True if datetime.now() - startTime > timedelta(seconds=gameMovingStartThreshold) else False
-                    uiAnimatePlayer(moveLegs, inTunnel)
-                    aiTextNeeded = False
-                    pacemakerTextNeeded = False
-                    if gameSettings.pacemaker != 0:
-                        if (len(futureShortestRoutes) == 0 or len(futureShortestRoutes[0]) == 0) and (reachedControl > 0 and reachedControl < len(controls) - 1):
-                            aiTextNeeded = True
-                        else:
-                            pacemakerTextNeeded = True
-                            
-                    externalMapInfoTexts = []
-                    if gameSettings.externalExampleTeam and gameSettings.externalExample:
-                        for item in externalImageData:
-                            if gameSettings.externalExampleTeam == item["team-name"]:
-                                for subitem in item["sub-listing"]:
-                                    if gameSettings.externalExample == subitem["name"]:
-                                        externalMapInfoTexts = [stripMapName(subitem["map-url"]), subitem["map-license"], subitem["map-credits"], stripMapName(subitem["lookup-png-url"]), subitem["lookup-png-license"], subitem["lookup-png-credits"]]
-                                        break
-                    if gameSettings.noUiTest != "yes":
-                        uiCompleteRender(finishTexts, externalMapInfoTexts, gameSettings.pacemaker, pacemakerTextNeeded, aiTextNeeded)
+                        # After that it is ok to draw to "big screen"
+                        moveLegs = True if datetime.now() - startTime > timedelta(seconds=gameMovingStartThreshold) else False
+                        uiAnimatePlayer(moveLegs, inTunnel)
+                        aiTextNeeded = False
+                        pacemakerTextNeeded = False
+                        if gameSettings.pacemaker != 0:
+                            if (len(futureShortestRoutes) == 0 or len(futureShortestRoutes[0]) == 0) and (reachedControl > 0 and reachedControl < len(controls) - 1):
+                                aiTextNeeded = True
+                            else:
+                                pacemakerTextNeeded = True
+
+                        externalMapInfoTexts = []
+                        if gameSettings.externalExampleTeam and gameSettings.externalExample:
+                            for item in externalImageData:
+                                if gameSettings.externalExampleTeam == item["team-name"]:
+                                    for subitem in item["sub-listing"]:
+                                        if gameSettings.externalExample == subitem["name"]:
+                                            externalMapInfoTexts = [stripMapName(subitem["map-url"]), subitem["map-license"], subitem["map-credits"], stripMapName(subitem["lookup-png-url"]), subitem["lookup-png-license"], subitem["lookup-png-credits"]]
+                                            break
+                        if gameSettings.noUiTest != "yes":
+                            uiCompleteRender(finishTexts, externalMapInfoTexts, gameSettings.pacemaker, pacemakerTextNeeded, aiTextNeeded)
 
     # Final freeing of resources
     stopSounds()

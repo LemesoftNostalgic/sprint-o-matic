@@ -82,5 +82,5 @@ def extractPngLookupsFromFile(pngFileName):
         print(f"Cannot load map from file: {err=}, {type(err)=}")
         return {}, {}, {}, {}, {}, []
 
-    faLookup, saLookup, ssaLookup, vsaLookup, controls = extractPngLookups(oMapMask)
+    faLookup, saLookup, ssaLookup, vsaLookup, tunnelLookup, controls = extractPngLookups(oMapMask)
     return faLookup, saLookup, ssaLookup, vsaLookup, tunnelLookup, controls
