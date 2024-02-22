@@ -312,7 +312,7 @@ ideas can be sent to sprint-o-matic at gmail com.
 ## Command-line usage
 
 For the advanced users, there are more detailed options in the form of
-command-line options. These are not as well tested and the home screen.
+command-line options. These are not as well tested as the home screen.
 
 These options are useful if you want to play with your own map:
 
