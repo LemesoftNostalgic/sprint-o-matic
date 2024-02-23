@@ -25,6 +25,18 @@ import io
 
 listingOfTeamsWithListing = "https://raw.githubusercontent.com/LemesoftNostalgic/sprint-o-matic-external-map-links/main/teams-hosting-their-own-map-listing.json"
 
+newsUrl= "https://raw.githubusercontent.com/LemesoftNostalgic/sprint-o-matic-external-map-links/main/NEWS.txt"
+
+def downloadNews():
+    news = ""
+    try:
+        response = requests.get(newsUrl)
+        news = response.text
+    except Exception as err:
+        print(f"Cannot load news: {err=}, {type(err)=}")
+    return news
+
+
 def downloadExternalImageData(ownMasterListing):
 
     try:

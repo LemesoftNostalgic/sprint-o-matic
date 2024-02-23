@@ -162,14 +162,23 @@ def uiCenterTurnZoomTheMap(pos, zoom, angle):
     getBigScreen().fill(getWhiteColor())
 
 
+characterCloudCtr = 0
+characterCloudCtrMid = 10
+characterCloudCtrMax = 14
 def uiAnimateCharacter(where, origin, angle, color, scale, feetPlus, inTunnel, background):
+    global characterCloudCtr
     feetPlus = feetPlus - 1.0
     if feetPlus <= -feetPlusStart:
         feetPlus = feetPlusStart
 
     if not inTunnel:
-        if background:
+
+        if background and characterCloudCtr > characterCloudCtrMid:
             pygame.draw.circle(where, getWhiteColor(), origin, int(7 * scale))
+        characterCloudCtr = characterCloudCtr + 1
+        if characterCloudCtr > characterCloudCtrMax:
+            characterCloudCtr = 0
+
         leftFootStart = rotatePoint(origin, (origin[0] - 2 * scale, origin[1]), angle)
         rightFootStart = rotatePoint(origin, (origin[0] + 2 * scale, origin[1]), angle)
         leftFootEnd = rotatePoint(origin, (origin[0] - 2 * scale, origin[1] + scale  * (3 + feetPlusStart - abs(feetPlus*1.5))), angle)

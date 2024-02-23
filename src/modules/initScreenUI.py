@@ -20,7 +20,7 @@
 import pygame
 import math
 
-from .gameUIUtils import getApplicationTitle, getMasterFont, getStopKey, getUpKey, getLeftKey, getRightKey, getDownKey, getEnterKey, getSpaceKey, getPlayerColor, getTrackColor, getCreditColor, getGreyColor, convertXCoordinate, convertYCoordinate, getBigScreen, getTimerStep, uiDrawTriangle, checkAutoTestKey
+from .gameUIUtils import getApplicationTitle, getMasterFont, getStopKey, getUpKey, getLeftKey, getRightKey, getDownKey, getEnterKey, getSpaceKey, getPlayerColor, getPacemakerColor, getTrackColor, getCreditColor, getGreyColor, convertXCoordinate, convertYCoordinate, getBigScreen, getTimerStep, uiDrawTriangle, checkAutoTestKey
 
 from .mathUtils import distanceBetweenPoints
 from .infoBox import showInfoBoxTxt, updateInfoTxtByEvent
@@ -67,7 +67,7 @@ def showInitArrow(surf, spot, inScale):
     pygame.draw.line(surf, getPlayerColor(), arrow1, arrow4, width=scale)
 
 
-def showInitSelections(surf, positions, selections, inScale, texts, titleTexts, titleTextPositions, creditTexts, creditTextPositions, externalOverallText, externalOverallPos, externalTeamText, externalTeamPosition, externalText, externalPosition, ouluText, ouluPosition):
+def showInitSelections(surf, positions, selections, inScale, texts, titleTexts, titleTextPositions, creditTexts, creditTextPositions, externalOverallText, externalOverallPos, externalTeamText, externalTeamPosition, externalText, externalPosition, ouluText, ouluPosition, news, newsPosition):
     # scale for the current display
     xStep = convertXCoordinate(xStepOrig)
     yStep = convertYCoordinate(yStepOrig)
@@ -123,12 +123,14 @@ def showInitSelections(surf, positions, selections, inScale, texts, titleTexts, 
         extTextSize = (extTextSize * extTextThreshold) // len(externalText)
     showTextShadowed(externalPosition, extTextSize, externalText, getTrackColor(), 2)
     showTextShadowed(ouluPosition, 32, ouluText, getTrackColor(), 2)
+    if news:
+        showTextShadowed(newsPosition, 24, "News: " + news, getPacemakerColor(2), 2)
 
 
 initScreenPos = 0
 externalExampleTeamCtr = 0
 externalExampleCtr = 0
-def initScreen(imagePath, gameSettings, externalImageData):
+def initScreen(imagePath, gameSettings, externalImageData, news):
     global selections
     global externalExampleTeamCtr
     global externalExampleCtr
@@ -140,6 +142,7 @@ def initScreen(imagePath, gameSettings, externalImageData):
     xStart = convertXCoordinate(xStartOrig)
     yStart = convertYCoordinate(yStartOrig)
 
+    newsPosition = (xStart + 7 * xStep, yStart - yStep * 2 / 3)
     positions = [
         # first row 6
         (xStart, yStart), (xStart + xStep, yStart), (xStart + 2 * xStep, yStart), (xStart + 3 * xStep, yStart), (xStart + 4 * xStep, yStart), (xStart + 5 * xStep, yStart), 
@@ -316,7 +319,7 @@ def initScreen(imagePath, gameSettings, externalImageData):
             selections[-1] = True
 
         getBigScreen().blit(backgroundImage, backgroundImage.get_rect())
-        showInitSelections(getBigScreen(), positions, selections, initCircleRadius, texts, titleTexts, titleTextPositions, creditTexts, creditTextPositions, externalExampleOverallText, externalExampleOverallPosition, externalExampleTeamText, externalExampleTeamSelectionPosition, externalExampleText, externalExampleSelectionPosition, ouluExampleText, ouluExampleSelectionPosition)
+        showInitSelections(getBigScreen(), positions, selections, initCircleRadius, texts, titleTexts, titleTextPositions, creditTexts, creditTextPositions, externalExampleOverallText, externalExampleOverallPosition, externalExampleTeamText, externalExampleTeamSelectionPosition, externalExampleText, externalExampleSelectionPosition, ouluExampleText, ouluExampleSelectionPosition, news, newsPosition)
         showInitArrow(getBigScreen(), positions[initScreenPos], arrowScale)
         if gameSettings.infoBox:
             showInfoBoxTxt(getBigScreen())

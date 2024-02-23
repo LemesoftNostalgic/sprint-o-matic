@@ -35,7 +35,7 @@ from modules.gameUI import uiInit, uiInitStartTriangle, uiStartControlEffect, ui
 from modules.gameEngine import startOverPlayerRoute, playerRoute, calculateNextStep, closeToControl, quiteCloseToControl, longLapEveryOther, generateAngleStep, normalizeAngleStep, defaultAngle, getPlayerRoute, getPacemakerThreshold, getPacemakerPos
 from modules.pathPruning import calculatePathWeightedDistance
 from modules.gameSounds import initSounds, stopSounds, maintainRunningStepEffect, startMelody, stopMelody, startBirds, stopBirds, shoutEffect, pacemakerShoutEffect, finishEffect, startEffect, stopEffects
-from modules.imageDownloader import downloadExternalImageData
+from modules.imageDownloader import downloadExternalImageData, downloadNews
 
 from modules.autoTest import fakeInitScreen, fakeCalculateNextStep, fakeUiEvent, fakeResetAgain
 
@@ -76,6 +76,8 @@ def setTheStageForNewRound(cfg):
             numAttempts = numAttempts - 1
             if numAttempts > 0:
                 ctrls = []
+
+    news = downloadNews()
 
     # Initialize evereything that has to be initialized for a new run
     if ctrls and len(ctrls) > 1:
@@ -185,6 +187,7 @@ if __name__ == "__main__":
     uiEarlyInit(gameSettings.fullScreen)
     initSounds(gameSettings.soundRoot)
     externalImageData = downloadExternalImageData(gameSettings.ownMasterListing)
+    news = downloadNews()
 
     # statistics and route display initial values
     shortestRoutesArray = []
@@ -242,7 +245,7 @@ if __name__ == "__main__":
             if gameSettings.autoTest:
                 (quitting, gameSettings) = fakeInitScreen(gameSettings.imageRoot, gameSettings, externalImageData)
             else:
-                (quitting, gameSettings) = initScreen(gameSettings.imageRoot, gameSettings, externalImageData)
+                (quitting, gameSettings) = initScreen(gameSettings.imageRoot, gameSettings, externalImageData, news)
             running = True
             if quitting:
                 running = False
