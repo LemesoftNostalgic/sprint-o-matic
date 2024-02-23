@@ -234,7 +234,7 @@ Käytä kuvaeditoria, jossa voit valita värit tarkasti.
 Olen käyttänyt [GIMP-editoria](https://www.gimp.org), koska se on minulle tuttu.
 Maastomerkintöjen on vastattava täsmälleen kuvassa esitettyjä värikoodeja.
 Lopussa on hyvä tarkistaa editoinnin tulos silmämääräisesti. Kiinnitä huomiota erityisesti
-sprinttikartakartan mustalla värillä oleviin symboleihin: pääasiassa mustalla värillä
+sprinttikartan mustalla värillä oleviin symboleihin: pääasiassa mustalla värillä
 merkitään sprinttikartoissa kohdat, joiden läpi ei voi juosta,
 mutta jotkut mustat merkinnät, kuten polut ja aitojen vinoviivat, ovat itse asiassa
 läpijuostavia. Varo ettet maalaa niitäkin kielletyiksi omassa maastokuvauksessasi.
