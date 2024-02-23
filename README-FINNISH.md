@@ -12,9 +12,9 @@ kokeilemaan sitä, joten tässä se nyt sitten on.
 Mitä sprinttisuunnistus sitten on? Se on nopeatempoinen suunnistuksen alalaji, jota
 järjestetään yleensä urbaanissa ympäristössä. Katso lisätietoa
 [Wikipedian artikkelista](https://en.wikipedia.org/wiki/Orienteering#Sprint) tai
-[YouTuben sprinttisuunnistussisällöstä](https://www.youtube.com/results?search_query=sprint +suunnistus).
+[YouTuben sprinttisuunnistussisällöstä](https://www.youtube.com/results?search_query=sprint+orienteering).
 
-Sprinttisuunnistus vaatii juoksunopeuden lisäksi,
+Sprinttisuunnistus vaatii juoksunopeuden lisäksi
 taitoa valita nopeasti paras reitti rastipisteeltä toiselle.
 Tässä Sprint-O-Matic voi olla hyödyksi.
 Se sisältää äärettömän määrän sprinttisuunnistuksen reitinvalintahaasteita
@@ -41,23 +41,23 @@ alustavan kuvan siitä miten peli toimii:
 
 Suositeltava tapa on ajaa ohjelmisto pythonilla suoraan lähdekoodina, koska se on helppoa ja turvallista:
 
-1. Lataa ja pura lähdekoodipaketti [Release-kansiosta] (https://github.com/LemesoftNostalgic/sprint-o-matic/releases/latest) koneellesi.
+1. Lataa ja pura lähdekoodipaketti [Release-kansiosta](https://github.com/LemesoftNostalgic/sprint-o-matic/releases/latest) koneellesi.
 2. Asenna python3.10 tai uudempi: (python.org/Downloads)
    * Varmista python-asennuspakettia asentaessasi, että python on asetettu PATH-ympäristomuuttujaan sallimalla ympäristömuuttujien muutokset
 3. Asenna tarvittavat python-moduulit komentoriviltä:
-   * Python -m pip asennus pygame
-   * Python -m pip -asennuspyynnöt
-   * python -m pip asennus argparse
+   * python -m pip install pygame
+   * python -m pip install requests
+   * python -m pip install argparse
 
 4. Käynnistä "main.py" sprint-o-matic:in src-kansiosta (napsauta "main"-kuvaketta tai käytä komentoa "python main.py" komentoriviltä)
 
 [Release-kansio](https://github.com/LemesoftNostalgic/sprint-o-matic/releases/latest) sisältää myös valmiiksi paketoidut sovellukset Linuxille ja Windowsille suoritettavina "exe"-tiedostoina. 
-Windows executable ei ole "Windows signed" sovellus jota ota huomioon [microsoftin vastaus tapauksiin, joissa Pyinstallerin luoma suoritettava tiedosto on merkitty väärin](https://answers.microsoft.com/en-us/windows/forum/all/where-executables-created-by-pyinstaller-are-being/09e58a6b-01f3-4e72-8765-6542ef7291f4)
+Windows executable ei ole "Windows signed" sovellus joten ota huomioon [microsoftin vastaus tapauksiin, joissa Pyinstallerin luoma suoritettava tiedosto on merkitty väärin](https://answers.microsoft.com/en-us/windows/forum/all/where-executables-created-by-pyinstaller-are-being/09e58a6b-01f3-4e72-8765-6542ef7291f4)
 tai käytä edellä mainitulla tavalla suoraan lähdekoodia "python"-ohjelman avulla.
 
-Jos todella haluat, voit rakentaa suoritettavat tiedostot itse lähdekoodista
+Jos todella haluat, voit koota suoritettavat tiedostot itse lähdekoodista
 käyttäen dopyinstaller.sh (Linux) tai dopyinstaller.bat (Windows) komentoja,
-jotka ovat lähdekoodissa mukana. Takentaminen vaatii pyinstaller-asennuksen:
+jotka ovat lähdekoodissa mukana. Kokoaminen vaatii pyinstaller-asennuksen:
 
 * Python -m pip asennus pyinstaller
    * Varmista, että pyinstaller on PATH-ympäristömuuttujasi polussa.
@@ -68,7 +68,7 @@ Sovellus on testattu Ubuntu 20.04 ja
 Windows 10 -laitteissa. Sprint-O-Maticin käyttäminen vaatii suhteellisen nykyaikaisen
 tietokoneen, koska sen hakualgoritmit suoritetaan useissa prosesseissa.
 Sovelluksessa voi olla hiukan viiveitä matkalla ensimmäiselle rastille,
-mutta tämän viiveiden pitäisi kadota hetkisen päästä.
+mutta viiveiden pitäisi kadota hetkisen päästä.
 
 ## Käyttö
 
@@ -90,7 +90,7 @@ Peli voi alkaa.
 
 ### Pelin kulku
 
-Pelin ohjaus ovat samankaltaista kuin aloitusnäytön ohjaus: nuolinäppäimistä tai hiiren
+Pelin ohjaus on samankaltaista kuin aloitusnäytön ohjaus: nuolinäppäimistä tai hiiren
 painikkeista käännetään suuntaa vasemmalle tai oikealle, esc tai keskipainike keskeyttää pelin.
 Käyttö on tarkoituksella niin yksinkertaista että pelatessa ei tarvitse istua
 epäterveellisesti pöydän ääressä. Langatonta hiirtä käyttäen voit vaikka treenata samanaikaisesti.
@@ -103,7 +103,7 @@ Kaikissa reittianalyysitiloissa liikut rastilta toiselle yksin.
 Kun saavutat kunkin rastin, edellisen rastivälin reittisi näytetään hetkeksi, 
 ja vertailuna näytetään optimaalisin reitti, jonka sovellus pystyi löytämään.
 
-Maalissa saan nähdäksesi käytetyn ajan, kuljetun matkan ja virheprosentin verrattuna
+Maalissa saat nähdäksesi käytetyn ajan, kuljetun matkan ja virheprosentin verrattuna
 optimireittiin. Reittianalyysitiloja on kolme:
 
 * repeat: kierrä satunnaisia ratoja samalla kartalla yhä uudelleen ja uudelleen
@@ -124,7 +124,7 @@ Graafisen analyysin tulos näyttää tältä:
 
 Jänistilassa kierrät reitin yhdessä jänisjuoksijan kanssa. Jänisjuoksija on
 henkilökohtainen virtuaalivalmentajasi. Se odottaa sinua jokaisella rastilla,
-ja kilpailee sinua vastaan / kanssasi kullakin rastivälillä välillä.
+ja kilpailee sinua vastaan / kanssasi kullakin rastivälillä.
 
 Silloin tällöin jänis päättää jättää yhden rastin väliin,
 ja tulee mukaan taas seuraavalla. Älä huolestu, vaan jatka peliä normaalisti.
@@ -142,12 +142,12 @@ Katso esimerkki edellisestä kuvasta.
 Sprint-O-Matic:in voi myös linkittää **ulkoisiin** karttoihin. 
 Sinun tarvitsee vain lähettää tarvittavat tiedot kartasta osoitteeseen
 sprint-o-matic gmail com. Jos kartan lisenssi on riittävän salliva,
-lisään sen linkkilistalle [https://github.com/LemesoftNostalgic/sprint-o-matic-external-map-links](https://github.com/LemesoftNostalgic/ sprint-o-matic-external-map-links)
+lisään sen linkkilistalle [https://github.com/LemesoftNostalgic/sprint-o-matic-external-map-links](https://github.com/LemesoftNostalgic/sprint-o-matic-external-map-links)
 jolloin se tulee näkyviin Sprint-O-Maticiin. Voin jopa myöntää joillekin joukkueille
 luvan pitää omaa karttalistaansa, jos kiinnostusta löytyy. Sovellus tarkistaa luettelot
 aina käynnistyessään ja näyttää karttavalinnan yksitellen, kun käyttäjä painaa
 aloitusnäytön "external/team"- ja "external/map"-painikkeita.
-Alussa on luotu yksi esimerkkijoukkue, jolla on jo muutamia karttoja. Toivottavasti
+Alussa on jo valmiina yksi esimerkkijoukkue, jolla on muutamia karttoja. Toivottavasti
 lisää tulee.
 
 Tarkista seuraavasta kappaleesta tiedot, jotka vaaditaan, jotta kartta voidaan tehdä näkyväksi
@@ -162,11 +162,11 @@ Käyttämällä [komentorivi](#komentorivin-käyttö) parametreja **--mapFileNam
 **--lookupPngName** voit pelata paikalliseen tiedostojärjestelmääsi tallennetulla kartalla.
 Karttatiedosto on vain kuva kartasta, mieluiten png-muodossa, ja 
 "maaston kuvaus" on samankokoinen png-kuva, johon on merkitty 
-maaston ominaisuudet. tietyillä väreillä, katso luku
+maaston ominaisuudet tietyillä väreillä, katso luku
 [maaston kuvauksen luominen](#maaston-kuvauksen-luominen).
 
 Yksityisillä kartoilla pelaaminen on hyvä tapa kokeilla maaston kuvausta ennen kuin sen
-tekee näkyväksi Spriot-O-Maticin käyttäjille.
+tekee näkyväksi muille Sprint-O-Maticin käyttäjille.
 
 ### Tee karttasi näkyväksi Sprint-O-Maticin käyttäjille
 
@@ -184,7 +184,7 @@ sprint-o-matic gmail com linkityksen toteuttamiseksi:
 - metriä/pikseli -kerroin
 - kartan koon skaalauskerroin
 
-Tässä on esimerkki yhden kartan tiedoista [sprint-o-maticin tämänhetkisessä ulkoisten karttojen luettelossa] (https://github.com/LemesoftNostalgic/sprint-o-matic-external-map-links):
+Tässä on esimerkki yhden kartan tiedoista [sprint-o-maticin tämänhetkisessä ulkoisten karttojen luettelossa](https://github.com/LemesoftNostalgic/sprint-o-matic-external-map-links):
 
    ```json
     {
@@ -203,13 +203,13 @@ Tässä on esimerkki yhden kartan tiedoista [sprint-o-maticin tämänhetkisessä
 **Vihje:** Jos et tiedä kuinka julkaista tiedostoja verkossa saadaksesi
 kartan URL-osoitteen: helppo tapa tehdä se on [avaa ilmainen tili ja
 kansio GitHub:ssa](https://github.com/signup) ja raahaa tiedostot sinne.
-Sprint-o-Matic gmail com ymmärtää github-osoitteet, joten sinulla ei ole
-välttämätöntä antaa tarkkaa URL-osoitetta tässä tapauksessa.
+Sprint-o-Matic gmail com ymmärtää github-osoitteet, joten sinun ei ole
+välttämätöntä kertoa tarkkaa URL-osoitetta github-osoitteiden kanssa.
 
 Kaksi muuta asiaa, joihin on kiinnitettävä huomiota, ovat a) kartan lisenssi
 ja b) maaston kuvauksen piirtäminen.
 
-a) Lisenssiin liittyen on julkiselle listalle on mahdollista
+a) Lisenssiin liittyen: julkiselle listalle on mahdollista
 sisällyttää vain suhteellisen sallivalla lisenssillä julkaistuja karttakuvia.
 Käytännössä karttakuva näkyy kaikille Sprint-O-Matic-käyttäjille, kun se otetaan mukaan.
 Paras tapa olisi että ehdokaskartta olisi julkaistu jollakin Creative Commons
@@ -235,9 +235,9 @@ Olen käyttänyt [GIMP-editoria](https://www.gimp.org), koska se on minulle tutt
 Maastomerkintöjen on vastattava täsmälleen kuvassa esitettyjä värikoodeja.
 Lopussa on hyvä tarkistaa editoinnin tulos silmämääräisesti. Kiinnitä huomiota erityisesti
 sprinttikartakartan mustalla värillä oleviin symboleihin: pääasiassa mustalla värillä
-merkitään kohdat, joiden läpi ei voi juosta,
+merkitään sprinttikartoissa kohdat, joiden läpi ei voi juosta,
 mutta jotkut mustat merkinnät, kuten polut ja aitojen vinoviivat, ovat itse asiassa
-läpijuostavia. Varo ettet maalaa niitäkin kielletyiksi.
+läpijuostavia. Varo ettet maalaa niitäkin kielletyiksi omassa maastokuvauksessasi.
 
 Katso [esimerkkikansiota](https://github.com/LemesoftNostalgic/sprint-o-matic-map-image-example)
 jossa on pelattavia esimerkkejä karttakuvasta ja sitä vastaavasta
@@ -264,7 +264,7 @@ Kyseessä on harrastusprojekti, joten vaikka olen tavoitellut hyvää laatua
 niin se ei välttämättä ole parhaiden kaupallisten ohjelmistojen tasolla.
 
 Ohjelmisto on lisensoitu Apache-2.0-lisenssillä. Voit siis vapaasti
-perustaa oman kehityshaaran se parantelua tai lisäkehitystä varten.
+perustaa oman kehityshaaran sen parantelua tai lisäkehitystä varten.
 Voit myös ehdottaa korjauksia "git pull request" mekanismilla.
 Harrastusprojektimaisesta luonteesta johtuen kaikki apu on tietysti tervetullutta.
 Tämänhetkinen idealista on seuraava:
@@ -330,11 +330,11 @@ Harrastin pelikoodausta 80-luvulla, nimimerkillä "Lemesoft". Kyseinen niminerkk
 nykyään varattu olemassaolevalle yritykselle joten tein uuden nimimerkin "LemesoftNostalgic"
 tätä harrasteprojektia varten.
 
-Aikani menee työhön, treeneihin, ja muuhun elämiseen. Harrastueohjelmointiin ei ole
-loputtomasti aikaa. Yritän silti vastata isoimpiin ongelmiin, jos niistä ilmoitetaan
+Aikani menee työhön, treeneihin, ja muuhun elämiseen. Harrasteohjelmointiin ei ole
+kovin paljon aikaa. Yritän silti vastata isoimpiin ongelmiin, jos niistä ilmoitetaan
 sprint-o-matic gmail com:iin.
 
-### Tietoja atageneraattorista
+### Tietoja ratageneraattorista
 
 Oletusarvoisesti Sprint-O-Matic luo uuden radan jokaiselle juoksulle.
 Yleensä radat ovat hyviä, mutta eivät joka kerta. Jos satut saamaan
@@ -345,14 +345,15 @@ pelata huonoa rataa kokonaan läpi.
 
 Sprint-O-Matic on pelin kaltainen interaktiivinen sovellus.
 Varoitus varsinkin ameriikan markkinoille: Sprint-O-Maticin turvallisuutta ei ole
-testattu kunnolla juoksumatttokäytössä. Siksi minun on ohjeistettava että ei pelata
+testattu kunnolla juoksumattokäytössä. Siksi minun on ohjeistettava että ei pelata
 samaan aikaan juoksumatolla juosten, vaikka se onkin
 teknisesti mahdollista langattomalla hiirellä. Ilmoita minulle sprint-o-matic gmail com:n
 kautta, jos jonkun juoksumaton edustaja näyttää vihreää valoa tämänkaltaiselle käytölle.
 
 ### Tuki
 
-Karttaehdotukset, joukkue-ehdotukset ja sovelluksen parannusideoita voi lähettää
+Karttaehdotukset, ehdotukset joukkueista jotka ovat kiinnostuneita ylläpitämään
+omaa karttaluetteloa, ja sovelluksen parannusideat voi lähettää
 sprint-o-matic gmail com:iin.
 
 ## Komentorivin käyttö
@@ -361,32 +362,32 @@ Edistyneille käyttäjille on olemassa lisävaihtoehtoja komentorivin kautta.
 
 Reittianalyysien tallentaminen tiedostoon.
 
-**--analyysi** Tallennetaanko reittianalyysit tiedostoon
+**--analyysi** Tallennetaan reittianalyysit tiedostoon
 
 Vaihtoehdot, jotka ovat hyödyllisiä, jos haluat pelata omalla kartallasi.
 Kun käytät niitä, et mene aloitusnäyttöön, vaan peli alkaa
 heti:
 
-**--mapFileName** haluamasi suunnistuskartan tiedoston nimi, mieluusti png-muoto
+**--mapFileName tiedoston-nimi** haluamasi suunnistuskartan tiedoston nimi, mieluusti png-muoto
 
-**--lookupPngName** maaston kuvauksen tiedoston nimi, png-muoto
+**--lookupPngName tiedoston-nimi** maaston kuvauksen tiedoston nimi, png-muoto
 
-**--metersPerPixel** Kuinka monta metriä karttapikseliä kohden
+**--metersPerPixel numero** Kuinka monta metriä karttapikseliä kohden
 
 Ja koska et siirry aloitusnäyttöön, käyttäessäsi omaa karttatiedostoa,
 joudut valitsemaan pelivalinnat komentoriviparametreilla:
 
-**--trackLength** pienin raidan pituus metreinä
+**--trackLength numero** pienin raidan pituus metreinä
 
-**--miniLegProbability** minijalkojen todennäköisyys (0,0-0,99)
+**--miniLegProbability numero** minijalkojen todennäköisyys (0,0-0,99)
 
-**--shortLegProbability** lyhyiden jalkojen todennäköisyys (0,0-0,99)
+**--shortLegProbability numero** lyhyiden jalkojen todennäköisyys (0,0-0,99)
 
-**--mediumLegProbability** keskipitkien jalkojen todennäköisyys (0,0-0,99)
+**--mediumLegProbability numero** keskipitkien jalkojen todennäköisyys (0,0-0,99)
 
-**--longLegProbability** pitkien jalkojen todennäköisyys (0,0-0,99)
+**--longLegProbability numero** pitkien jalkojen todennäköisyys (0,0-0,99)
 
-**--extraLongLegProbability** erittäin pitkien jalkojen todennäköisyys (0,0-0,99)
+**--extraLongLegProbability numero** erittäin pitkien jalkojen todennäköisyys (0,0-0,99)
 
 **--continuous** Jatkuva pelisilmukka (tai yhden laukauksen peli)
 
@@ -394,15 +395,15 @@ joudut valitsemaan pelivalinnat komentoriviparametreilla:
 
 Ja jos haluat suunnitella tietyn reitin:
 
-**--routeFileName** järjestetty lista ohjauspisteen koordinaateista (tuple) json-formaatissa
+**--routeFileName tiedoston-nimi** järjestetty lista ohjauspisteen koordinaateista (tuple) json-formaatissa
 
 Ja lopuksi, jos haluat isännöidä yksityistä karttatietoluetteloasi.
 
-**--ownMasterListing** Korvaa oletusverkkolistaus toisella URL-osoitteella
+**--ownMasterListing url-osoite** Korvaa oletusverkkolistaus toisella URL-osoitteella
 
-**--externalExampleTeam** Joukkueen valinta listauksesta
+**--externalExampleTeam teksti-nimi** Joukkueen valinta listauksesta
 
-**--externalExample** Karttavalinta listauksesta
+**--externalExample teksti-nimi** Karttavalinta listauksesta
 
 On myös joitain muita vaihtoehtoja, jotka on tarkoitettu pääasiassa sovelluksen
 testaukseen. Ne on dokumentoitu vain koodissa.
