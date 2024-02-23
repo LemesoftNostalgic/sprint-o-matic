@@ -326,7 +326,7 @@ kemian taitojensa vuoksi. Epäilty dopingista, mutta ei ole jäänyt kiinni.
 
 ### Tietoja tämän sovelluksen luojasta
 
-Harrastin pelikoodausta 80-luvulla, nimimerkillä "Lemesoft". Kyseinen niminerkki on
+Harrastin pelikoodausta 80-luvulla, nimimerkillä "Lemesoft". Kyseinen nimimerkki on
 nykyään varattu olemassaolevalle yritykselle joten tein uuden nimimerkin "LemesoftNostalgic"
 tätä harrasteprojektia varten.
 
