@@ -4,20 +4,20 @@
 
 ## Introduction
 
-Sprint-O-Matic is a training application for sprint orienteering or
+Sprint-O-Matic is a training application for sprint orienteering, or
 Sprint-O for short.
 I created it initially for my own use, to give some variety to my
 exercise during cold winter days in Finland. After a while, it came to my
-mind that someone else might be interested to try it out, so here it is.
+mind, that someone else might be interested to try it out, so here it is.
 
 What then is sprint orienteering? It is a fast paced foot navigation
 sport arranged usually in urban environments. More description can be found
 from the [Wikipedia article on sprint orienteering](https://en.wikipedia.org/wiki/Orienteering#Sprint) or [sprint orienteering content in YouTube](https://www.youtube.com/results?search_query=sprint+orienteering).
 
-The discipline of sprint orienteering requires not only the running speed
+The discipline of sprint orienteering requires, not only the running speed,
 but the ability to rapidly choose the best route from one control to another.
 This is the place where the Sprint-O-Matic comes into the picture.
-It provides you an infinite number of sprint orienteering route selection challenges in a
+It provides you an infinite number of sprint orienteering route selection challenges, in a
 form of an entertaining 2D game. See the following YouTube videos to get an
 idea:
 
@@ -39,7 +39,7 @@ idea:
 
 ## Installation
 
-The recommended method is to run the software with python directly from
+The recommended method is to run the software with python, directly from
 source code, because it is easy and safe:
 
 1. Download and unzip the source code package from the [Release folder](https://github.com/LemesoftNostalgic/sprint-o-matic/releases/latest) to your machine
@@ -76,15 +76,15 @@ orienteering, but that lag should settle later on.
 
 ![Sprint-O-Matic Home Screen by Jyrki Leskela](/doc/InitialDisplay.png)
 
-The first thing you see when you start the application is the home screen.
-It allows for the basic setting of track and leg length, play modes and map selection. The home screen can be used from keyboard (arrow keys to move the blue pointer, enter/space to select, esc to exit) or
+The first thing you see, when you start the application, is the home screen.
+It allows for the basic setting of track and leg length, play modes, and map selection. The home screen can be used from keyboard (arrow keys to move the blue pointer, enter/space to select, esc to exit), or
 with a mouse (left/right button to move the blue pointer and middle button to select. The mouse usage might sound unintuitive, but I want to be able to use the application when the mouse is not at the desk surface.
 
 When you have selected all the settings, move the blue pointer to the finish circle and select it. The game you just configured will then begin.
 
 ### Gameplay
 
-The keys and buttons for the gameplay are similar to those in the home screen: Arrow keys or mouse buttons to turn left or right, esc or middle button to quit. The usage is intentionally as straightforward as possible.
+The gameplay keys are similar to the home screen keys: Arrow keys or mouse buttons to turn left or right, esc or middle button to quit. The usage is intentionally simlified.
 
 ![Sprint-O-Matic gameplay with a fantasy map by Jyrki Leskela](/doc/ExternalFantasyMap.png)
 
@@ -102,8 +102,10 @@ modes to choose from:
 * once: run the track once and return to the home screen
 * fast: doubles the runner speed to give a little bit more challenge
 
-It is also possible to get the analysis results as a file after the
-session, when using the [command line](#command-line-usage) parameter **--analysis**.
+It is also possible to get the analysis results as a file to your disk,
+after the session. This requires using the [command line](#command-line-usage)
+parameter **--analysis** when starting the application.
+
 The graphical analysis result looks like this:
 
 ![Sprint-O-Matic Analysis result by Jyrki Leskela](/doc/Analysis.png)
