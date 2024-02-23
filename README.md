@@ -4,6 +4,8 @@
 
 ## Introduction
 
+_Linkki suomenkieliseen ohjeeseen_: [README-FINNISH.md](/README-FINNISH.md).
+
 Sprint-O-Matic is a training application for sprint orienteering, or
 Sprint-O for short.
 I created it initially for my own use, to give some variety to my
@@ -155,6 +157,7 @@ sprint-o-matic gmail com to make the linkage happen:
 - license information for the terrain description
 - credit text for the owner/creator of the terrain description
 - meters-per-pixel factor
+- default zoom factor
 
 Here is an example of an entry in the [sprint-o-matic's current listing of external maps](https://github.com/LemesoftNostalgic/sprint-o-matic-external-map-links):
 
@@ -189,7 +192,7 @@ This will probably limit the selection to older maps that have no more use
 for live sprint orienteering events. For me, that sounds a good trade-off.
 
 b) A bit more involved is the creation of the terrain description
-e.g. "lookup-png". The following subchapter tells hot to do that.
+e.g. "lookup-png". The following subchapter tells how to do that.
 
 ### Creating the terrain description
 
