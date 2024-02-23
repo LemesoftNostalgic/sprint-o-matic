@@ -395,7 +395,7 @@ joudut valitsemaan pelivalinnat komentoriviparametreilla:
 
 Ja jos haluat suunnitella tietyn reitin:
 
-**--routeFileName tiedoston-nimi** järjestetty lista ohjauspisteen koordinaateista (tuple) json-formaatissa
+**--routeFileName tiedoston-nimi** järjestetty lista rastien koordinaateista (tuple) json-formaatissa. Huom: ensimmäinen koordinaatti on lähtöpaikka, ja viimeinen koordinaatti on maali.
 
 Ja lopuksi, jos haluat isännöidä yksityistä karttatietoluetteloasi.
 
