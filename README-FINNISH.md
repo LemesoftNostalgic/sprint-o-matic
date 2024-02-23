@@ -52,8 +52,8 @@ Suositeltava tapa on ajaa ohjelmisto pythonilla suoraan lähdekoodina, koska se 
 4. Käynnistä "main.py" sprint-o-matic:in src-kansiosta (napsauta "main"-kuvaketta tai käytä komentoa "python main.py" komentoriviltä)
 
 [Release-kansio](https://github.com/LemesoftNostalgic/sprint-o-matic/releases/latest) sisältää myös valmiiksi paketoidut sovellukset Linuxille ja Windowsille suoritettavina "exe"-tiedostoina. 
-Windows executable ei ole "Windows signed" sovellus joten ota huomioon [microsoftin vastaus tapauksiin, joissa Pyinstallerin luoma suoritettava tiedosto on merkitty väärin](https://answers.microsoft.com/en-us/windows/forum/all/where-executables-created-by-pyinstaller-are-being/09e58a6b-01f3-4e72-8765-6542ef7291f4)
-tai käytä edellä mainitulla tavalla suoraan lähdekoodia "python"-ohjelman avulla.
+Windows executable ei ole "Windows signed" sovellus, mutta seurasin ohjetta [microsoftin vastaus tapauksiin, joissa Pyinstallerin luoma suoritettava tiedosto on merkitty väärin](https://answers.microsoft.com/en-us/windows/forum/all/where-executables-created-by-pyinstaller-are-being/09e58a6b-01f3-4e72-8765-6542ef7291f4). Mutta jos pelaat varman päälle niin käytä edellä mainitulla tavalla suoraan
+lähdekoodia "python"-ohjelman avulla.
 
 Jos todella haluat, voit koota suoritettavat tiedostot itse lähdekoodista
 käyttäen dopyinstaller.sh (Linux) tai dopyinstaller.bat (Windows) komentoja,
