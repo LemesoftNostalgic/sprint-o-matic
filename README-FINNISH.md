@@ -260,8 +260,9 @@ Myös hidas vihreä maasto on hyvä, mutta ei välttämätön.
 ## Tietoja tästä ohjelmistosta ja sen lisenssistä
 
 Sovelluksen sisäosat on kirjoitettu pythonilla pygame-kirjaston avulla.
-Kyseessä on harrastusprojekti, joten vaikka olen tavoitellut hyvää laatua
-niin se ei välttämättä ole parhaiden kaupallisten ohjelmistojen tasolla.
+Kyseessä on harrastusprojekti, joten vaikka olen tavoitellut kohtalaista laatua
+ajankäyttöni sallimissa rajoissa, niin laatu ei välttämättä
+ole parhaiden kaupallisten ohjelmistojen tasolla.
 
 Ohjelmisto on lisensoitu Apache-2.0-lisenssillä. Voit siis vapaasti
 perustaa oman kehityshaaran sen parantelua tai lisäkehitystä varten.
