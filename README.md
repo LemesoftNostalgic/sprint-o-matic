@@ -29,7 +29,10 @@ idea:
 
   * [Installation](#installation)
   * [Usage](#usage)
-  * [Linking external maps to Sprint-O-Matic](#linking-external-maps-to-sprint-o-matic)
+  * [Adding new maps to Sprint-O-Matic](#adding-new-maps-to-sprint-o-matic)
+    * [Playing with your private maps](#playing-with-your-private-maps)
+    * [Make your map visible to Sprint-O-Matic users](#make-your-map-visible-to-sprint-o-matic-users)
+    * [Creating the terrain description](#creating-the-terrain-description)
   * [Software developent and license](#software-developent-and-license)
   * [Misc topics](#misc-topics)
   * [Command-line usage](#command-line-usage)
@@ -45,6 +48,8 @@ source code, because it is easy and safe:
 3. Install the required python modules from command prompt
   * python -m pip install pygame
   * python -m pip install requests
+  * python -m pip install argparse
+
 4. Start the "main.py" from src folder of sprint-o-matic (click the "main" icon or use command "python main.py" from the command line)
 
 The [Release folder](https://github.com/LemesoftNostalgic/sprint-o-matic/releases/latest) contains also pre-built applications for Linux and Windows as executables. The Windows PyInstaller executable is not signed by Microsoft so the [microsoft answer for cases when Pyinstaller-created executable is incorrectly flagged](https://answers.microsoft.com/en-us/windows/forum/all/where-executables-created-by-pyinstaller-are-being/09e58a6b-01f3-4e72-8765-6542ef7291f4) should be taken into account.
@@ -126,10 +131,19 @@ The Sprint-O-Matic can also link to **external** maps. All you have to do is to 
 
 See the following chapter for the data that is needed, to make a map playable in Sprint-O-Matic.
 
-## Linking external maps to Sprint-O-Matic
 
-To link an external map for the Sprint-O-Matic listing, some information
-regarding the map is needed:
+## Adding new maps to Sprint-O-Matic
+
+### Playing with your private maps
+
+Using the [command line](#command-line-usage) parameters **--mapFileName** and **--lookupPngName** you can play with a map stored in your local filesystem. The map file is just an image of the map, preferably in png format, and the lookup file (i.e. terrain description) is an equally sized png image where the terrain characteristics are marked
+with specific colors, see chapter [creating the terrain description](#creating-the-terrain-description).
+
+### Make your map visible to Sprint-O-Matic users
+
+Add a map to the Sprint-O-Matic's map listing, and everyone can play
+with it. Some information regarding the map needs to be sent to the
+sprint-o-matic gmail com to make the linkage happen:
 
 - name, short one to fit it in the home screen
 - url-link to an image of the map (png format is encouraged)
@@ -140,7 +154,7 @@ regarding the map is needed:
 - credit text for the owner/creator of the terrain description
 - meters-per-pixel factor
 
-Here is an example of an entry in the [https://github.com/LemesoftNostalgic/sprint-o-matic-external-map-links](https://github.com/LemesoftNostalgic/sprint-o-matic-external-map-links):
+Here is an example of an entry in the [sprint-o-matic's current listing of external maps](https://github.com/LemesoftNostalgic/sprint-o-matic-external-map-links):
 
    ```json
     {
@@ -156,7 +170,13 @@ Here is an example of an entry in the [https://github.com/LemesoftNostalgic/spri
     }
    ```
 
-The two main things to pay attention is a) license of the map and b) creating the terrain description e.g "lookup-png".
+**Hint:** If you don't know how to publish files in the web to get an
+URL of the map: an easy way to do that is to [open a free account and
+repository in the GitHub](https://github.com/signup) and drag the files there.
+Sprint-o-Matic gmail com understands github repository names so you don't have
+to give the precise URL in that case.
+
+The two other things to pay attention is a) license of the map and b) creating the terrain description e.g "lookup-png".
 
 a) Regarding the license, it is only possible to include map images
 with relatively permissive license to the listing. In practice, the map
@@ -166,12 +186,11 @@ image of a candidate map with one of the creative commons license types.
 This will probably limit the selection to older maps that have no more use
 for live sprint orienteering events. For me, that sounds a good trade-off.
 
-There is also a way to use the app with your private maps.
-In that case you have to rely on the command line options, and keep the
-map content in your own computer.
-
 b) A bit more involved is the creation of the terrain description
-e.g. "lookup-png".
+e.g. "lookup-png". The following subchapter tells hot to do that.
+
+### Creating the terrain description
+
 Basically, you have to create equally sized image as the map image.
 One easy method is to make a copy of the original map image, re-paint
 each terrain type with a correct color code and save the result as png.
@@ -180,11 +199,11 @@ The color codes are the following:
 
 ![Sprint-O-Matic lookup colors by Jyrki Leskelä](/doc/lookupcolors.png)
 
-Please use an editor where you can choose the colors accurately. The
+Please use an editor where you can choose the colors accurately.
+I have used [GIMP](https://www.gimp.org) because I am familiar with it. The
 terrain markings must represent exactly the color codes shown in the image
-above. Then you need to review the edits. Especially the black color of
-sprint map notation is
-difficult: usually it marks an area that you cannot run through,
+above. Then you need to review the edits. Pay attention to the black color of
+sprint map notation: usually it marks an area that you cannot run through,
 but some black features such as forest paths and fence symbol
 slashes are actually runnable, so do not mark them forbidden.
 
@@ -224,11 +243,11 @@ Low hanging fruits:
 * Add control numbering, control descriptions, etc.
 * graphics beautification
 * Score-O mode (collect contols with score in any order, time limit)
+* events/multiplayer support (might have to be a paid subcription to cover the
+server costs)
 
 A bit more involved:
 
-* events/multiplayer support (might have to be a paid subcription to cover the
-server costs)
 * automatic creation of terrain descriptions. With sprint orienteering maps,
 the black color is a problem. It is used for symbols that you can run through
 and symbols that you can't run through. There is even some variation from map
@@ -309,12 +328,15 @@ ideas can be sent to sprint-o-matic at gmail com.
 ## Command-line usage
 
 For the advanced users, there are more detailed options in the form of
-command-line options. These are not as well tested as the home screen.
-For using them, also the following python module needs to be installed:
+command-line options.
 
-  * python -m pip install argparse
+It is also possible to write the route analyses to a file.
 
-These options are useful if you want to play with your own map:
+**--analysis** Whether to write the route analyses into a file
+
+These options are useful if you want to play with your own map.
+When using them, you don't go to the home screen, but the game starts
+immediately:
 
 **--mapFileName** sprint orienteering map, png format
 
@@ -322,8 +344,10 @@ These options are useful if you want to play with your own map:
 
 **--metersPerPixel** How many meters per map pixel
 
-These are similar options that you can activate from the home screen,
-with a bit more detail:
+And since you don't go to the home screen when using your own map file,
+there are command line parameters for the options that you would
+normally toggle in the in the home screen,
+just a bit more detailed:
 
 **--trackLength** the minimum track length in meters
 
@@ -341,21 +365,17 @@ with a bit more detail:
 
 **--pacemaker** A pacemaker runner to compete against (1-3, 0 for none)
 
-And in case you want to maintain your private routes or map listings:
+And in case you want to design a specific route:
 
-**--routeFileName** ordered list of tuples (track control points) in json
+**--routeFileName** ordered list of tuples (control point coordinates) in json
+
+And finally, if you want to host your private map listing.
 
 **--ownMasterListing** Override the default web listing with other URL
 
 **--externalExampleTeam** The team selection from the listing
 
 **--externalExample** The map selection from the listing
-
-
-It is also possible to write the route analyses to a file:
-
-**--analysis** Whether to write the route analyses into a file
-
 
 There are also some other options that are mainly for application
 testing. They are documented only in the code.
