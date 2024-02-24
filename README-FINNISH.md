@@ -50,6 +50,7 @@ Suositeltava tapa on ajaa ohjelmisto pythonilla suoraan lähdekoodina, koska se 
    * python -m pip install argparse
 
 4. Käynnistä "main.py" sprint-o-matic:in src-kansiosta (napsauta "main"-kuvaketta tai käytä komentoa "python main.py" komentoriviltä)
+   * tai käytä komentoa "python main.py --fullScreen no" jos haluat pelata ikkunassa.
 
 [Release-kansio](https://github.com/LemesoftNostalgic/sprint-o-matic/releases/latest) sisältää myös valmiiksi paketoidut sovellukset Linuxille ja Windowsille suoritettavina "exe"-tiedostoina. 
 Windows executable ei ole "Windows signed" sovellus, mutta seurasin ohjetta [microsoftin vastaus tapauksiin, joissa Pyinstallerin luoma suoritettava tiedosto on merkitty väärin](https://answers.microsoft.com/en-us/windows/forum/all/where-executables-created-by-pyinstaller-are-being/09e58a6b-01f3-4e72-8765-6542ef7291f4). Jos kuitenkin pelaat varman päälle niin käytä edellä mainitulla tavalla suoraan
@@ -360,6 +361,10 @@ sprint-o-matic gmail com:iin.
 ## Komentorivin käyttö
 
 Edistyneille käyttäjille on olemassa lisävaihtoehtoja komentorivin kautta.
+
+It is also possible to play either fullscreen or in a window.
+
+**--fullScreen** Whether to play fullscreen, yes or no.
 
 Reittianalyysien tallentaminen tiedostoon.
 
