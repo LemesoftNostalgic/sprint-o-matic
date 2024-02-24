@@ -53,6 +53,7 @@ source code, because it is easy and safe:
   * python -m pip install argparse
 
 4. Start the "main.py" from src folder of sprint-o-matic (click the "main" icon or use command "python main.py" from the command line)
+  * or use command "python main.py --fullScreen no" if you want to play in a window.
 
 The [Release folder](https://github.com/LemesoftNostalgic/sprint-o-matic/releases/latest) contains also pre-built applications for Linux and Windows as executables. The Windows PyInstaller executable is not signed by Microsoft, but I followed the [microsoft answer for cases when Pyinstaller-created executable is incorrectly flagged](https://answers.microsoft.com/en-us/windows/forum/all/where-executables-created-by-pyinstaller-are-being/09e58a6b-01f3-4e72-8765-6542ef7291f4).
 
@@ -334,6 +335,10 @@ ideas can be sent to sprint-o-matic at gmail com.
 
 For the advanced users, there are more detailed options in the form of
 command-line options.
+
+It is also possible to play either fullscreen or in a window.
+
+**--fullScreen** Whether to play fullscreen, yes or no.
 
 It is also possible to write the route analyses to a file.
 
