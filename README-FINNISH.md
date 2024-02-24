@@ -362,9 +362,9 @@ sprint-o-matic gmail com:iin.
 
 Edistyneille käyttäjille on olemassa lisävaihtoehtoja komentorivin kautta.
 
-It is also possible to play either fullscreen or in a window.
+On myös mahdollista pelata joko koko näytöllä tai ikkunassa.
 
-**--fullScreen** Whether to play fullscreen, yes or no.
+**--fullScreen** Pelaatko koko näytöllä vai ikkunassa, yes tai no.
 
 Reittianalyysien tallentaminen tiedostoon.
 
