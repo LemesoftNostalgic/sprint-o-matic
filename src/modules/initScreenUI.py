@@ -367,7 +367,7 @@ def initScreen(imagePath, gameSettings, externalImageData, externalWorldCityMap,
     else:
         gameSettings.speed = "superfast"
         gameSettings.pacemaker = 0
-        gameSettings.continuous = True
+        gameSettings.continuous = False
 
     if retSettings[3] == "infinite-oulu":
         gameSettings.infiniteOulu = True
