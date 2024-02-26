@@ -59,7 +59,7 @@ def returnSettings():
             self.autoTest="no"
             self.infoBox="no"
             self.noUiTest="no"
-            self.fullScreen="yes"
+            self.fullScreen="no"
             self.infiniteOulu="no"
             self.infiniteWorld="no"
             self.infiniteWorldCity=""
