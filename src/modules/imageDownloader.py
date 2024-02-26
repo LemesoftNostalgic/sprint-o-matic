@@ -25,6 +25,8 @@ import io
 
 listingOfTeamsWithListing = "https://raw.githubusercontent.com/LemesoftNostalgic/sprint-o-matic-external-map-links/main/teams-hosting-their-own-map-listing.json"
 
+listingOfMapsInCities = "https://raw.githubusercontent.com/LemesoftNostalgic/sprint-o-matic-external-map-links/main/world-city-maps.json"
+
 newsUrl= "https://raw.githubusercontent.com/LemesoftNostalgic/sprint-o-matic-external-map-links/main/NEWS.txt"
 
 def downloadNews():
@@ -35,6 +37,17 @@ def downloadNews():
     except Exception as err:
         print(f"Cannot load news: {err=}, {type(err)=}")
     return news
+
+
+def downloadExternalWorldCityMap():
+    try:
+        response = requests.get(listingOfMapsInCities)
+        data = response.text
+        listingofmaps = json.loads(data)
+    except Exception as err:
+        print(f"Cannot load listing of map coords in cities: {err=}, {type(err)=}")
+        return []
+    return listingofmaps
 
 
 def downloadExternalImageData(ownMasterListing):

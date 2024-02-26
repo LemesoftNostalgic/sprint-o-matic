@@ -35,7 +35,7 @@ from modules.gameUI import uiInit, uiInitStartTriangle, uiStartControlEffect, ui
 from modules.gameEngine import startOverPlayerRoute, playerRoute, calculateNextStep, closeToControl, quiteCloseToControl, longLapEveryOther, generateAngleStep, normalizeAngleStep, defaultAngle, getPlayerRoute, getPacemakerThreshold, getPacemakerPos
 from modules.pathPruning import calculatePathWeightedDistance
 from modules.gameSounds import initSounds, stopSounds, maintainRunningStepEffect, startMelody, stopMelody, startBirds, stopBirds, shoutEffect, pacemakerShoutEffect, finishEffect, startEffect, stopEffects
-from modules.imageDownloader import downloadExternalImageData, downloadNews
+from modules.imageDownloader import downloadExternalImageData, downloadExternalWorldCityMap, downloadNews
 
 from modules.autoTest import fakeInitScreen, fakeCalculateNextStep, fakeUiEvent, fakeResetAgain
 
@@ -62,20 +62,20 @@ def setTheStageForNewRound(cfg):
     global pacemakerStep
     global aiCounter
 
-    # effects initialization
-    uiControlEffectRestart()
-    startEffect()
-    uiStartControlEffect(0)
-
     # Ensure we have a list of controls
     ctrls = []
     numAttempts = 3
     while ctrls == []:
-        ctrls, numberOfDifficultControls = createAutoControls(cfg, trackLengthInPixels, gameSettings.distributionOfControlLegs, gameSettings.metersPerPixel, faLookup)
+        ctrls, numberOfDifficultControls = createAutoControls(cfg, trackLengthInPixels, gameSettings.distributionOfControlLegs, gameSettings.metersPerPixel, faLookup, gameSettings.infiniteWorld)
         if ctrls and numberOfDifficultControls < len(ctrls) / 2:
             numAttempts = numAttempts - 1
             if numAttempts > 0:
                 ctrls = []
+
+    # effects initialization
+    uiControlEffectRestart()
+    startEffect()
+    uiStartControlEffect(0)
 
     news = downloadNews()
 
@@ -187,6 +187,7 @@ if __name__ == "__main__":
     uiEarlyInit(gameSettings.fullScreen)
     initSounds(gameSettings.soundRoot)
     externalImageData = downloadExternalImageData(gameSettings.ownMasterListing)
+    externalWorldCityMap = downloadExternalWorldCityMap()
     news = downloadNews()
 
     # statistics and route display initial values
@@ -245,13 +246,13 @@ if __name__ == "__main__":
             if gameSettings.autoTest:
                 (quitting, gameSettings) = fakeInitScreen(gameSettings.imageRoot, gameSettings, externalImageData)
             else:
-                (quitting, gameSettings) = initScreen(gameSettings.imageRoot, gameSettings, externalImageData, news)
+                (quitting, gameSettings) = initScreen(gameSettings.imageRoot, gameSettings, externalImageData, externalWorldCityMap, news)
             running = True
             if quitting:
                 running = False
             stopBirds()
         if not quitting:
-            config, controls, faLookup, saLookup, ssaLookup, vsaLookup, tunnelLookup, generatedOrDownloadedMap, tmpMetersPerPixel, externalZoom = returnConfig(gameSettings, externalImageData)
+            config, controls, faLookup, saLookup, ssaLookup, vsaLookup, tunnelLookup, generatedOrDownloadedMap, tmpMetersPerPixel, externalZoom = returnConfig(gameSettings, externalImageData, externalWorldCityMap)
 
             # scale from multiple sources...
             if gameSettings.infiniteOulu:
@@ -416,6 +417,9 @@ if __name__ == "__main__":
                                 running = False
                             else:
                                 controls = setTheStageForNewRound(config)
+                                # There might have been a delay
+                                uiFlushEvents()
+
 
                         # Now the render phase, need to sort out the pacemaker code
                         if running:

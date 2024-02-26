@@ -32,7 +32,7 @@ selections = [
     False, True, False, False, False, False,
     False, True, False, False, False, False,
     True, False, False, False,
-    True, False, False]
+    True, False, False, False]
 
 arrowScale = 4
 initCircleRadius = 30
@@ -67,7 +67,12 @@ def showInitArrow(surf, spot, inScale):
     pygame.draw.line(surf, getPlayerColor(), arrow1, arrow4, width=scale)
 
 
-def showInitSelections(surf, positions, selections, inScale, texts, titleTexts, titleTextPositions, creditTexts, creditTextPositions, externalOverallText, externalOverallPos, externalTeamText, externalTeamPosition, externalText, externalPosition, ouluText, ouluPosition, news, newsPosition):
+def uiRenderImmediate(pos, textStr):
+    showTextShadowed(pos, 32, textStr, getTrackColor(), 2)
+    pygame.display.flip()
+
+
+def showInitSelections(surf, positions, selections, inScale, texts, titleTexts, titleTextPositions, creditTexts, creditTextPositions, externalOverallText, externalOverallPos, externalTeamText, externalTeamPosition, externalText, externalPosition, ouluText, ouluPosition, news, newsPosition, worldText, worldPosition):
     # scale for the current display
     xStep = convertXCoordinate(xStepOrig)
     yStep = convertYCoordinate(yStepOrig)
@@ -123,6 +128,7 @@ def showInitSelections(surf, positions, selections, inScale, texts, titleTexts, 
         extTextSize = (extTextSize * extTextThreshold) // len(externalText)
     showTextShadowed(externalPosition, extTextSize, externalText, getTrackColor(), 2)
     showTextShadowed(ouluPosition, 32, ouluText, getTrackColor(), 2)
+    showTextShadowed(worldPosition, 32, worldText, getTrackColor(), 2)
     if news:
         showTextShadowed(newsPosition, 24, "News: " + news, getPacemakerColor(2), 2)
 
@@ -130,10 +136,12 @@ def showInitSelections(surf, positions, selections, inScale, texts, titleTexts, 
 initScreenPos = 0
 externalExampleTeamCtr = 0
 externalExampleCtr = 0
-def initScreen(imagePath, gameSettings, externalImageData, news):
+worldExampleCtr = 0
+def initScreen(imagePath, gameSettings, externalImageData, externalWorldCityMap, news):
     global selections
     global externalExampleTeamCtr
     global externalExampleCtr
+    global worldExampleCtr
     global initScreenPos
 
     # scale for the current display
@@ -148,10 +156,10 @@ def initScreen(imagePath, gameSettings, externalImageData, news):
         (xStart, yStart), (xStart + xStep, yStart), (xStart + 2 * xStep, yStart), (xStart + 3 * xStep, yStart), (xStart + 4 * xStep, yStart), (xStart + 5 * xStep, yStart), 
         # second row 6
         (xStart + 2* xStep, yStart + yStep), (xStart + 3 * xStep, yStart + yStep), (xStart + 4 * xStep, yStart + yStep), (xStart + 5 * xStep, yStart + yStep), (xStart + 6 * xStep, yStart + yStep), (xStart + 7 * xStep, yStart + yStep),
-        # third row 2
+        # third row 4
          (xStart + 5 * xStep, yStart + 2 * yStep),(xStart + 6 * xStep, yStart + 2 * yStep), (xStart + 7 * xStep, yStart + 2 * yStep), (xStart + 8 * xStep, yStart + 2 * yStep),
-        # fourth row 3
-        (xStart + 6.6 * xStep, yStart + 3 * yStep), (xStart + 7.6 * xStep, yStart + 3 * yStep), (xStart + 8.6 * xStep, yStart + 3 * yStep), (xStart + 9.6 * xStep, yStart + 3 * yStep)]
+        # fourth row 4
+        (xStart + 5.6 * xStep, yStart + 3 * yStep), (xStart + 6.6 * xStep, yStart + 3 * yStep), (xStart + 7.6 * xStep, yStart + 3 * yStep), (xStart + 8.6 * xStep, yStart + 3 * yStep), (xStart + 9.6 * xStep, yStart + 3 * yStep)]
     titleTexts = [
         "track length:",
         "leg length:",
@@ -176,7 +184,7 @@ def initScreen(imagePath, gameSettings, externalImageData, news):
         (xStart, yStart - yStep/5),
         (xStart + 1 * xStep - xStep / 10, yStart + 1 * yStep + yStep/4),
         (xStart + 4 * xStep - xStep / 10, yStart + 2 * yStep + yStep/4),
-        (xStart + 5.6 * xStep - xStep / 7, yStart + 3 * yStep + yStep/4)
+        (xStart + 4.6 * xStep - xStep / 7, yStart + 3 * yStep + yStep/4)
         ]
     creditTextPositions = [
         (xStart + xStep, yStart + 1.7 * yStep),
@@ -199,18 +207,18 @@ def initScreen(imagePath, gameSettings, externalImageData, news):
         # second row 6
         "micro", "    mini", "short", "regular", "longish", "long",
         # third row 2
-        "repeat", "once", "fast  ", "pacemaker",
+        "once", "    repeat", "fast  ", "pacemaker",
         # fourth row 3
-            "infinite   ", "team", "map", "start"
+            "World", "", "team", "map", "start"
         ]
     indexes = [
         [0, 1, 2, 3,  4,  5],
         [6, 7, 8, 9, 10, 11],
         [12, 13, 14, 15],
-        [16, 17, 18],
+        [16, 17, 18, 19],
         ]
     values = [
-        [400, 1000, 1600, 2200,  3200,  4800],
+        [600, 1000, 1400, 2000,  2400,  3000],
         [ [0.60, 0.30, 0.10, 0.00, 0.00],
            [0.40, 0.30, 0.20, 0.10, 0.00],
            [0.20, 0.30, 0.30, 0.15, 0.05],
@@ -218,15 +226,18 @@ def initScreen(imagePath, gameSettings, externalImageData, news):
            [0.10, 0.10, 0.20, 0.30, 0.30],
            [0.00, 0.05, 0.15, 0.35, 0.45]
            ],
-        ["repeat", "one-shot", "superfast", "pacemaker"],
-        ["infinite-oulu", "external-team", "external-map"],
+        ["one-shot", "repeat", "superfast", "pacemaker"],
+        ["infinite-world", "infinite-oulu", "external-team", "external-map"],
         ]
     infiniteOuluTerrains = ["shortLeg", "mediumLeg", "mediumLeg", "mediumLeg", "longLeg", "longLeg"]
     externalExampleOverallPosition = (xStart + 8.1 * xStep, yStart + 2.55 * yStep)
     externalExampleTeamSelectionPosition = (xStart + 7.6 * xStep, yStart + 3.3 * yStep)
     externalExampleSelectionPosition = (xStart + 8.6 * xStep, yStart + 3.3 * yStep)
+    loadingPosition = (xStart + 9.6 * xStep, yStart + 3.3 * yStep)
     ouluExampleSelectionPosition = (xStart + 6.6 * xStep, yStart + 3.3 * yStep)
-    
+
+    worldExampleSelectionPosition = (xStart + 5.6 * xStep, yStart + 3.3 * yStep)
+
     running = True
     quitting = False
     TIMER_EVENT = pygame.USEREVENT + 1
@@ -234,8 +245,10 @@ def initScreen(imagePath, gameSettings, externalImageData, news):
     backgroundImage = pygame.transform.scale(pygame.image.load(backgroundImageFile), getBigScreen().get_size())
     externalExampleTeamText = ""
     externalExampleText = ""
+    worldExampleText = ""
     externalExampleOverallText = "external"
-    ouluExampleText = "Oulu"
+    ouluExampleText = "iOulu"
+    loadingText = "Loading..."
 
     pygame.key.set_repeat(200, 50)
     pygame.time.set_timer(TIMER_EVENT, getTimerStep())
@@ -278,6 +291,10 @@ def initScreen(imagePath, gameSettings, externalImageData, news):
                                 externalExampleCtr = externalExampleCtr + 1
                                 if externalExampleCtr >= len(externalImageData[externalExampleTeamCtr]["sub-listing"]):
                                     externalExampleCtr = 0
+                            if initScreenPos == len(selections) - 4:
+                                worldExampleCtr = worldExampleCtr + 1
+                                if worldExampleCtr >= len(externalWorldCityMap):
+                                    worldExampleCtr = 0
                                 
             if event.type == TIMER_EVENT:
                 if pygame.mouse.get_pressed()[0]:
@@ -318,8 +335,13 @@ def initScreen(imagePath, gameSettings, externalImageData, news):
             selections[-2] = True
             selections[-1] = True
 
+        worldExampleText = ""
+        if len(externalWorldCityMap) > 0 and selections[-4] == True:
+            worldExampleText = externalWorldCityMap[worldExampleCtr][0]
+            selections[-4] = True
+
         getBigScreen().blit(backgroundImage, backgroundImage.get_rect())
-        showInitSelections(getBigScreen(), positions, selections, initCircleRadius, texts, titleTexts, titleTextPositions, creditTexts, creditTextPositions, externalExampleOverallText, externalExampleOverallPosition, externalExampleTeamText, externalExampleTeamSelectionPosition, externalExampleText, externalExampleSelectionPosition, ouluExampleText, ouluExampleSelectionPosition, news, newsPosition)
+        showInitSelections(getBigScreen(), positions, selections, initCircleRadius, texts, titleTexts, titleTextPositions, creditTexts, creditTextPositions, externalExampleOverallText, externalExampleOverallPosition, externalExampleTeamText, externalExampleTeamSelectionPosition, externalExampleText, externalExampleSelectionPosition, ouluExampleText, ouluExampleSelectionPosition, news, newsPosition, worldExampleText, worldExampleSelectionPosition)
         showInitArrow(getBigScreen(), positions[initScreenPos], arrowScale)
         if gameSettings.infoBox:
             showInfoBoxTxt(getBigScreen())
@@ -349,9 +371,17 @@ def initScreen(imagePath, gameSettings, externalImageData, news):
 
     if retSettings[3] == "infinite-oulu":
         gameSettings.infiniteOulu = True
+        gameSettings.infiniteWorld = False
         gameSettings.externalExample = ""
+    if retSettings[3] == "infinite-world":
+        gameSettings.infiniteOulu = False
+        gameSettings.infiniteWorld = True
+        gameSettings.infiniteWorldCity = worldExampleText
+        gameSettings.externalExample = ""
+        uiRenderImmediate(loadingPosition, loadingText)
     elif retSettings[3] == "external-team" or retSettings[3] == "external-map":
         gameSettings.infiniteOulu = False
+        gameSettings.infiniteWorld = False
         gameSettings.externalExample = externalExampleText
         gameSettings.externalExampleTeam = externalExampleTeamText
     pygame.time.set_timer(TIMER_EVENT, 0)

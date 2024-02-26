@@ -23,6 +23,8 @@ import time
 
 from .mathUtils import angleBetweenLineSegments, distanceBetweenPoints
 from .pathPruning import pruneEnsureLineOfSight
+from .routeAI import checkRouteExists
+
 
 firstControlMinDistance = 100
 
@@ -72,9 +74,12 @@ def pickDistAutoControl(cfg, ctrls, distribution, metersPerPixel, faLookup):
             if candidate is None:
                 return None, None, None
             # compare to all the ones so far
+            nearnessGood = True
             for ctrl in ctrls:
                 if distanceBetweenPoints(candidate, ctrl) < minlen:
-                    continue
+                    nearnessGood = False
+            if not nearnessGood:
+                continue
             # then more strictly to the previous one
             dist = distanceBetweenPoints(candidate, ctrls[-1])
             if dist >= minlen and dist < maxlen:
@@ -97,20 +102,29 @@ def pickDistAutoControl(cfg, ctrls, distribution, metersPerPixel, faLookup):
         return candidate, dist, isDifficultControl
 
 
-def createAutoControls(cfg, trackLength, distribution, metersPerPixel, faLookup):
-    ctrls = []
+def createAutoControls(cfg, trackLength, distribution, metersPerPixel, faLookup, isWorld):
     totdist = 0
+    ctrls = []
     ctrl = pickAutoControl(cfg, ctrls)
     ctrls.append(ctrl)
     numDifficultControls = 0
-    while totdist < trackLength or len(ctrls) < 3:
+    while (len(ctrls) < 25 and totdist < trackLength) or len(ctrls) < 3:
         ctrl, dist, isDifficultControl = pickDistAutoControl(cfg, ctrls, distribution, metersPerPixel, faLookup)
         if isDifficultControl:
             numDifficultControls = numDifficultControls + 1
         if ctrl is None:
             return [], 0
-        ctrls.append(ctrl)
-        totdist = totdist + dist
+        if isWorld:
+            if checkRouteExists(ctrl, ctrls[-1], faLookup):
+                ctrls.append(ctrl)
+                totdist = totdist + dist
+            elif len(ctrls) < 2:
+                ctrls = []
+                ctrl = pickAutoControl(cfg, ctrls)
+                ctrls.append(ctrl)
+        else:
+            ctrls.append(ctrl)
+            totdist = totdist + dist
     return ctrls, numDifficultControls
 
 

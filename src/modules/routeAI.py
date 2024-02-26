@@ -32,6 +32,8 @@ maxScoreInit = -10000
 
 tfs = [1, 2, 4, 8, 16]
 
+quickCheckDefaultTf = 4
+
 start_time = None
 refreshCtr = 5000
 
@@ -54,6 +56,67 @@ def lookupContains(lookups, point):
                 contains = True
             break
     return contains
+
+
+# Quickly check if any chance of route between A and B
+def checkRouteExists(pointA, pointB, forbiddenAreaLookup):
+
+    tf = quickCheckDefaultTf
+    forbiddenLookup = forbiddenAreaLookup[tf]
+
+    routeLookup = {}
+    backRouteLookup = {}
+
+     # The algorithm is time-restricted, be less accurate if takes too long
+    start_time = time.time()
+
+     # Find a rudimentary angular route with a painter algo with A* flavour
+    tfA = (int(pointA[0]/tf), int(pointA[1]/tf))
+    tfB = (int(pointB[0]/tf), int(pointB[1]/tf))
+    startScore = 1.0
+    routeLookup[tfA] = startScore
+    backRouteLookup[tfB] = startScore
+    stop = False
+    nextPruning = True
+    pointsInBetween = []
+
+    while not stop:
+        pointsInBetween = []
+        backPoints = []
+        for point in backRouteLookup.copy():
+            directions = getDirections(point)
+            for direction in directions:
+                newPoint = direction[0]
+                if (newPoint not in backRouteLookup or backRouteLookup[point] + 1.0 < backRouteLookup[newPoint]) and newPoint not in forbiddenLookup:
+                    backRouteLookup[newPoint] = backRouteLookup[point] + 1.0
+                    backPoints.append(newPoint)
+
+        for point in routeLookup.copy():
+            directions = getDirections(point)
+            for direction in directions:
+                newPoint = direction[0]
+                if (newPoint not in routeLookup or routeLookup[point] + 1.0 <= routeLookup[newPoint]) and newPoint not in forbiddenLookup:
+                    routeLookup[newPoint] = routeLookup[point] + 1.0
+                    if newPoint in backRouteLookup:
+                        return True
+                    # shortcut
+                    elif nextPruning and backPoints:
+                        nextPruning = True if randrange(refreshCtr//tf) == 0 else False
+                        backPoint = getNearestPointOfList(backPoints, newPoint)
+                        pointsInBetween = pruneEnsureGoodShortcut(backPoint, newPoint, forbiddenLookup, {}, {})
+                        if pointsInBetween != None:
+                            return True
+        if time.time() - start_time > getAiPoolMaxTimeLimit(tf) / 2:
+            return False
+    return True
+
+
+# Global variables for the AI pools
+aiNumberOfSlots = 2 # not too much pressure for the PC
+aiSlots = []
+readyRoutesArray = []
+
+
 
 
 # This shortest route finder is my genuine creation.
@@ -98,7 +161,7 @@ def calculateShortestRoute(setupList):
         if time.time() - start_time > getAiPoolMaxTimeLimit(tf):
             continue
 
-        # Find a rudimentary angular route with a sort of painter algo with A* flavour
+        # Find a rudimentary angular route with a painter algo with A* flavour
         tfA = (int(pointA[0]/tf), int(pointA[1]/tf))
         tfB = (int(pointB[0]/tf), int(pointB[1]/tf))
         startScore = 1.0
@@ -147,7 +210,7 @@ def calculateShortestRoute(setupList):
                             break
                         # shortcut
                         elif nextPruning and backPoints:
-                            nextPruning = True if randrange(refreshCtr) == 0 else False
+                            nextPruning = True if randrange(refreshCtr//tf) == 0 else False
                             backPoint = getNearestPointOfList(backPoints, newPoint)
                             pointsInBetween = pruneEnsureGoodShortcut(backPoint, newPoint, forbiddenLookup, slowLookup, verySlowLookup)
                             if pointsInBetween != None:

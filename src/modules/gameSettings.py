@@ -24,6 +24,7 @@ from random import randrange
 
 from .utils import getPackagePath
 from .infiniteOulu import setupPreGeneratedInfiniteOulu, getPreGeneratedInfiniteOulu
+from .infiniteWorld import getInfiniteWorldDefault
 from .lookupPngReader import extractPngLookups, extractPngLookupsFromFile
 from .imageDownloader import downloadMapSurfacesBasedOnUrl
 
@@ -60,6 +61,9 @@ def returnSettings():
             self.noUiTest="no"
             self.fullScreen="yes"
             self.infiniteOulu="no"
+            self.infiniteWorld="no"
+            self.infiniteWorldCity=""
+            self.infiniteWorldCityMap=[]
             self.analysis="no"
             self.ownMasterListing=""
             self.externalExample=""
@@ -99,6 +103,8 @@ def returnSettings():
         parser.add_argument("--ownMasterListing", type=str, help="Override the degfault web listing", default=defaultSettings.ownMasterListing)
         parser.add_argument("--externalExample", type=str, help="The map selection from a web listing", default=defaultSettings.externalExample)
         parser.add_argument("--externalExampleTeam", type=str, help="The team selection from a web listing", default=defaultSettings.externalExampleTeam)
+        parser.add_argument("--infiniteWorld", type=str, help="Infinite world feature", default=defaultSettings.infiniteWorld)
+        parser.add_argument("--infiniteWorldCity", type=str, help="Infinite world city selection", default=defaultSettings.infiniteWorldCity)
         parser.add_argument("--infiniteOuluTerrain", type=str, choices=["shortLeg", "mediumLeg", "longLeg"], help="Select the terrain good for a given leg length", default=defaultSettings.infiniteOuluTerrain)
         parser.add_argument("--speed", type=str, choices=["regular", "superfast"], help="The speed of the player", default=defaultSettings.speed)
         
@@ -115,13 +121,14 @@ def returnSettings():
     #    m   -   m      probability
         [20.0,    50.0, gameSettings.miniLegProbability],
         [50.0,   100.0, gameSettings.shortLegProbability],
-        [100.0,  200.0, gameSettings.mediumLegProbability],
-        [200.0,  300.0, gameSettings.longLegProbability],
-        [300.0,  500.0, gameSettings.extraLongLegProbability]
+        [100.0,  150.0, gameSettings.mediumLegProbability],
+        [150.0,  200.0, gameSettings.longLegProbability],
+        [200.0,  300.0, gameSettings.extraLongLegProbability]
     ]
     gameSettings.continuous = True if gameSettings.continuous=="yes" else False
     gameSettings.fullScreen = True if gameSettings.fullScreen=="yes" else False
     gameSettings.infiniteOulu = True if gameSettings.infiniteOulu=="yes" else False
+    gameSettings.infiniteWorld = True if gameSettings.infiniteWorld=="yes" else False
     gameSettings.autoTest = True if gameSettings.autoTest=="yes" else False
     gameSettings.infoBox = True if gameSettings.infoBox=="yes" else False
     gameSettings.analysis = True if gameSettings.analysis=="yes" else False
@@ -138,7 +145,7 @@ def returnSettings():
     return gameSettings
 
 
-def returnConfig(gameSettings, externalImageData):
+def returnConfig(gameSettings, externalImageData, infiniteWorldCityMap):
 
     metersPerPixel = 0
     defaultZoom = 1.0
@@ -148,7 +155,10 @@ def returnConfig(gameSettings, externalImageData):
         preGenResult = getPreGeneratedInfiniteOulu()
         png = preGenResult[0]
         pngMask = preGenResult[1]
+        faLookup, saLookup, ssaLookup, vsaLookup, tunnelLookup, config = extractPngLookups(pngMask)
 
+    elif gameSettings.infiniteWorld:
+        png, pngMask = getInfiniteWorldDefault(gameSettings.infiniteWorldCity, infiniteWorldCityMap)
         faLookup, saLookup, ssaLookup, vsaLookup, tunnelLookup, config = extractPngLookups(pngMask)
 
     elif not gameSettings.lookupPngName and (gameSettings.externalExampleTeam and gameSettings.externalExample):
@@ -166,7 +176,7 @@ def returnConfig(gameSettings, externalImageData):
         #pngMask = None
         faLookup, saLookup, ssaLookup, vsaLookup, tunnelLookup, config = extractPngLookups(pngMask)
 
-    if gameSettings.lookupPngName: # map given at command line
+    elif gameSettings.lookupPngName: # map given at command line
         faLookup, saLookup, ssaLookup, vsaLookup, tunnelLookup, config = extractPngLookupsFromFile(gameSettings.lookupPngName)
         metersPerPixel = gameSettings.metersPerPixel
 

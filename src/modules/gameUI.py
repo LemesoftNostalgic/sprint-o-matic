@@ -216,7 +216,7 @@ def uiCompleteRender(finishTexts, mapInfoTextList, pacemakerInd, pacemakerTextNe
     if pacemakerTextNeeded:
         uiRenderPacemakerText(pacemakerInd)
     if aiTextNeeded:
-        uiRenderAiText()
+        uiRenderAIText()
         
     uiShowFinishText(getBigScreen(), finishTexts)
     if mapInfoTextList:
