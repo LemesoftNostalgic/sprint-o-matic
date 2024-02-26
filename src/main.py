@@ -64,13 +64,7 @@ def setTheStageForNewRound(cfg):
 
     # Ensure we have a list of controls
     ctrls = []
-    numAttempts = 3
-    while ctrls == []:
-        ctrls, numberOfDifficultControls = createAutoControls(cfg, trackLengthInPixels, gameSettings.distributionOfControlLegs, gameSettings.metersPerPixel, faLookup, gameSettings.infiniteWorld)
-        if ctrls and numberOfDifficultControls < len(ctrls) / 2:
-            numAttempts = numAttempts - 1
-            if numAttempts > 0:
-                ctrls = []
+    ctrls, numberOfDifficultControls = createAutoControls(cfg, trackLengthInPixels, gameSettings.distributionOfControlLegs, gameSettings.metersPerPixel, faLookup, gameSettings.infiniteWorld)
 
     # effects initialization
     uiControlEffectRestart()

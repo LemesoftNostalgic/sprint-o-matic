@@ -39,7 +39,7 @@ initCircleRadius = 30
 
 # these are for reference display screen of size (1920, 1080)
 xStepOrig = 160
-yStepOrig = 210
+yStepOrig = 200
 xStartOrig = 280
 yStartOrig = 300
 
@@ -171,7 +171,7 @@ def initScreen(imagePath, gameSettings, externalImageData, externalWorldCityMap,
         "developer Jyrki Leskelä, Oulu. License: Apache-2.0.",
         "Use mouse keys or keyboard arrows",
         "select: ENTER, quit: ESC",
-        "Map / feature proposals to sprint-o-matic gmail com",
+        "Credits for the 'World' map data: OpenStreetMap",
         "Credits for sound effects (freesound.org):",
         "CC 1.0 DEED:",
         "ali, craigsmith, crk365, frodo89, fupicat, jackslay, furbyguy",
@@ -191,7 +191,7 @@ def initScreen(imagePath, gameSettings, externalImageData, externalWorldCityMap,
         (xStart + xStep, yStart + 1.8 * yStep),
         (xStart + xStep, yStart + 2.0 * yStep),
         (xStart + xStep, yStart + 2.1 * yStep),
-        (xStart + xStep, yStart + 2.2 * yStep),
+        (xStart + xStep, yStart + 2.3 * yStep),
         (xStart + xStep, yStart + 2.4 * yStep),
         (xStart + xStep, yStart + 2.6 * yStep),
         (xStart + xStep, yStart + 2.7 * yStep),

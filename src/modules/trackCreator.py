@@ -27,6 +27,9 @@ from .routeAI import checkRouteExists
 
 
 firstControlMinDistance = 100
+pickMaxTime = 0.1
+pickDistMaxTime = 1.0
+totMaxTime = 30.0
 
 def pickLegLen(distribution, metersPerPixel):
     a = random.random()
@@ -42,7 +45,6 @@ def pickLegLen(distribution, metersPerPixel):
 
 def pickAutoControl(cfg, ctrls):
     index = 0
-    pickMaxTime = 0.1
     start_time = time.time()
     while True:
         index = int(len(cfg) * random.random())
@@ -59,7 +61,6 @@ def pickAutoControl(cfg, ctrls):
 
 
 def pickDistAutoControl(cfg, ctrls, distribution, metersPerPixel, faLookup):
-    pickDistMaxTime = 1.0
     start_time = time.time()
     easyOneOutOf = 2
     isDifficultControl = True
@@ -75,8 +76,8 @@ def pickDistAutoControl(cfg, ctrls, distribution, metersPerPixel, faLookup):
                 return None, None, None
             # compare to all the ones so far
             nearnessGood = True
-            for ctrl in ctrls:
-                if distanceBetweenPoints(candidate, ctrl) < minlen:
+            for ctrl in ctrls[:-1]:
+                if distanceBetweenPoints(candidate, ctrl) < minlen/2:
                     nearnessGood = False
             if not nearnessGood:
                 continue
@@ -105,6 +106,7 @@ def pickDistAutoControl(cfg, ctrls, distribution, metersPerPixel, faLookup):
 def createAutoControls(cfg, trackLength, distribution, metersPerPixel, faLookup, isWorld):
     totdist = 0
     ctrls = []
+    start_tot_time = time.time()
     ctrl = pickAutoControl(cfg, ctrls)
     ctrls.append(ctrl)
     numDifficultControls = 0
@@ -125,6 +127,10 @@ def createAutoControls(cfg, trackLength, distribution, metersPerPixel, faLookup,
         else:
             ctrls.append(ctrl)
             totdist = totdist + dist
+
+        if time.time() - start_tot_time > totMaxTime:
+            break
+
     return ctrls, numDifficultControls
 
 

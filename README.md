@@ -23,6 +23,7 @@ It provides you an infinite number of sprint orienteering route selection challe
 form of an entertaining 2D game. See the following YouTube videos to get an
 idea:
 
+* [Sprint-O-Matic 2.0: hundreds of sprint orienteering maps all around the world](https://youtu.be/lmbBzbUQUbc)
 * [Sprint-O-Matic early prototype, generated map, pacemaker mode, treadmill stunt](https://youtu.be/VikFxwu9e0Q).
 * [Trying out Sprint-O-Matic route analysis mode with a fantasy map](https://youtu.be/rI9zinYGOmc)
 * [Using a real sprint orienteering map with Sprint-O-Matic. Fast mode.](https://youtu.be/Kn53WGpEUgo)
@@ -51,9 +52,10 @@ source code, because it is easy and safe:
   * python -m pip install pygame
   * python -m pip install requests
   * python -m pip install argparse
+  * python -m pip install overpy (sprint-o-matic v2.0.0 onwards)
 
 4. Start the "main.py" from src folder of sprint-o-matic (click the "main" icon or use command "python main.py" from the command line)
-  * or use command "python main.py --fullScreen no" if you want to play in a window.
+  * or use command "python main.py --fullScreen yes" if you want to play in a fullscreen mode.
 
 The [Release folder](https://github.com/LemesoftNostalgic/sprint-o-matic/releases/latest) contains also pre-built applications for Linux and Windows as executables. The Windows PyInstaller executable is not signed by Microsoft, but I followed the [microsoft answer for cases when Pyinstaller-created executable is incorrectly flagged](https://answers.microsoft.com/en-us/windows/forum/all/where-executables-created-by-pyinstaller-are-being/09e58a6b-01f3-4e72-8765-6542ef7291f4).
 
@@ -72,6 +74,9 @@ Windows 10. Running the Sprint-O-Matic requires relatively modern PC due to
 its search algorithms that run in separate processes. There may be some
 lag on the way to the first control, as it often is the case with real life
 orienteering, but that lag should settle later on.
+
+The World series maps take a while to start, sometimes even half a minute
+or so. The time is well spent on map data downloading and track rendering. 
 
 ## Usage
 
@@ -124,11 +129,15 @@ and competes against/with you in between the controls.
 In some rare circumstances, the pacemaker decides to skip a control,
 and wait at the next one. In that case, don't worry. Shit happens.
 
-### Map types (Infinite Oulu / External)
+### Map types (World series / Infinite Oulu / External)
 
-There are two different categories of maps in Sprint-O-Matic.
+There are three different categories of maps in Sprint-O-Matic.
 
-**Infinite Oulu** is an automatically generated city-block-map, different map every time. The Infinite Oulu is an internal system of the Sprint-O-Matic application. See the previous image for an example.
+**Infinite Oulu** is an automatically generated city-block-map, different map every time. The Infinite Oulu is also an internal system of the Sprint-O-Matic application. See the previous image for an example.
+
+![Sprint-O-Matic gameplay with a Barcelona map by Jyrki Leskelä](/doc/Barcelona.png)
+
+**World sprint maps** is available from Sprint-O-Matic v2.0.0 onwards. It is a growing collection of hand-picked sprint orienteering maps from the best cityscapes all around the world. From Oulu to Helsinki, Tokio to Paris, I've got you covered. The initial numbers are 72 cities and 662 maps, and it is expected to grow fast. The World sprint maps is also an automatic system internal using Map data from OpenStreetMap. You don't have to do to anything to get more maps.
 
 ![Sprint-O-Matic gameplay map with an external map by Jyrki Leskelä](/doc/tartu/ExternalMapWithRouteAnalysis.png)
 
