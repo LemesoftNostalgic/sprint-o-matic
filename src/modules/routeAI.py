@@ -37,7 +37,18 @@ quickCheckDefaultTf = 4
 start_time = None
 refreshCtr = 5000
 
+def getSignX(x):
+    return (x > 0) - (x < 0)
+
 # Provide the 4 primitive directions to nearest points and the distance to them
+def getQuickDirections(point, target):
+    retList = []
+    if point[0] != target[0]:
+        retList.append((point[0] + getSignX(target[0] - point[0]), point[1]))
+    if point[1] != target[1]:
+        retList.append((point[0], point[1] + getSignX(target[1] - point[1])))
+    return retList
+
 def getDirections(point):
     return [
         [(point[0] - 1, point[1]), 1.0],
@@ -77,46 +88,57 @@ def checkRouteExists(pointA, pointB, forbiddenAreaLookup):
     routeLookup[tfA] = startScore
     backRouteLookup[tfB] = startScore
     stop = False
-    nextPruning = True
-    pointsInBetween = []
+
+    pointsInBetween = pruneEnsureGoodShortcut(tfA, tfB, forbiddenLookup, {}, {})
+    if pointsInBetween != None:
+        return True
 
     while not stop:
-        pointsInBetween = []
-        backPoints = []
+        backPoints = 0
         for point in backRouteLookup.copy():
-            directions = getDirections(point)
+            directions = getQuickDirections(point, tfA)
             for direction in directions:
-                newPoint = direction[0]
+                newPoint = direction
                 if (newPoint not in backRouteLookup or backRouteLookup[point] + 1.0 < backRouteLookup[newPoint]) and newPoint not in forbiddenLookup:
                     backRouteLookup[newPoint] = backRouteLookup[point] + 1.0
-                    backPoints.append(newPoint)
+                    backPoints = backPoints + 1
+        if backPoints == 0:
+            for point in backRouteLookup.copy():
+                directions = getDirections(point)
+                for direction in directions:
+                    newPoint = direction[0]
+                    if (newPoint not in backRouteLookup or backRouteLookup[point] + 1.0 < backRouteLookup[newPoint]) and newPoint not in forbiddenLookup:
+                        backRouteLookup[newPoint] = backRouteLookup[point] + 1.0
+                        backPoints = backPoints + 1
+            if backPoints == 0:
+                return False
 
+        frontPoints = 0
         for point in routeLookup.copy():
-            directions = getDirections(point)
+            directions = getQuickDirections(point, tfB)
             for direction in directions:
-                newPoint = direction[0]
+                newPoint = direction
                 if (newPoint not in routeLookup or routeLookup[point] + 1.0 <= routeLookup[newPoint]) and newPoint not in forbiddenLookup:
                     routeLookup[newPoint] = routeLookup[point] + 1.0
+                    frontPoints = frontPoints + 1
                     if newPoint in backRouteLookup:
                         return True
-                    # shortcut
-                    elif nextPruning and backPoints:
-                        nextPruning = True if randrange(refreshCtr//tf) == 0 else False
-                        backPoint = getNearestPointOfList(backPoints, newPoint)
-                        pointsInBetween = pruneEnsureGoodShortcut(backPoint, newPoint, forbiddenLookup, {}, {})
-                        if pointsInBetween != None:
+        if frontPoints == 0:
+            for point in routeLookup.copy():
+                directions = getDirections(point)
+                for direction in directions:
+                    newPoint = direction[0]
+                    if (newPoint not in routeLookup or routeLookup[point] + 1.0 <= routeLookup[newPoint]) and newPoint not in forbiddenLookup:
+                        routeLookup[newPoint] = routeLookup[point] + 1.0
+                        frontPoints = frontPoints + 1
+                        if newPoint in backRouteLookup:
                             return True
+            if frontPoints == 0:
+                return False
+
         if time.time() - start_time > getAiPoolMaxTimeLimit(tf) / 2:
             return False
     return True
-
-
-# Global variables for the AI pools
-aiNumberOfSlots = 2 # not too much pressure for the PC
-aiSlots = []
-readyRoutesArray = []
-
-
 
 
 # This shortest route finder is my genuine creation.
