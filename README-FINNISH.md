@@ -21,6 +21,7 @@ Se sisältää äärettömän määrän sprinttisuunnistuksen reitinvalintahaast
 hauskan 2D-pelin muodossa. Katso seuraavat esittelyvideot saadaksesi
 alustavan kuvan siitä miten peli toimii:
 
+* [Sprint-O-Matic 2.0: satoja sprinttisuunnistukseen soveltuvia karttoja ympäri maailmaa](https://youtu.be/lmbBzbUQUbc)
 * [Sprint-O-Matic varhainen prototyyppi, automaattisesti luotu kartta, jänismoodi, juoksumatto](https://youtu.be/VikFxwu9e0Q).
 * [Sprint-O-Matic reittianalyysitila, kartta kuvitteellisesta keskiaikaisesta kaupungista](https://youtu.be/rI9zinYGOmc)
 * [Oikean sprinttisuunnistuskartan käyttö Sprint-O-Maticin kanssa. Pikavauhtinen pelitila](https://youtu.be/Kn53WGpEUgo)
@@ -48,9 +49,10 @@ Suositeltava tapa on ajaa ohjelmisto pythonilla suoraan lähdekoodina, koska se 
    * python -m pip install pygame
    * python -m pip install requests
    * python -m pip install argparse
-
+   * python -m pip install overpy (sprint-o-matic v2.0.0 versiosta lähtien)
+ 
 4. Käynnistä "main.py" sprint-o-matic:in src-kansiosta (napsauta "main"-kuvaketta tai käytä komentoa "python main.py" komentoriviltä)
-   * tai käytä komentoa "python main.py --fullScreen no" jos haluat pelata ikkunassa.
+   * tai käytä komentoa "python main.py --fullScreen yes" jos haluat pelata koko näytön tilassa.
 
 [Release-kansio](https://github.com/LemesoftNostalgic/sprint-o-matic/releases/latest) sisältää myös valmiiksi paketoidut sovellukset Linuxille ja Windowsille suoritettavina "exe"-tiedostoina. 
 Windows executable ei ole "Windows signed" sovellus, mutta seurasin ohjetta [microsoftin vastaus tapauksiin, joissa Pyinstallerin luoma suoritettava tiedosto on merkitty väärin](https://answers.microsoft.com/en-us/windows/forum/all/where-executables-created-by-pyinstaller-are-being/09e58a6b-01f3-4e72-8765-6542ef7291f4). Jos kuitenkin pelaat varman päälle niin käytä edellä mainitulla tavalla suoraan
@@ -70,6 +72,10 @@ Windows 10 -laitteissa. Sprint-O-Maticin käyttäminen vaatii suhteellisen nykya
 tietokoneen, koska sen hakualgoritmit suoritetaan useissa prosesseissa.
 Sovelluksessa voi olla hiukan viiveitä matkalla ensimmäiselle rastille,
 mutta viiveiden pitäisi kadota hetkisen päästä.
+
+World-sarjan karttojen alustaminen kestää hieman tavanomaista kauemmin,
+joskus jopa puolisen minuuttia.
+
 
 ## Käyttö
 
@@ -130,13 +136,21 @@ ja kilpailee sinua vastaan / kanssasi kullakin rastivälillä.
 Silloin tällöin jänis päättää jättää yhden rastin väliin,
 ja tulee mukaan taas seuraavalla. Älä huolestu, vaan jatka peliä normaalisti.
 
-### Karttatyypit (Infinite Oulu / External)
+### Karttatyypit (World series / Infinite Oulu / External)
 
-Sprint-O-Maticissa on kaksi erilaista karttatyyppiä.
+Sprint-O-Maticissa on kolme erilaista karttatyyppiä.
 
 **Infinite Oulu** on automaattisesti luotu kaupunkikorttelikartta, joka kerta erilainen.
 Infinite Oulu on Sprint-O-Matic-sovelluksen sisäinen järjestelmä.
 Katso esimerkki edellisestä kuvasta.
+
+![Sprint-O-Matic kartta Barcelonan alueelta, kirjoittanut Jyrki Leskelä](/doc/Barcelona.png)
+
++**Word series** Sprint-O-Matic v2.0.0 versiosta lähtien. Kasvava määrä
+sprinttikarttoja maailman parhaista sprinttimaastoita.
+Oulusta Helsinkiin, Tokiosta Pariisiin. Ensimmäinen versio kattaa 72
+kaupunkia ja 662 karttaa. Määrä tulee tuosta vielä kasvamaan.
+Toiminto käyttää pohjana OpenStreetMap-järjestelmän karttadataa.
 
 ![Sprint-O-Matic-pelikartta ulkoisella kartalla, kirjoittanut Jyrki Leskelä](/doc/tartu/ExternalMapWithRouteAnalysis.png)
 
