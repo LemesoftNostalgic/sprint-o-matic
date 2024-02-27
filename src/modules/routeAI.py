@@ -23,7 +23,7 @@ from random import randrange
 
 import sys
 
-from .pathPruning import pruneShortestRoute, pruneEnsureGoodShortcut, distanceBetweenPoints
+from .pathPruning import pruneShortestRoute, pruneEnsureGoodShortcut, pruneEnsureLineOfSight, distanceBetweenPoints
 from .mathUtils import getBoundingBox, getNearestPointOfList
 from .utils import getSlowdownFactor, getSemiSlowdownFactor, getVerySlowdownFactor, getAiPoolMaxTimeLimit
 
@@ -119,12 +119,12 @@ def checkRouteExists(pointA, pointB, forbiddenAreaLookup, bubbleSpacing, checkMa
     tfB = (int(pointB[0]/tf), int(pointB[1]/tf))
 
     # Try quick win
-    if pruneEnsureGoodShortcut(tfA, tfB, forbiddenLookup, {}, {}) != None:
+    if pruneEnsureLineOfSight(tfA, tfB, forbiddenLookup) != None:
         return True
     tfA, tfB = moveCloserToEachOther(tfA, tfB, forbiddenLookup)
     if tfA == tfB:
         return True
-    if pruneEnsureGoodShortcut(tfA, tfB, forbiddenLookup, {}, {}) != None:
+    if pruneEnsureLineOfSight(tfA, tfB, forbiddenLookup) != None:
         return True
 
     # desperately optimized...
@@ -145,11 +145,10 @@ def checkRouteExists(pointA, pointB, forbiddenAreaLookup, bubbleSpacing, checkMa
         bubbleLookup[bubblePoint] = startScore
         bubbleLookups.append(bubbleLookup)
         prevMidPointsArray.append(list(bubbleLookup.keys()))
-    stop = False
 
     # Find a rudimentary angular route with a painter algo with A* flavour
     # add bubbles and stuff to make it quicker 
-    while not stop:
+    while True:
         backPoints = []
         for point in prevBackPoints:
             directions = getQuickDirections(point, tfA)
@@ -242,13 +241,155 @@ def checkRouteExists(pointA, pointB, forbiddenAreaLookup, bubbleSpacing, checkMa
 
         if time.time() - start_time > checkMaxTime:
             return False
-    return True
 
 
-# This shortest route finder is my genuine creation.
-# Finding a fast enough algorithm was not easy, so I decided to take the
-# time and think this through. Not the most beautiful one, but does the
-# trick very fast.
+# this may give some ideas, no more. Need to switch to bdd algorithm (ota forb kappaleiden ulkoreuna mukaan massaan)
+# kaikki muutkin nopeutukset tähän
+def quickCalculateShortestRoute(pointA, pointB, lookup, forbiddenAreaLookup, slowAreaLookup, semiSlowAreaLookup, verySlowAreaLookup, tf, pacemakerInd):
+    shortestRoute = []
+    routeLookup = {}
+    backRouteLookup = {}
+    start_time = time.time()
+    forbiddenLookup = {}
+    if tf in forbiddenAreaLookup:
+        forbiddenLookup = forbiddenAreaLookup[tf]
+    slowLookup = {}
+    if tf in slowAreaLookup:
+        slowLookup = slowAreaLookup[tf]
+    semiSlowLookup = {}
+    if tf in semiSlowAreaLookup:
+        semiSlowLookup = slowAreaLookup[tf]
+    verySlowLookup = {}
+    if tf in verySlowAreaLookup:
+        verySlowLookup = slowAreaLookup[tf]
+    intersectionPointBack = None
+    intersectionPointFront = None
+
+    tfA = (int(pointA[0]/tf), int(pointA[1]/tf))
+    tfB = (int(pointB[0]/tf), int(pointB[1]/tf))
+    startScore = 1.0
+    routeLookup[tfA] = startScore
+    backRouteLookup[tfB] = startScore
+    prevFrontPoints = [tfA]
+    prevBackPoints = [tfB]
+        
+    # Find a rudimentary angular route with a painter algo with A* flavour
+    stop = False
+
+    while not stop:
+        backPoints = []
+        for point in prevBackPoints:
+            directions = getDirections(point)
+            for direction in directions:
+                newPoint = direction[0]
+                if (newPoint not in backRouteLookup or backRouteLookup[point] + 1.0 < backRouteLookup[newPoint]) and newPoint in lookup:
+                    factor = 1.0
+                    if newPoint in slowLookup:
+                        factor = getSlowdownFactor()
+                    elif newPoint in semiSlowLookup:
+                        factor = getSemiSlowdownFactor()
+                    elif newPoint in verySlowLookup:
+                        factor = getVerySlowdownFactor()
+                    newScore = direction[1] * factor
+                    backRouteLookup[newPoint] = backRouteLookup[point] + newScore
+                    backPoints.append(newPoint)
+        if not backPoints:
+            return []
+        prevBackPoints = backPoints
+
+        frontPoints = []
+        for point in prevFrontPoints:
+            directions = getDirections(point)
+            for direction in directions:
+                newPoint = direction[0]
+                if (newPoint not in routeLookup or routeLookup[point] + 1.0 <= routeLookup[newPoint]) and newPoint in lookup:
+                    factor = 1.0
+                    if newPoint in slowLookup:
+                        factor = getSlowdownFactor()
+                    elif newPoint in semiSlowLookup:
+                        factor = getSemiSlowdownFactor()
+                    elif newPoint in verySlowLookup:
+                        factor = getVerySlowdownFactor()
+                    newScore = direction[1] * factor
+                    routeLookup[newPoint] = routeLookup[point] + newScore
+                    frontPoints.append(newPoint)
+                    if newPoint in backRouteLookup:
+                        stop = True
+                        intersectionPointBack = newPoint
+                        intersectionPointFront = newPoint
+                        break
+                if stop:
+                    break
+        if not frontPoints:
+            return []
+        if time.time() - start_time > getAiPoolMaxTimeLimit(tf):
+            return []
+        prevFrontPoints = frontPoints
+
+    if intersectionPointBack is None or intersectionPointFront is None:
+        return []
+
+    # Pick up the rudimentary angular route out of the painted data
+    point = intersectionPointBack
+    score = backRouteLookup[point]
+    while score > startScore:
+        directions = getDirections(point)
+        minScore = minScoreInit
+        minPoint = None
+        for direction in directions:
+             newPoint = direction[0]
+             if newPoint in backRouteLookup and backRouteLookup[newPoint] < score:
+                 minScore = backRouteLookup[newPoint]
+                 minPoint = newPoint
+        score = minScore
+        if not minPoint:
+            return []
+        point = minPoint
+        shortestRoute.insert(0, point)
+
+    point = intersectionPointFront
+    shortestRoute.append(point)
+    score = routeLookup[point]
+    while score > startScore:
+        directions = getDirections(point)
+        minScore = minScoreInit
+        minPoint = None
+        for direction in directions:
+             newPoint = direction[0]
+             if newPoint in routeLookup and routeLookup[newPoint] < score:
+                 minScore = routeLookup[newPoint]
+                 minPoint = newPoint
+        score = minScore
+        if not minPoint:
+            return []
+        point = minPoint
+        shortestRoute.append(point)
+
+     # Straighten the route into a beautiful one
+    if pacemakerInd != 2:
+        shortestRoute = pruneShortestRoute(shortestRoute, forbiddenLookup, slowLookup, semiSlowLookup, verySlowLookup, -1)
+    scaledShortestRoute = []
+    for point in shortestRoute:
+        scaledShortestRoute.append((point[0] * tf, point[1] * tf))
+    return scaledShortestRoute
+
+
+def quickUpdateShortestRoutes(shortestRoutesArray, lookups, controls, faLookup, saLookup, ssaLookup, vsaLookup, first, last, pacemakerInd):
+    if first == 0:
+        shortestRoutesArray = []
+        for ind in range(len(lookups)):
+            shortestRoutesArray.append([])
+
+    for ind in range(first, last):
+        if ind >= len(lookups):
+            break
+        lookup = lookups[ind]
+        ptA = controls[ind]
+        ptB = controls[ind + 1]
+        shortestRoutesArray[ind] = [quickCalculateShortestRoute(ptA, ptB, lookup, faLookup, saLookup, ssaLookup, vsaLookup, 4, pacemakerInd)]
+        print(ind, shortestRoutesArray[ind])
+    return shortestRoutesArray
+
 
 # Calculate shortest route between A and B, using pre-submitted lookups
 def calculateShortestRoute(setupList):

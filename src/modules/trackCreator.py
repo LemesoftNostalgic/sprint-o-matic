@@ -27,9 +27,9 @@ from .routeAI import checkRouteExists
 
 
 firstControlMinDistance = 100
-pickMaxTime = 0.1
-pickDistMaxTime = 1.0
-totMaxTime = 15.0
+pickMaxTime = 0.01
+pickDistMaxTime = 1.5
+totMaxTime = 20.0
 
 def pickLegLen(distribution, metersPerPixel):
     a = random.random()
@@ -117,13 +117,17 @@ def createAutoControls(cfg, trackLength, distribution, metersPerPixel, faLookup,
         if ctrl is None:
             return [], 0
 
-        if checkRouteExists(ctrl, ctrls[-1], faLookup, 4, totMaxTime / 5):
+        if isWorld:
+            if checkRouteExists(ctrl, ctrls[-1], faLookup, 4, totMaxTime / 5):
+                ctrls.append(ctrl)
+                totdist = totdist + dist
+            elif len(ctrls) < 2:
+                ctrls = []
+                ctrl = pickAutoControl(cfg, ctrls)
+                ctrls.append(ctrl)
+        else:
             ctrls.append(ctrl)
             totdist = totdist + dist
-        elif len(ctrls) < 2:
-            ctrls = []
-            ctrl = pickAutoControl(cfg, ctrls)
-            ctrls.append(ctrl)
 
         if time.time() - start_tot_time > totMaxTime:
             break
