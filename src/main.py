@@ -283,7 +283,7 @@ if __name__ == "__main__":
                 uiFlushEvents()
 
         # main loop of the gameplay itself:
-        while running and not quitting:
+        while running and controls and not quitting:
             # Keep on running (sound)
             if datetime.now() - startTime > timedelta(seconds=gameMovingStartThreshold):
                 maintainRunningStepEffect()

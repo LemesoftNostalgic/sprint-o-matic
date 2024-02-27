@@ -23,7 +23,7 @@ from random import randrange
 
 import sys
 
-from .pathPruning import pruneShortestRoute, pruneEnsureGoodShortcut
+from .pathPruning import pruneShortestRoute, pruneEnsureGoodShortcut, distanceBetweenPoints
 from .mathUtils import getBoundingBox, getNearestPointOfList
 from .utils import getSlowdownFactor, getSemiSlowdownFactor, getVerySlowdownFactor, getAiPoolMaxTimeLimit
 
@@ -40,7 +40,7 @@ refreshCtr = 5000
 def getSignX(x):
     return (x > 0) - (x < 0)
 
-# Provide the 4 primitive directions to nearest points and the distance to them
+
 def getQuickDirections(point, target):
     retList = []
     if point[0] != target[0]:
@@ -48,6 +48,7 @@ def getQuickDirections(point, target):
     if point[1] != target[1]:
         retList.append((point[0], point[1] + getSignX(target[1] - point[1])))
     return retList
+    
 
 def getDirections(point):
     return [
@@ -56,6 +57,42 @@ def getDirections(point):
         [(point[0], point[1] - 1), 1.0],
         [(point[0], point[1] + 1), 1.0]
     ]
+
+
+def moveCloserToEachOther(tfA, tfB, forbiddenLookup):
+    moving = True
+    while moving:
+        moving = False
+        dirsToB = getQuickDirections(tfA, tfB)
+        for dirToB in dirsToB:
+            if dirToB not in forbiddenLookup:
+                tfA = dirToB
+                moving = True
+        dirsToA = getQuickDirections(tfB, tfA)
+        for dirToA in dirsToA:
+            if dirToA not in forbiddenLookup:
+                tfB = dirToA
+                moving = True
+    return tfA, tfB
+
+
+def getBubblePoints(ptA, ptB, forbiddenLookup, bubbleSpacing):
+    bubblePoints = []
+    steps = max(abs(ptA[0]- ptB[0]), abs(ptA[1] - ptB[1]))
+    incr = (float(ptB[0] - ptA[0]) / float(steps), float(ptB[1] - ptA[1]) / float(steps))
+    start = (float(ptA[0]), float(ptA[1]))
+
+    prevBubble = start
+    for ind in range(steps):
+        testPt = (int(start[0] + ind * incr[0]), int(start[1] + ind * incr[1]))
+        if distanceBetweenPoints(testPt, ptB) < bubbleSpacing:
+            break
+        if distanceBetweenPoints(prevBubble, testPt) > bubbleSpacing:
+            if testPt not in forbiddenLookup:
+                bubblePoints.append(testPt)
+                prevBubble = testPt
+
+    return bubblePoints
 
 
 def lookupContains(lookups, point):
@@ -70,73 +107,140 @@ def lookupContains(lookups, point):
 
 
 # Quickly check if any chance of route between A and B
-def checkRouteExists(pointA, pointB, forbiddenAreaLookup):
+def checkRouteExists(pointA, pointB, forbiddenAreaLookup, bubbleSpacing, checkMaxTime):
 
     tf = quickCheckDefaultTf
     forbiddenLookup = forbiddenAreaLookup[tf]
 
-    routeLookup = {}
-    backRouteLookup = {}
-
-     # The algorithm is time-restricted, be less accurate if takes too long
+     # The algorithm is time-restricted
     start_time = time.time()
-
-     # Find a rudimentary angular route with a painter algo with A* flavour
+    
     tfA = (int(pointA[0]/tf), int(pointA[1]/tf))
     tfB = (int(pointB[0]/tf), int(pointB[1]/tf))
-    startScore = 1.0
-    routeLookup[tfA] = startScore
-    backRouteLookup[tfB] = startScore
-    stop = False
 
-    pointsInBetween = pruneEnsureGoodShortcut(tfA, tfB, forbiddenLookup, {}, {})
-    if pointsInBetween != None:
+    # Try quick win
+    if pruneEnsureGoodShortcut(tfA, tfB, forbiddenLookup, {}, {}) != None:
+        return True
+    tfA, tfB = moveCloserToEachOther(tfA, tfB, forbiddenLookup)
+    if tfA == tfB:
+        return True
+    if pruneEnsureGoodShortcut(tfA, tfB, forbiddenLookup, {}, {}) != None:
         return True
 
+    # desperately optimized...
+    bubblePoints = getBubblePoints(tfA, tfB, forbiddenLookup, bubbleSpacing)
+
+    startScore = 1.0
+    routeLookup = {}
+    backRouteLookup = {}
+    bubbleLookups = []
+    prevMidPointsArray = []
+
+    routeLookup[tfA] = startScore
+    backRouteLookup[tfB] = startScore
+    prevBackPoints = list(backRouteLookup.keys())
+    prevFrontPoints = list(routeLookup.keys())
+    for bubblePoint in bubblePoints:
+        bubbleLookup = {}
+        bubbleLookup[bubblePoint] = startScore
+        bubbleLookups.append(bubbleLookup)
+        prevMidPointsArray.append(list(bubbleLookup.keys()))
+    stop = False
+
+    # Find a rudimentary angular route with a painter algo with A* flavour
+    # add bubbles and stuff to make it quicker 
     while not stop:
-        backPoints = 0
-        for point in backRouteLookup.copy():
+        backPoints = []
+        for point in prevBackPoints:
             directions = getQuickDirections(point, tfA)
             for direction in directions:
                 newPoint = direction
                 if (newPoint not in backRouteLookup or backRouteLookup[point] + 1.0 < backRouteLookup[newPoint]) and newPoint not in forbiddenLookup:
                     backRouteLookup[newPoint] = backRouteLookup[point] + 1.0
-                    backPoints = backPoints + 1
-        if backPoints == 0:
-            for point in backRouteLookup.copy():
+                    backPoints.append(newPoint)
+        if not backPoints:
+            for point in prevBackPoints:
                 directions = getDirections(point)
                 for direction in directions:
                     newPoint = direction[0]
                     if (newPoint not in backRouteLookup or backRouteLookup[point] + 1.0 < backRouteLookup[newPoint]) and newPoint not in forbiddenLookup:
                         backRouteLookup[newPoint] = backRouteLookup[point] + 1.0
-                        backPoints = backPoints + 1
-            if backPoints == 0:
+                        backPoints.append(newPoint)
+            if not backPoints:
                 return False
+        prevBackPoints = backPoints
 
-        frontPoints = 0
-        for point in routeLookup.copy():
+        for midRouteLookupInd in range(len(bubbleLookups)):
+            midRouteLookup = bubbleLookups[midRouteLookupInd]
+            prevMidPoints = prevMidPointsArray[midRouteLookupInd]
+            midPoints = []
+            emergencyBreak = False
+            for point in prevMidPoints:
+                directions = getDirections(point)
+                for direction in directions:
+                    newPoint = direction[0]
+                    if (newPoint not in midRouteLookup or midRouteLookup[point] + 1.0 < midRouteLookup[newPoint]) and newPoint not in forbiddenLookup:
+                        midRouteLookup[newPoint] = midRouteLookup[point] + 1.0
+                        midPoints.append(newPoint)
+                        if midRouteLookupInd and newPoint in bubbleLookups[midRouteLookupInd - 1]:
+                            bubbleLookups[midRouteLookupInd - 1].update(midRouteLookup.copy())
+                            prevMidPointsArray[midRouteLookupInd - 1] = list(set(prevMidPointsArray[midRouteLookupInd - 1].copy()) | set(midRouteLookup.keys()).copy())
+                            bubbleLookups[midRouteLookupInd] = {}
+                            prevMidPointsArray[midRouteLookupInd] = []
+                            emergencyBreak = True
+                            break
+                        elif not midRouteLookupInd and newPoint in backRouteLookup:
+                            backRouteLookup.update(midRouteLookup.copy())
+                            prevBackPoints = list(set(prevBackPoints.copy()) | set(midRouteLookup.keys()).copy())
+                            bubbleLookups[midRouteLookupInd] = {}
+                            prevMidPointsArray[midRouteLookupInd] = []
+                            emergencyBreak = True
+                            break
+                if emergencyBreak:
+                    break
+            if emergencyBreak:
+                break
+
+            if bubbleLookups[midRouteLookupInd]:
+                prevMidPointsArray[midRouteLookupInd] = midPoints
+                bubbleLookups[midRouteLookupInd] = midRouteLookup
+                prevLookup = midRouteLookup
+
+        newbubbleLookups = []
+        newprevMidPointsArray = []
+        for ind in range(len(bubbleLookups)):
+            if bubbleLookups[ind]:
+                newbubbleLookups.append(bubbleLookups[ind])
+                newprevMidPointsArray.append(prevMidPointsArray[ind])
+        bubbleLookups = newbubbleLookups
+        prevMidPointsArray = newprevMidPointsArray
+
+        frontPoints = []
+        for point in prevFrontPoints:
             directions = getQuickDirections(point, tfB)
             for direction in directions:
                 newPoint = direction
                 if (newPoint not in routeLookup or routeLookup[point] + 1.0 <= routeLookup[newPoint]) and newPoint not in forbiddenLookup:
                     routeLookup[newPoint] = routeLookup[point] + 1.0
-                    frontPoints = frontPoints + 1
+                    frontPoints.append(newPoint)
                     if newPoint in backRouteLookup:
                         return True
-        if frontPoints == 0:
-            for point in routeLookup.copy():
+
+        if not frontPoints:
+            for point in prevFrontPoints:
                 directions = getDirections(point)
                 for direction in directions:
                     newPoint = direction[0]
                     if (newPoint not in routeLookup or routeLookup[point] + 1.0 <= routeLookup[newPoint]) and newPoint not in forbiddenLookup:
                         routeLookup[newPoint] = routeLookup[point] + 1.0
-                        frontPoints = frontPoints + 1
+                        frontPoints.append(newPoint)
                         if newPoint in backRouteLookup:
                             return True
-            if frontPoints == 0:
+            if not frontPoints:
                 return False
+        prevFrontPoints = frontPoints
 
-        if time.time() - start_time > getAiPoolMaxTimeLimit(tf) / 2:
+        if time.time() - start_time > checkMaxTime:
             return False
     return True
 
@@ -179,16 +283,17 @@ def calculateShortestRoute(setupList):
         if tf in verySlowAreaLookup:
             verySlowLookup = slowAreaLookup[tf]
 
-        # The algorithm is time-restricted, be less accurate if takes too long
+        # The algorithm is time-restricted
         if time.time() - start_time > getAiPoolMaxTimeLimit(tf):
             continue
 
-        # Find a rudimentary angular route with a painter algo with A* flavour
         tfA = (int(pointA[0]/tf), int(pointA[1]/tf))
         tfB = (int(pointB[0]/tf), int(pointB[1]/tf))
         startScore = 1.0
         routeLookup[tfA] = startScore
         backRouteLookup[tfB] = startScore
+        
+        # Find a rudimentary angular route with a painter algo with A* flavour
         stop = False
         nextPruning = True
         pointsInBetween = []
@@ -245,8 +350,11 @@ def calculateShortestRoute(setupList):
             if time.time() - start_time > getAiPoolMaxTimeLimit(tf):
                 break
         # this is also intentional!
-        if tf > 1 and time.time() - start_time < getAiPoolMaxTimeLimit(tf) / 5:
-            continue
+
+        # perf tuning: always accept coarse result for now...
+        # if tf > 1 and time.time()-start_time < getAiPoolMaxTimeLimit(tf) / 5:
+        #    continue
+
         if time.time() - start_time > getAiPoolMaxTimeLimit(tf):
             continue
 
