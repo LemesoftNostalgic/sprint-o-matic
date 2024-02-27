@@ -27,7 +27,7 @@ from .routeAI import checkRouteExists
 
 
 firstControlMinDistance = 100
-pickMaxTime = 0.01
+pickMaxTime = 0.1
 pickDistMaxTime = 1.5
 totMaxTime = 20.0
 
@@ -118,7 +118,7 @@ def createAutoControls(cfg, trackLength, distribution, metersPerPixel, faLookup,
             return [], 0
 
         if isWorld:
-            if checkRouteExists(ctrl, ctrls[-1], faLookup, 4, totMaxTime / 5):
+            if checkRouteExists(ctrl, ctrls[-1], faLookup, 4, totMaxTime / 8):
                 ctrls.append(ctrl)
                 totdist = totdist + dist
             elif len(ctrls) < 2:
