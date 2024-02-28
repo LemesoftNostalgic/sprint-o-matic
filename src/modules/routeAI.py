@@ -467,8 +467,10 @@ def calculateShortestRoute(setupList):
         shortestRoute = pruneShortestRoute(shortestRoute, forbiddenLookup, slowLookup, semiSlowLookup, verySlowLookup)
         shortestRoute2 = pruneShortestRoute(shortestRoute2, forbiddenLookup, slowLookup, semiSlowLookup, verySlowLookup)
         if len(shortestRoute) < 2:
+            shortestRoute2.reverse()
             shortestRoute = shortestRoute2            
         elif len(shortestRoute2) > 1 and calculatePathDistance(shortestRoute2) < calculatePathDistance(shortestRoute):
+            shortestRoute2.reverse()
             shortestRoute = shortestRoute2
 
     shortestRoute = [(x[0] * tf, x[1] * tf) for x in shortestRoute.copy()]
