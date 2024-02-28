@@ -23,7 +23,7 @@ import time
 
 from .mathUtils import angleBetweenLineSegments, distanceBetweenPoints
 from .pathPruning import pruneEnsureLineOfSight
-from .routeAI import checkRouteExists
+from .routeAI import calculateCoarseRoute
 
 
 firstControlMinDistance = 100
@@ -103,7 +103,7 @@ def pickDistAutoControl(cfg, ctrls, distribution, metersPerPixel, faLookup):
         return candidate, dist, isDifficultControl
 
 
-def createAutoControls(cfg, trackLength, distribution, metersPerPixel, faLookup, isWorld):
+def createAutoControls(cfg, trackLength, distribution, metersPerPixel, faLookups, isWorld):
     totdist = 0
     ctrls = []
     start_tot_time = time.time()
@@ -111,23 +111,19 @@ def createAutoControls(cfg, trackLength, distribution, metersPerPixel, faLookup,
     ctrls.append(ctrl)
     numDifficultControls = 0
     while (len(ctrls) < 25 and totdist < trackLength) or len(ctrls) < 3:
-        ctrl, dist, isDifficultControl = pickDistAutoControl(cfg, ctrls, distribution, metersPerPixel, faLookup)
+        ctrl, dist, isDifficultControl = pickDistAutoControl(cfg, ctrls, distribution, metersPerPixel, faLookups[1])
         if isDifficultControl:
             numDifficultControls = numDifficultControls + 1
         if ctrl is None:
             return [], 0
 
-        if isWorld:
-            if checkRouteExists(ctrl, ctrls[-1], faLookup, 4, totMaxTime / 8):
-                ctrls.append(ctrl)
-                totdist = totdist + dist
-            elif len(ctrls) < 2:
-                ctrls = []
-                ctrl = pickAutoControl(cfg, ctrls)
-                ctrls.append(ctrl)
-        else:
+        if len(calculateCoarseRoute(ctrl, ctrls[-1], faLookups[1])) > 1 and len(calculateCoarseRoute(ctrl, ctrls[-1], faLookups[2])) > 1:
             ctrls.append(ctrl)
             totdist = totdist + dist
+        elif len(ctrls) < 2:
+            ctrls = []
+            ctrl = pickAutoControl(cfg, ctrls)
+            ctrls.append(ctrl)
 
         if time.time() - start_tot_time > totMaxTime:
             break

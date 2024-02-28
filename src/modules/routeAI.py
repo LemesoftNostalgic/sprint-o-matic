@@ -23,8 +23,8 @@ from random import randrange
 
 import sys
 
-from .pathPruning import pruneShortestRoute, pruneEnsureGoodShortcut, pruneEnsureLineOfSight, distanceBetweenPoints
-from .mathUtils import getBoundingBox, getNearestPointOfList
+from .pathPruning import pruneShortestRoute, pruneEnsureGoodShortcut, pruneEnsureLineOfSight
+from .mathUtils import getBoundingBox, getNearestPointOfList, distanceBetweenPoints, calculatePathDistance
 from .utils import getSlowdownFactor, getSemiSlowdownFactor, getVerySlowdownFactor, getAiPoolMaxTimeLimit
 
 minScoreInit = 10000
@@ -33,6 +33,7 @@ maxScoreInit = -10000
 tfs = [1, 2, 4, 8, 16]
 
 quickCheckDefaultTf = 4
+bddTimeThreshold = 1.5
 
 start_time = None
 refreshCtr = 5000
@@ -242,139 +243,243 @@ def checkRouteExists(pointA, pointB, forbiddenAreaLookup, bubbleSpacing, checkMa
         if time.time() - start_time > checkMaxTime:
             return False
 
+closenessThreshold = 4.0
+movementDirections = [(1, 0), (0, -1), (-1, 0), (0, 1)]
+sideDirections = [(1, -1), (-1, -1), (-1, 1), (1, 1)]
 
-# this may give some ideas, no more. Need to switch to bdd algorithm (ota forb kappaleiden ulkoreuna mukaan massaan)
-# kaikki muutkin nopeutukset tähän
-def quickCalculateShortestRoute(pointA, pointB, lookup, forbiddenAreaLookup, slowAreaLookup, semiSlowAreaLookup, verySlowAreaLookup, tf, pacemakerInd):
-    shortestRoute = []
-    routeLookup = {}
-    backRouteLookup = {}
-    start_time = time.time()
-    forbiddenLookup = {}
-    if tf in forbiddenAreaLookup:
-        forbiddenLookup = forbiddenAreaLookup[tf]
-    slowLookup = {}
-    if tf in slowAreaLookup:
-        slowLookup = slowAreaLookup[tf]
-    semiSlowLookup = {}
-    if tf in semiSlowAreaLookup:
-        semiSlowLookup = slowAreaLookup[tf]
-    verySlowLookup = {}
-    if tf in verySlowAreaLookup:
-        verySlowLookup = slowAreaLookup[tf]
-    intersectionPointBack = None
-    intersectionPointFront = None
+def turnLeft(directionIndex):
+    directionIndex = (directionIndex - 1) % len(movementDirections)
+    return directionIndex
 
-    tfA = (int(pointA[0]/tf), int(pointA[1]/tf))
-    tfB = (int(pointB[0]/tf), int(pointB[1]/tf))
-    startScore = 1.0
-    routeLookup[tfA] = startScore
-    backRouteLookup[tfB] = startScore
-    prevFrontPoints = [tfA]
-    prevBackPoints = [tfB]
-        
-    # Find a rudimentary angular route with a painter algo with A* flavour
-    stop = False
+def turnRight(directionIndex):
+    directionIndex = (directionIndex + 1) % len(movementDirections)
+    return directionIndex
 
-    while not stop:
-        backPoints = []
-        for point in prevBackPoints:
-            directions = getDirections(point)
-            for direction in directions:
-                newPoint = direction[0]
-                if (newPoint not in backRouteLookup or backRouteLookup[point] + 1.0 < backRouteLookup[newPoint]) and newPoint in lookup:
-                    factor = 1.0
-                    if newPoint in slowLookup:
-                        factor = getSlowdownFactor()
-                    elif newPoint in semiSlowLookup:
-                        factor = getSemiSlowdownFactor()
-                    elif newPoint in verySlowLookup:
-                        factor = getVerySlowdownFactor()
-                    newScore = direction[1] * factor
-                    backRouteLookup[newPoint] = backRouteLookup[point] + newScore
-                    backPoints.append(newPoint)
-        if not backPoints:
-            return []
-        prevBackPoints = backPoints
+def calculateLeftSpot(spot, directionIndex):
+    direction = movementDirections[(directionIndex - 1) % len(movementDirections)]
+    return (spot[0] + direction[0], spot[1] + direction[1])
 
-        frontPoints = []
-        for point in prevFrontPoints:
-            directions = getDirections(point)
-            for direction in directions:
-                newPoint = direction[0]
-                if (newPoint not in routeLookup or routeLookup[point] + 1.0 <= routeLookup[newPoint]) and newPoint in lookup:
-                    factor = 1.0
-                    if newPoint in slowLookup:
-                        factor = getSlowdownFactor()
-                    elif newPoint in semiSlowLookup:
-                        factor = getSemiSlowdownFactor()
-                    elif newPoint in verySlowLookup:
-                        factor = getVerySlowdownFactor()
-                    newScore = direction[1] * factor
-                    routeLookup[newPoint] = routeLookup[point] + newScore
-                    frontPoints.append(newPoint)
-                    if newPoint in backRouteLookup:
-                        stop = True
-                        intersectionPointBack = newPoint
-                        intersectionPointFront = newPoint
-                        break
-                if stop:
-                    break
-        if not frontPoints:
-            return []
-        if time.time() - start_time > getAiPoolMaxTimeLimit(tf):
-            return []
-        prevFrontPoints = frontPoints
+def calculateRightSpot(spot, directionIndex):
+    direction = movementDirections[(directionIndex + 1) % len(movementDirections)]
+    return (spot[0] + direction[0], spot[1] + direction[1])
 
-    if intersectionPointBack is None or intersectionPointFront is None:
+def setInitialLeftGuyDirection(spot, lookup):
+    directionIndex = 0
+    while calculateLeftSpot(spot, directionIndex) not in lookup:
+        directionIndex = turnLeft(directionIndex)
+    return directionIndex
+
+def setInitialRightGuyDirection(spot, lookup):
+    directionIndex = 0
+    while calculateRightSpot(spot, directionIndex) not in lookup:
+        directionIndex = turnRight(directionIndex)
+    return directionIndex
+
+def calculateNextSpot(spot, directionIndex):
+    direction = movementDirections[directionIndex]
+    return (spot[0] + direction[0], spot[1] + direction[1])
+
+def moveToWallSide(currentPt, lookup):
+    for m in movementDirections:
+        movePt = (currentPt[0] + m[0], currentPt[1] + m[1])
+        if movePt in lookup:
+            return currentPt
+
+    for sInd in range(len(sideDirections)):
+        s = sideDirections[sInd]
+        sidePt = (currentPt[0] + s[0], currentPt[1] + s[1])
+        if sidePt in lookup:
+            m = movementDirections[sInd]
+            newPt = (currentPt[0] + m[0], currentPt[1] + m[1])
+            return newPt
+
+    # should not end here
+    return None
+
+    
+# Ensure there is no forbidden areas between point A and B
+def getTestPointList(ptA, ptB, lookup):
+    testPtList = []
+    testScoreList = []
+    testScore = 1.0
+    if ptA == ptB:
+        testPtList.append(ptA)
+        testScoreList.append(testScore)
+        return testPtList, testScoreList
+    steps = max(abs(ptA[0]- ptB[0]), abs(ptA[1] - ptB[1]))
+    incr = (float(ptB[0] - ptA[0]) / float(steps), float(ptB[1] - ptA[1]) / float(steps))
+    incrDist = distanceBetweenPoints((0.0, 0.0), incr)
+    start = (float(ptA[0]), float(ptA[1]))
+
+    for ind in range(steps):
+        testPt = (int(start[0] + ind * incr[0]), int(start[1] + ind * incr[1]))
+        if testPt not in lookup:
+            if not testPtList or testPtList[-1] != testPt:
+                testPtList.append(testPt)
+                testScoreList.append(testScore)
+                testScore = testScore + 0.1
+        else:
+            if ind < 1 or ind > steps - 2:
+                return [], []
+                
+            testScore = testScore + 1000.0
+    return testPtList, testScoreList
+
+
+def nearby(ptA, ptB):
+    if abs(ptA[0] - ptB[0]) <= 1 and abs(ptA[1] - ptB[1]) <= 1:
+        return True
+    return False
+
+
+def calculateCoarseRoute(ptA, ptB, forbiddenLookup):
+    currentPt2 = (-100, -100)
+
+    leftGuyIndex = 0
+    prevEasy = True
+    ptList, scoreList = getTestPointList(ptA, ptB, forbiddenLookup)
+
+    if not ptList:
         return []
 
-    # Pick up the rudimentary angular route out of the painted data
-    point = intersectionPointBack
-    score = backRouteLookup[point]
-    while score > startScore:
-        directions = getDirections(point)
-        minScore = minScoreInit
-        minPoint = None
-        for direction in directions:
-             newPoint = direction[0]
-             if newPoint in backRouteLookup and backRouteLookup[newPoint] < score:
-                 minScore = backRouteLookup[newPoint]
-                 minPoint = newPoint
-        score = minScore
-        if not minPoint:
-            return []
-        point = minPoint
-        shortestRoute.insert(0, point)
+    start_time = time.time()
 
-    point = intersectionPointFront
-    shortestRoute.append(point)
-    score = routeLookup[point]
-    while score > startScore:
-        directions = getDirections(point)
-        minScore = minScoreInit
-        minPoint = None
-        for direction in directions:
-             newPoint = direction[0]
-             if newPoint in routeLookup and routeLookup[newPoint] < score:
-                 minScore = routeLookup[newPoint]
-                 minPoint = newPoint
-        score = minScore
-        if not minPoint:
-            return []
-        point = minPoint
-        shortestRoute.append(point)
+    shortestRoute = []
 
-     # Straighten the route into a beautiful one
+    currentPt = ptList.pop(0) # turn to pop() ti give a bit more perf
+    currentScore=scoreList.pop(0)
+    shortestRoute.append(currentPt)
+
+    state = 0
+
+    while distanceBetweenPoints(currentPt, ptB) > closenessThreshold and distanceBetweenPoints(currentPt2, ptB) > closenessThreshold:
+        if time.time() - start_time > bddTimeThreshold:
+            return []
+
+        if not ptList:
+            return []
+
+        # currentscore test not madatory?
+        if state == 0:
+            if scoreList[0] > currentScore and nearby(ptList[0], currentPt):
+                currentPt = ptList.pop(0)
+                currentPt2 = (-100, -100)
+                currentScore = scoreList.pop(0)
+                shortestRoute.append(currentPt)
+            else:
+                state = 1
+                prevEasy = True
+        else:
+            if prevEasy:
+                currentPt = moveToWallSide(currentPt, forbiddenLookup)
+                currentPt2 = moveToWallSide(currentPt, forbiddenLookup)
+                leftGuyIndex = setInitialLeftGuyDirection(currentPt, forbiddenLookup)
+                rightGuyIndex = setInitialRightGuyDirection(currentPt2, forbiddenLookup)
+                leftGuyRoute = []
+                rightGuyRoute = []
+                prevEasy = False
+
+            anyMoves = False
+             # the left-moving seeker
+            if calculateNextSpot(currentPt, leftGuyIndex) not in forbiddenLookup:
+                anyMoves = True
+                currentPt = calculateNextSpot(currentPt, leftGuyIndex)
+                currentScore = currentScore + 0.0001
+                if calculateLeftSpot(currentPt, leftGuyIndex) not in forbiddenLookup:
+                    leftGuyIndex = turnLeft(leftGuyIndex)
+                    currentPt = calculateNextSpot(currentPt, leftGuyIndex)
+
+            for dummy in range(4):
+                if calculateNextSpot(currentPt, leftGuyIndex) in forbiddenLookup:
+                    leftGuyIndex = turnRight(leftGuyIndex)
+
+            # the right-moving seeker
+            if calculateNextSpot(currentPt2, rightGuyIndex) not in forbiddenLookup:
+                anyMoves = True
+                currentPt2 = calculateNextSpot(currentPt2, rightGuyIndex)
+                if calculateRightSpot(currentPt2, rightGuyIndex) not in forbiddenLookup:
+                    rightGuyIndex = turnRight(rightGuyIndex)
+                    currentPt2 = calculateNextSpot(currentPt2, rightGuyIndex)
+
+            for dummy in range(4):
+                if calculateNextSpot(currentPt2, rightGuyIndex) in forbiddenLookup:
+                    rightGuyIndex = turnLeft(rightGuyIndex)
+
+            if not anyMoves:
+                return []
+
+            leftGuyRoute.append(currentPt)
+            rightGuyRoute.append(currentPt2)
+
+            if currentPt in ptList:
+                ind = ptList.index(currentPt)
+                for subind in range(ind):
+                    ptList.pop(0)
+                    scoreList.pop(0)
+                currentPt = ptList.pop(0)
+                currentScore = scoreList.pop(0)
+                shortestRoute = shortestRoute + leftGuyRoute
+                state = 0
+            elif currentPt2 in ptList:
+                ind = ptList.index(currentPt2)
+                for subind in range(ind):
+                    ptList.pop(0)
+                    scoreList.pop(0)
+                currentPt = ptList.pop(0)
+                currentScore = scoreList.pop(0)
+                shortestRoute = shortestRoute + rightGuyRoute
+                state = 0
+
+    if state == 1:
+        if distanceBetweenPoints(currentPt, ptB) <= 4.0:
+            shortestRoute = shortestRoute + leftGuyRoute
+        elif distanceBetweenPoints(currentPt2, ptB) <= 4.0:
+            shortestRoute = shortestRoute + leftGuyRoute
+    shortestRoute.append(ptB)
+
+    return shortestRoute
+
+
+def calculateShortestRoute(setupList):
+
+    pointA = setupList[0]
+    pointB = setupList[1]
+    forbiddenAreaLookup = setupList[2]
+    slowAreaLookup = setupList[3]
+    semiSlowAreaLookup = setupList[4]
+    verySlowAreaLookup = setupList[5]
+    tf = tfs[setupList[6]]
+    pacemakerInd = setupList[7]
+
+    forbiddenLookup = forbiddenAreaLookup[tf]
+    slowLookup = slowAreaLookup[tf]
+    semiSlowLookup = semiSlowAreaLookup[tf]
+    verySlowLookup = verySlowAreaLookup[tf]
+    
+    ptA = (pointA[0] // tf, pointA[1] // tf)
+    ptB = (pointB[0] // tf, pointB[1] // tf)
+
+    shortestRoute = calculateCoarseRoute(ptA, ptB, forbiddenLookup)
+    shortestRoute2 = calculateCoarseRoute(ptB, ptA, forbiddenLookup)
+        
+    # Straighten the route into a beautiful one
     if pacemakerInd != 2:
-        shortestRoute = pruneShortestRoute(shortestRoute, forbiddenLookup, slowLookup, semiSlowLookup, verySlowLookup, -1)
-    scaledShortestRoute = []
-    for point in shortestRoute:
-        scaledShortestRoute.append((point[0] * tf, point[1] * tf))
-    return scaledShortestRoute
+        shortestRoute = pruneShortestRoute(shortestRoute, forbiddenLookup, slowLookup, semiSlowLookup, verySlowLookup)
+        shortestRoute2 = pruneShortestRoute(shortestRoute2, forbiddenLookup, slowLookup, semiSlowLookup, verySlowLookup)
+        if len(shortestRoute) < 2:
+            shortestRoute = shortestRoute2            
+        elif len(shortestRoute2) > 1 and calculatePathDistance(shortestRoute2) < calculatePathDistance(shortestRoute):
+            shortestRoute = shortestRoute2
+
+    shortestRoute = [(x[0] * tf, x[1] * tf) for x in shortestRoute.copy()]
+
+    if len(shortestRoute) < 2:
+        return []
+
+    return shortestRoute
 
 
-def quickUpdateShortestRoutes(shortestRoutesArray, lookups, controls, faLookup, saLookup, ssaLookup, vsaLookup, first, last, pacemakerInd):
+def updateShortestRoutes(shortestRoutesArray, lookups, controls, faLookup, saLookup, ssaLookup, vsaLookup, first, last, pacemakerInd):
     if first == 0:
         shortestRoutesArray = []
         for ind in range(len(lookups)):
@@ -386,13 +491,13 @@ def quickUpdateShortestRoutes(shortestRoutesArray, lookups, controls, faLookup, 
         lookup = lookups[ind]
         ptA = controls[ind]
         ptB = controls[ind + 1]
-        shortestRoutesArray[ind] = [quickCalculateShortestRoute(ptA, ptB, lookup, faLookup, saLookup, ssaLookup, vsaLookup, 4, pacemakerInd)]
+        shortestRoutesArray[ind] = [calculateShortestRoute(ptA, ptB, lookup, faLookup, saLookup, ssaLookup, vsaLookup, 1, pacemakerInd)]
         print(ind, shortestRoutesArray[ind])
     return shortestRoutesArray
 
 
 # Calculate shortest route between A and B, using pre-submitted lookups
-def calculateShortestRoute(setupList):
+def slowAccurateCalculateShortestRoute(setupList):
 
     pointA = setupList[0]
     pointB = setupList[1]
@@ -540,7 +645,7 @@ def calculateShortestRoute(setupList):
 
         # Straighten the route into a beautiful one
         if pacemakerInd != 2:
-            shortestRoute = pruneShortestRoute(shortestRoute, forbiddenLookup, slowLookup, semiSlowLookup, verySlowLookup, -1)
+            shortestRoute = pruneShortestRoute(shortestRoute, forbiddenLookup, slowLookup, semiSlowLookup, verySlowLookup)
         scaledShortestRoute = []
         for point in shortestRoute:
             scaledShortestRoute.append((point[0] * tf, point[1] * tf))
@@ -573,7 +678,7 @@ def initializeAINextTrack(ctrls, faLookup, saLookup, ssaLookup, vsaLookup, pacem
     readyRoutesArray = []
 
     for index in range(len(ctrls) - 1):
-        readyRoutesArray.append({"setuplist": [[ctrls[index], ctrls[index+1], faLookup, saLookup, ssaLookup, vsaLookup, 3, pacemakerInd]], "route": None})
+        readyRoutesArray.append({"setuplist": [[ctrls[index], ctrls[index+1], faLookup, saLookup, ssaLookup, vsaLookup, 0, pacemakerInd]], "route": None})
 
     for ind in range(aiNumberOfSlots):
         aiSlots[ind]["aiIndex"] = None

@@ -22,6 +22,7 @@ from random import randrange
 from .mathUtils import distanceBetweenPoints
 from .utils import getSlowdownFactor, getSemiSlowdownFactor, getVerySlowdownFactor
 
+pruneDefaultRes = 16
 
 def pruneDistanceWeighter(testPt, lookup, semilookup, verylookup):
     testPtInt = (int(testPt[0]), int(testPt[1]))
@@ -112,37 +113,50 @@ def pruneEnsureGoodShortcut(ptA, ptB, lookup1, lookup2, lookup3):
 def pruneCheckLineOfSight(ptA, ptB, ptMid, forbiddenLookup, slowLookup, semiSlowLookup, verySlowLookup):
     origScore = pruneWeightedDistance(ptA, ptMid, slowLookup, semiSlowLookup, verySlowLookup) + pruneWeightedDistance(ptMid, ptB, slowLookup, semiSlowLookup, verySlowLookup)
     if pruneEnsureLineOfSight(ptA, ptB, forbiddenLookup) != None:
+        origScore = pruneWeightedDistance(ptA, ptMid, slowLookup, semiSlowLookup, verySlowLookup) + pruneWeightedDistance(ptMid, ptB, slowLookup, semiSlowLookup, verySlowLookup)
         newScore = pruneWeightedDistance(ptA, ptB, slowLookup, semiSlowLookup, verySlowLookup)
         if newScore < origScore:
             return True, origScore - newScore
     return False, 0.0
 
 # Straighten the rudimentary angular route that was found intially
-def pruneShortestRoute(route, forbiddenLookup, slowLookup, semiSlowLookup, verySlowLookup, iterations):
+def pruneShortestRouteRes(route, forbiddenLookup, slowLookup, semiSlowLookup, verySlowLookup, res):
     prunedRoute = route.copy()
 
-    while len(prunedRoute) > 2:
+    while len(prunedRoute) > res * 2:
         nextRoute = []
 
         maxDelta = 0
         maxDeltaInd = 0
-        for index in range(len(prunedRoute) - 2):
+
+        thisStep = 1
+        if res//4 != res:
+            thisStep = thisStep + randrange(res//4, res)
+        for index in range(len(prunedRoute) - res * 2):
             pt1 = prunedRoute[index]
-            ptMid = prunedRoute[index + 1]
-            pt2 = prunedRoute[index + 2]
+            ptMid = prunedRoute[index + thisStep]
+            pt2 = prunedRoute[index + thisStep * 2]
 
             shortcutFound, delta = pruneCheckLineOfSight(pt1, pt2, ptMid, forbiddenLookup, slowLookup, semiSlowLookup, verySlowLookup)
             if shortcutFound:
                 if delta > maxDelta:
                     maxDelta = delta
-                    maxDeltaInd = index + 1
+                    maxDeltaInd = index + thisStep
 
         if maxDeltaInd == 0:
             break
-        prunedRoute.pop(maxDeltaInd)
-        if iterations > 0:
-            iterations = iterations - 1
-            if iterations == 0:
-                break
+
+        toBeRemovedInd = maxDeltaInd + 1 - thisStep
+        for dummy in range(toBeRemovedInd, toBeRemovedInd + (thisStep * 2 - 1)):
+            prunedRoute.pop(toBeRemovedInd)
 
     return prunedRoute
+
+
+def pruneShortestRoute(route, forbiddenLookup, slowLookup, semiSlowLookup, verySlowLookup):
+    res = pruneDefaultRes
+    while res and res < len(route)//3:
+        route = pruneShortestRouteRes(route, forbiddenLookup, slowLookup, semiSlowLookup, verySlowLookup, res)
+        res = res//2
+
+    return route
