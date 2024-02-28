@@ -43,19 +43,22 @@ minPacemakerThresholds = [0, 10, 0, 15]
 def stepAdvancer(saLookup, ssaLookup, vsaLookup, pos, angle, speed, speedupFactor):
     xStep, yStep = rotateVector(angle, 1.0)
 
+    xStep = xStep * speedupFactor
+    yStep = yStep * speedupFactor
+
     if speed == "superfast":
-        xStep = xStep * superSpeedupFactor * speedupFactor
-        yStep = yStep * superSpeedupFactor * speedupFactor
-            
+        xStep = xStep * superSpeedupFactor
+        yStep = yStep * superSpeedupFactor
+
     if lookupContains(saLookup, (pos[0] + xStep, pos[1] + yStep)):
-        xStep = xStep * speedupFactor / getSlowdownFactor()
-        yStep = yStep * speedupFactor / getSlowdownFactor()
+        xStep = xStep / getSlowdownFactor()
+        yStep = yStep / getSlowdownFactor()
     elif lookupContains(ssaLookup, (pos[0] + xStep, pos[1] + yStep)):
-        xStep = xStep * speedupFactor / getSemiSlowdownFactor()
+        xStep = xStep / getSemiSlowdownFactor()
         yStep = yStep / getSemiSlowdownFactor()
     elif lookupContains(vsaLookup, (pos[0] + xStep, pos[1] + yStep)):
-        xStep = xStep * speedupFactor / getVerySlowdownFactor()
-        yStep = yStep * speedupFactor / getVerySlowdownFactor()
+        xStep = xStep / getVerySlowdownFactor()
+        yStep = yStep / getVerySlowdownFactor()
 
     return (pos[0] + xStep, pos[1] + yStep)
 

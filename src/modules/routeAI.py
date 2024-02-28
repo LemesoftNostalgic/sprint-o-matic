@@ -434,7 +434,8 @@ def calculateCoarseRoute(ptA, ptB, forbiddenLookup):
         if distanceBetweenPoints(currentPt, ptB) <= 4.0:
             shortestRoute = shortestRoute + leftGuyRoute
         elif distanceBetweenPoints(currentPt2, ptB) <= 4.0:
-            shortestRoute = shortestRoute + leftGuyRoute
+            shortestRoute = shortestRoute + rightGuyRoute
+
     shortestRoute.append(ptB)
 
     return shortestRoute
@@ -461,7 +462,6 @@ def calculateShortestRoute(setupList):
 
     shortestRoute = calculateCoarseRoute(ptA, ptB, forbiddenLookup)
     shortestRoute2 = calculateCoarseRoute(ptB, ptA, forbiddenLookup)
-        
     # Straighten the route into a beautiful one
     if pacemakerInd != 2:
         shortestRoute = pruneShortestRoute(shortestRoute, forbiddenLookup, slowLookup, semiSlowLookup, verySlowLookup)
