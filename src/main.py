@@ -61,6 +61,9 @@ def setTheStageForNewRound(cfg):
     global pacemakerAngle
     global pacemakerStep
     global aiCounter
+    global shortestRoutesArray
+    global shortestRoutes
+    global futureShortestRoutes
 
     # Ensure we have a list of controls
     ctrls = []
