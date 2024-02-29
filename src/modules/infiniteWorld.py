@@ -1,5 +1,6 @@
 import overpy
 import pygame
+import asyncio
 from math import cos, radians
 from random import randrange, random
 
@@ -738,29 +739,44 @@ def initWorldCreator(size):
     return png, mask
 
 
-def getInfiniteWorld(latlonMapOrigo, xyPictureSize, metersPerPixel):
+async def getInfiniteWorld(latlonMapOrigo, xyPictureSize, metersPerPixel):
     db = constructWayDb(latlonMapOrigo, xyPictureSize, metersPerPixel)
+    await asyncio.sleep(0)
     world, worldMask = initWorldCreator(xyPictureSize)
+    await asyncio.sleep(0)
     world, worldMask = drawForestArea(world, worldMask, db)
+    await asyncio.sleep(0)
     world, worldMask = drawOpenArea(world, worldMask, db)
+    await asyncio.sleep(0)
     world, worldMask = drawBrownArea(world, worldMask, db)
+    await asyncio.sleep(0)
     world, worldMask = drawAsphaltArea(world, worldMask, db)
+    await asyncio.sleep(0)
     world, worldMask = drawOliveArea(world, worldMask, db)
+    await asyncio.sleep(0)
     world, worldMask = drawSolidGreenArea(world, worldMask, db)
+    await asyncio.sleep(0)
     world, worldMask = drawWater(world, worldMask, db)
+    await asyncio.sleep(0)
     world, worldMask = drawCliff(world, worldMask, db)
+    await asyncio.sleep(0)
     world, worldMask = drawRailway(world, worldMask, db, metersPerPixel)
+    await asyncio.sleep(0)
     world, worldMask = drawArtificialSpots(world, worldMask)
+    await asyncio.sleep(0)
     world, worldMask = drawRoads(world, worldMask, db, metersPerPixel)
+    await asyncio.sleep(0)
     world, worldMask = drawFences(world, worldMask, db)
+    await asyncio.sleep(0)
     world, worldMask = drawHouses(world, worldMask, db)
+    await asyncio.sleep(0)
     world, worldMask = drawSpots(world, worldMask, db)
     x, y = worldMask.get_size()
     pygame.draw.rect(worldMask, getForbiddenAreaMask(), [(2,2), ((x-2, y-2))], width=2)
     return world, worldMask
 
 
-def getInfiniteWorldDefault(city, citymap):
+async def getInfiniteWorldDefault(city, citymap):
     currmap = []
     for tentative in citymap:
         if tentative[0] == city:
@@ -771,5 +787,5 @@ def getInfiniteWorldDefault(city, citymap):
         latlonMapOrigo = tuple(setup[0])
         metersPerPixel = setup[1] * (0.9 + 0.2 *random())
         xyPictureSize = (1280, 720)
-        return getInfiniteWorld(latlonMapOrigo, xyPictureSize, metersPerPixel)
+        return await getInfiniteWorld(latlonMapOrigo, xyPictureSize, metersPerPixel)
     return None, None

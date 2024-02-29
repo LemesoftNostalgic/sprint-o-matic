@@ -19,6 +19,7 @@
 
 from random import randrange
 import pygame
+import asyncio
 import math
 
 from .mathUtils import rotateVector, rotatePoint, getBoundingBox, polygonCreate, polygonContainsWithLookup
@@ -1251,13 +1252,15 @@ def initOuluCreator(blockSize, gridSize, boundary):
     return png, mask
 
 
-def getInfiniteOulu(blockSize, gridSize, boundary):
+async def getInfiniteOulu(blockSize, gridSize, boundary):
     terranizer(terrains[randrange(len(terrains))])
     oulu, ouluMask = initOuluCreator(blockSize, gridSize, boundary)
     for x in range(gridSize[0]):
         for y in range(gridSize[1]):
             yard, png, mask = addBlock(blockSize, True)
+            await asyncio.sleep(0)
             oulu, ouluMask = installOuluBlock(oulu, png, ouluMask, mask, (x, y), blockSize, boundary)
+            await asyncio.sleep(0)
     return oulu, ouluMask
 
 
@@ -1270,9 +1273,9 @@ kAiPoolSlot =  3
 kAiResultDescSlot = 4
 kAiResultArraySlot = 5
 
-def getInfiniteOuluArray(setupArray):
+async def getInfiniteOuluArray(setupArray):
 
-    oulu, ouluMask = getInfiniteOulu(setupArray[0], setupArray[1], setupArray[2])
+    oulu, ouluMask = await getInfiniteOulu(setupArray[0], setupArray[1], setupArray[2])
     ouluStr = pygame.image.tostring(oulu, 'RGBA')
     ouluMaskStr = pygame.image.tostring(ouluMask, 'RGBA')
     ouluSize = oulu.get_size()

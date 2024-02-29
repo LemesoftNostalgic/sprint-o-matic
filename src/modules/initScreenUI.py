@@ -17,6 +17,7 @@
 # under the License.
 #
 
+import asyncio
 import pygame
 import math
 
@@ -137,7 +138,7 @@ initScreenPos = 0
 externalExampleTeamCtr = 0
 externalExampleCtr = 0
 worldExampleCtr = 0
-def initScreen(imagePath, gameSettings, externalImageData, externalWorldCityMap, news):
+async def initScreen(imagePath, gameSettings, externalImageData, externalWorldCityMap, news):
     global selections
     global externalExampleTeamCtr
     global externalExampleCtr
@@ -178,7 +179,7 @@ def initScreen(imagePath, gameSettings, externalImageData, externalWorldCityMap,
         "berdnikov2004, badoink, bronxio, cgoulao, fran_ky, iykqic0",
         "johaynes, josefpres, nomiqbomi, seth, szymalix, the_loner",
         "CC BY 3.0 DEED:",
-        "frodo89 for 84456__frodo89__standard-beep-pre-start.wav"
+        "frodo89 for 84456__frodo89__standard-beep-pre-start.ogg"
         ]
     titleTextPositions = [
         (xStart, yStart - yStep/5),
@@ -346,6 +347,7 @@ def initScreen(imagePath, gameSettings, externalImageData, externalWorldCityMap,
         if gameSettings.infoBox:
             showInfoBoxTxt(getBigScreen())
         pygame.display.flip()
+        await asyncio.sleep(0)
 
     retSettings = []
     for subindexes in indexes:

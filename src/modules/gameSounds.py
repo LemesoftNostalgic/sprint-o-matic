@@ -33,60 +33,60 @@ melodyChannel = None
 
 soundPath = "21608__ali_6868__gravel-footsteps"
 leftSteps = [
-    "384873__ali_6868__left-gravel-footstep-1.wav",
-    "384871__ali_6868__left-gravel-footstep-2.wav",
-    "384872__ali_6868__left-gravel-footstep-3.wav",
-    "384875__ali_6868__left-gravel-footstep-4.wav",
-    "384874__ali_6868__left-gravel-footstep-5.wav"
+    "384873__ali_6868__left-gravel-footstep-1.ogg",
+    "384871__ali_6868__left-gravel-footstep-2.ogg",
+    "384872__ali_6868__left-gravel-footstep-3.ogg",
+    "384875__ali_6868__left-gravel-footstep-4.ogg",
+    "384874__ali_6868__left-gravel-footstep-5.ogg"
 ]
 leftSounds = []
 
 rightSteps = [
-    "384877__ali_6868__right-gravel-footstep-1.wav",
-    "384876__ali_6868__right-gravel-footstep-2.wav",
-    "384879__ali_6868__right-gravel-footstep-3.wav",
-    "384878__ali_6868__right-gravel-footstep-4.wav",
-    "384880__ali_6868__right-gravel-footstep-5.wav"
+    "384877__ali_6868__right-gravel-footstep-1.ogg",
+    "384876__ali_6868__right-gravel-footstep-2.ogg",
+    "384879__ali_6868__right-gravel-footstep-3.ogg",
+    "384878__ali_6868__right-gravel-footstep-4.ogg",
+    "384880__ali_6868__right-gravel-footstep-5.ogg"
 ]
 rightSounds = []
 
 melodyPaths = [
-    os.path.join("jackslay", "380848__jackslay__futuristic.mp3"),
-    os.path.join("berdnikov2004", "641751__berdnikov2004__vibe-tracker-drum-loop-8-bit16-bit.wav"),
-    os.path.join("badoink", "519621__badoink__jazzloop_120_bpm.wav"),
-    os.path.join("bronxio", "239549__bronxio__drumloop-for-chaos-bass-no-hihat-4-bar-95-bpm-swing.wav"),
-    os.path.join("cgoulao", "431538__cgoulao__fiesta.wav"),
-    os.path.join("fran_ky", "350702__fran_ky__120-num-chrome-7.wav"),
-    os.path.join("furbyguy", "388101__furbyguy__90s-game-loop.wav"),
-    os.path.join("iykqic0", "253489__iykqic0__pringle-rhythm-industrial-ghost-echo-delay.wav"),
-    os.path.join("johaynes", "659527__johaynes__jos-genedrums-150bpm-43.wav"),
-    os.path.join("badoink", "547095__badoink__awesome-arp.wav"),
-    os.path.join("josefpres", "609809__josefpres__random-loop-001-simple-mix-120-bpm.wav"),
-    os.path.join("nomiqbomi", "579059__nomiqbomi__transist-4.mp3"),
-    os.path.join("seth", "680840__seth_makes_sounds__homemade.wav"),
-    os.path.join("szymalix", "588569__szymalix__risemix.wav"),
-    os.path.join("the_loner", "705439__the_loner__weird_loop02.wav")
+    os.path.join("jackslay", "380848__jackslay__futuristic.ogg"),
+    os.path.join("berdnikov2004", "641751__berdnikov2004__vibe-tracker-drum-loop-8-bit16-bit.ogg"),
+    os.path.join("badoink", "519621__badoink__jazzloop_120_bpm.ogg"),
+    os.path.join("bronxio", "239549__bronxio__drumloop-for-chaos-bass-no-hihat-4-bar-95-bpm-swing.ogg"),
+    os.path.join("cgoulao", "431538__cgoulao__fiesta.ogg"),
+    os.path.join("fran_ky", "350702__fran_ky__120-num-chrome-7.ogg"),
+    os.path.join("furbyguy", "388101__furbyguy__90s-game-loop.ogg"),
+    os.path.join("iykqic0", "253489__iykqic0__pringle-rhythm-industrial-ghost-echo-delay.ogg"),
+    os.path.join("johaynes", "659527__johaynes__jos-genedrums-150bpm-43.ogg"),
+    os.path.join("badoink", "547095__badoink__awesome-arp.ogg"),
+    os.path.join("josefpres", "609809__josefpres__random-loop-001-simple-mix-120-bpm.ogg"),
+    os.path.join("nomiqbomi", "579059__nomiqbomi__transist-4.ogg"),
+    os.path.join("seth", "680840__seth_makes_sounds__homemade.ogg"),
+    os.path.join("szymalix", "588569__szymalix__risemix.ogg"),
+    os.path.join("the_loner", "705439__the_loner__weird_loop02.ogg")
     ]
 
 melodySounds = []
 melodyCtr = None
 
-birdsPath = os.path.join("crk365", "38895__crk365__urban-birds.mp3")
+birdsPath = os.path.join("crk365", "38895__crk365__urban-birds.ogg")
 birdsSound = None
 
-shoutPath = os.path.join("craigsmith", "481757__craigsmith__r21-22-cowboy-shouts-at-cattle.wav")
+shoutPath = os.path.join("craigsmith", "481757__craigsmith__r21-22-cowboy-shouts-at-cattle.ogg")
 shoutSound = None
 
-pacemakerShoutPath = os.path.join("craigsmith", "481757__craigsmith__r21-22-cowboy-shouts-at-cattle-truncated.wav")
+pacemakerShoutPath = os.path.join("craigsmith", "481757__craigsmith__r21-22-cowboy-shouts-at-cattle-truncated.ogg")
 pacemakerShoutSound = None
 
-finishPath = os.path.join("fupicat", "521645__fupicat__winfantasia.wav")
+finishPath = os.path.join("fupicat", "521645__fupicat__winfantasia.ogg")
 finishSound = None
 
-startPath = os.path.join("frodo89", "84456__frodo89__standard-beep-pre-start.wav")
+startPath = os.path.join("frodo89", "84456__frodo89__standard-beep-pre-start.ogg")
 startSound = None
 
-stepPath = os.path.join("21608__ali_6868__gravel-footsteps", "384873__ali_6868__left-gravel-footstep-1.wav")
+stepPath = os.path.join("21608__ali_6868__gravel-footsteps", "384873__ali_6868__left-gravel-footstep-1.ogg")
 stepSound = None
 
 left = False

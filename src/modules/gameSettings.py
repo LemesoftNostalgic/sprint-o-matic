@@ -21,6 +21,7 @@ import json
 import os
 import sys
 from random import randrange
+import asyncio
 
 from .utils import getPackagePath
 from .infiniteOulu import getInfiniteOulu
@@ -141,18 +142,18 @@ def returnSettings():
     return gameSettings
 
 
-def returnConfig(gameSettings, externalImageData, infiniteWorldCityMap):
+async def returnConfig(gameSettings, externalImageData, infiniteWorldCityMap):
 
     metersPerPixel = 0
     defaultZoom = 1.0
     png = None
 
     if gameSettings.infiniteOulu:
-        png, pngMask = getInfiniteOulu((160, 160), (4, 5), 40 + randrange(0, 20))
+        png, pngMask = await getInfiniteOulu((160, 160), (4, 5), 40 + randrange(0, 20))
         faLookup, saLookup, ssaLookup, vsaLookup, tunnelLookup, config = extractPngLookups(pngMask)
 
     elif gameSettings.infiniteWorld:
-        png, pngMask = getInfiniteWorldDefault(gameSettings.infiniteWorldCity, infiniteWorldCityMap)
+        png, pngMask = await getInfiniteWorldDefault(gameSettings.infiniteWorldCity, infiniteWorldCityMap)
         faLookup, saLookup, ssaLookup, vsaLookup, tunnelLookup, config = extractPngLookups(pngMask)
 
     elif not gameSettings.lookupPngName and (gameSettings.externalExampleTeam and gameSettings.externalExample):

@@ -21,10 +21,8 @@ __version__ = "1.0.3"
 
 import gc
 import time
+import asyncio
 from datetime import datetime, timedelta
-
-#from modules.routeAI import initializeAITables, closeAITables, initializeAINextTrack, getReadyShortestRoutes
-#from modules.infiniteOulu import closePreGeneratedInfiniteOulu
 
 from modules.gameSettings import returnSettings, returnConfig
 from modules.mathUtils import angleOfLine, calculatePathDistance
@@ -64,6 +62,7 @@ def setTheStageForNewRound(cfg):
     global shortestRoutesArray
     global shortestRoutes
     global futureShortestRoutes
+    global trackLengthInPixels
 
     # Ensure we have a list of controls
     ctrls = []
@@ -88,8 +87,6 @@ def setTheStageForNewRound(cfg):
         playerRoutesArray = []
         playerRoutes = []
         startOverPlayerRoute()
-#        initializeAINextTrack(ctrls, faLookup, saLookup, ssaLookup, vsaLookup, gameSettings.pacemaker)
-#        shortestRoutesArray = getReadyShortestRoutes()
         shortestRoutes = []
         futureShortestRoutes = []
         startTime = datetime.now()
@@ -162,7 +159,6 @@ def updateRoutesAndDistances():
     playerRoutes = [ getPlayerRoute() ]
     playerRoutesArray.append(playerRoutes)
     playerDistance = playerDistance + calculatePathDistance(playerRoutes[0])
-    #shortestRoutesArray = getReadyShortestRoutes()
     shortestRoutes = shortestRoutesArray[reachedControl - 1] if reachedControl > 0 else []
     futureShortestRoutes = shortestRoutesArray[reachedControl] if reachedControl > 0 and reachedControl < len(shortestRoutesArray) else []
     uiFlushEvents()
@@ -174,10 +170,51 @@ def updateRoutesAndDistances():
 
 
 # This is the main loop
-if __name__ == "__main__":
-
-    # start AI processes
-    #initializeAITables()
+async def main():
+    global aiCounter
+    global angle
+    global autoControls
+    global config
+    global controls
+    global externalImageData
+    global externalWorldCityMap
+    global externalZoom
+    global faLookup
+    global finishTexts
+    global futureShortestRoutes
+    global gameMovingStartThreshold
+    global gameSettings
+    global generatedOrDownloadedMap
+    global inTunnel
+    global inTunnelPacemaker
+    global news
+    global nextControl
+    global pacemakerAngle
+    global pacemakerPath
+    global pacemakerPosition
+    global pacemakerPrepareForShout
+    global pacemakerStartThreshold
+    global pacemakerStep
+    global pacemakerSteps
+    global playerDistance
+    global playerRoutes
+    global playerRoutesArray
+    global playerWeightedDistance
+    global position
+    global quitting
+    global reachedControl
+    global saLookup
+    global shortestDistance
+    global shortestRoutes
+    global shortestRoutesArray
+    global shortestWeightedDistance
+    global showInitScreen
+    global ssaLookup
+    global startTime
+    global tmpMetersPerPixel
+    global trackLengthInPixels
+    global tunnelLookup
+    global vsaLookup
 
     # all the initialization that happens only once at the startup
     gameSettings = returnSettings()
@@ -186,7 +223,7 @@ if __name__ == "__main__":
     externalImageData = downloadExternalImageData(gameSettings.ownMasterListing)
     externalWorldCityMap = downloadExternalWorldCityMap()
     news = downloadNews()
-
+    
     # statistics and route display initial values
     shortestRoutesArray = []
     playerRoutesArray = []
@@ -201,7 +238,7 @@ if __name__ == "__main__":
     shortestWeightedDistance = None
     playerWeightedDistance = None
     finishTexts = ["", "", ""]
-
+    
     # pacemaker parameters
     pacemakerSteps = 0
     pacemakerStartThreshold = 0
@@ -211,19 +248,16 @@ if __name__ == "__main__":
     pacemakerAngle = 0
     pacemakerPrepareForShout = True
     pacemakerStep = -5
-
+    
     # some counters to time the flushing/progressing the AI pools
-    #aiCounter = 0
-    #aiCounterThreshold = 30
-
     # threshold for the game to really start
     gameMovingStartThreshold = 5
-
+    
     # the choice between specific route file and an automatic route
     autoControls = True
     if gameSettings.routeFileName:
         autoControls = False
-
+    
     # Show init screen only if no specific map file provided in command line
     showInitScreen = False 
     if not gameSettings.mapFileName:
@@ -243,13 +277,13 @@ if __name__ == "__main__":
             if gameSettings.autoTest:
                 (quitting, gameSettings) = fakeInitScreen(gameSettings.imageRoot, gameSettings, externalImageData)
             else:
-                (quitting, gameSettings) = initScreen(gameSettings.imageRoot, gameSettings, externalImageData, externalWorldCityMap, news)
+                (quitting, gameSettings) = await initScreen(gameSettings.imageRoot, gameSettings, externalImageData, externalWorldCityMap, news)
             running = True
             if quitting:
                 running = False
             stopBirds()
         if not quitting:
-            config, controls, faLookup, saLookup, ssaLookup, vsaLookup, tunnelLookup, generatedOrDownloadedMap, tmpMetersPerPixel, externalZoom = returnConfig(gameSettings, externalImageData, externalWorldCityMap)
+            config, controls, faLookup, saLookup, ssaLookup, vsaLookup, tunnelLookup, generatedOrDownloadedMap, tmpMetersPerPixel, externalZoom = await returnConfig(gameSettings, externalImageData, externalWorldCityMap)
 
             # scale from multiple sources...
             if gameSettings.infiniteOulu:
@@ -296,16 +330,6 @@ if __name__ == "__main__":
 
             # Event handling
             if gameSettings.autoTest:
-                #while True:
-                    #shortestRoutesArray = getReadyShortestRoutes()
-                #    allFound = True
-                #    for item in shortestRoutesArray:
-                #        if item == []:
-                #            allFound = False
-                #    if allFound:
-                #        break
-                #    
-                #    time.sleep(1)
                 events = fakeUiEvent()
             else:
                 events = uiEvent(gameSettings.infoBox)
@@ -345,19 +369,6 @@ if __name__ == "__main__":
                             if pacemakerSteps > pacemakerStartThreshold:
                                 pacemakerAdvancement = pacemakerSteps - pacemakerStartThreshold
                             pacemakerPosition, pacemakerAngle, inTunnelPacemaker = getPacemakerPos(saLookup, ssaLookup, vsaLookup, tunnelLookup, pacemakerPath, pacemakerAdvancement, gameSettings.speed, gameSettings.metersPerPixel, gameSettings.pacemaker)
-
-                    # Flush the AI pools every now and then
-                    #aiCounter = aiCounter + 1
-                    #if aiCounter > aiCounterThreshold:
-                    #    aiCounter = 0
-                    #    sa = getReadyShortestRoutes()
-                    # Just for reading out some route calculation data
-                    #    for item in sa:
-                    #        if item:
-                    #            print(len(item[0]), "; ", end="")
-                    #        else:
-                    #            print("0", "; ", end="")
-                    #    print("")
 
                     # Now enter the rendering phase
                     uiClearCanvas()
@@ -472,11 +483,11 @@ if __name__ == "__main__":
                                             break
                         if gameSettings.noUiTest != "yes":
                             uiCompleteRender(finishTexts, externalMapInfoTexts, gameSettings.pacemaker, pacemakerTextNeeded, aiTextNeeded)
+            await asyncio.sleep(0)
 
     # Final freeing of resources
     stopSounds()
     uiLateQuit()
 
-    # free multiprocessing resources, too
-    #closeAITables()
-    #closePreGeneratedInfiniteOulu()
+if __name__ == "__main__":
+    asyncio.run(main())
