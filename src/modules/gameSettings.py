@@ -23,7 +23,7 @@ import sys
 from random import randrange
 
 from .utils import getPackagePath
-from .infiniteOulu import setupPreGeneratedInfiniteOulu, getPreGeneratedInfiniteOulu
+from .infiniteOulu import getInfiniteOulu
 from .infiniteWorld import getInfiniteWorldDefault
 from .lookupPngReader import extractPngLookups, extractPngLookupsFromFile
 from .imageDownloader import downloadMapSurfacesBasedOnUrl
@@ -133,10 +133,6 @@ def returnSettings():
     gameSettings.infoBox = True if gameSettings.infoBox=="yes" else False
     gameSettings.analysis = True if gameSettings.analysis=="yes" else False
 
-    setupPreGeneratedInfiniteOulu([
-        [(160, 160), (4, 5), 40 + randrange(0, 20)]
-        ])
-
     if (gameSettings.lookupPngName != '' and gameSettings.mapFileName == '') or (gameSettings.mapFileName != '' and gameSettings.lookupPngName == ''):
         print("Error: please specify --lookupPngName and --mapFileName together")
         gameSettings.lookupPngName = ''
@@ -152,9 +148,7 @@ def returnConfig(gameSettings, externalImageData, infiniteWorldCityMap):
     png = None
 
     if gameSettings.infiniteOulu:
-        preGenResult = getPreGeneratedInfiniteOulu()
-        png = preGenResult[0]
-        pngMask = preGenResult[1]
+        png, pngMask = getInfiniteOulu((160, 160), (4, 5), 40 + randrange(0, 20))
         faLookup, saLookup, ssaLookup, vsaLookup, tunnelLookup, config = extractPngLookups(pngMask)
 
     elif gameSettings.infiniteWorld:

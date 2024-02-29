@@ -24,7 +24,7 @@ import time
 from datetime import datetime, timedelta
 
 #from modules.routeAI import initializeAITables, closeAITables, initializeAINextTrack, getReadyShortestRoutes
-from modules.infiniteOulu import closePreGeneratedInfiniteOulu
+#from modules.infiniteOulu import closePreGeneratedInfiniteOulu
 
 from modules.gameSettings import returnSettings, returnConfig
 from modules.mathUtils import angleOfLine, calculatePathDistance
@@ -479,4 +479,4 @@ if __name__ == "__main__":
 
     # free multiprocessing resources, too
     #closeAITables()
-    closePreGeneratedInfiniteOulu()
+    #closePreGeneratedInfiniteOulu()

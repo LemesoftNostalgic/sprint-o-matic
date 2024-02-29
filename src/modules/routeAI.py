@@ -18,7 +18,6 @@
 #
 
 import time
-import multiprocessing
 from random import randrange
 
 import sys
@@ -648,94 +647,96 @@ def slowAccurateCalculateShortestRoute(setupList):
 
 
 # Global variables for the AI pools
-aiNumberOfSlots = 2 # not too much pressure for the PC
-aiSlots = []
-readyRoutesArray = []
+#aiNumberOfSlots = 2 # not too much pressure for the PC
+#aiSlots = []
+#readyRoutesArray = []
+#
 
+#import multiprocessing
+#def initializeAITables():
+#    multiprocessing.freeze_support()
+#    for ind in range(aiNumberOfSlots):
+#        aiSlots.append({"aiIndex": None, "aiPool": multiprocessing.Pool(processes = 1), "aiResult": None})
+#
 
-def initializeAITables():
-    multiprocessing.freeze_support()
-    for ind in range(aiNumberOfSlots):
-        aiSlots.append({"aiIndex": None, "aiPool": multiprocessing.Pool(processes = 1), "aiResult": None})
+#def closeAITables():
+#    for ind in range(aiNumberOfSlots):
+#        aiSlots[ind]["aiPool"].close()
+#        aiSlots[ind]["aiPool"].join()
+#        aiSlots[ind]["aiIndex"] = None
+#        aiSlots[ind]["aiResult"] = None
+#
 
+#def initializeAINextTrack(ctrls, faLookup, saLookup, ssaLookup, vsaLookup, pacemakerInd):
+#    global readyRoutesArray
+#    readyRoutesArray = []
+#
+#    for index in range(len(ctrls) - 1):
+#        readyRoutesArray.append({"setuplist": [[ctrls[index], ctrls[index+1], faLookup, saLookup, ssaLookup, vsaLookup, 0, pacemakerInd]], "route": None})
+#
+#    for ind in range(aiNumberOfSlots):
+#        aiSlots[ind]["aiIndex"] = None
+#        if aiSlots[ind]["aiResult"] != None:
+#            aiSlots[ind]["aiResult"].wait()
+#        aiSlots[ind]["aiResult"] = None
+#
 
-def closeAITables():
-    for ind in range(aiNumberOfSlots):
-        aiSlots[ind]["aiPool"].close()
-        aiSlots[ind]["aiPool"].join()
-        aiSlots[ind]["aiIndex"] = None
-        aiSlots[ind]["aiResult"] = None
-
-
-def initializeAINextTrack(ctrls, faLookup, saLookup, ssaLookup, vsaLookup, pacemakerInd):
-    global readyRoutesArray
-    readyRoutesArray = []
-
-    for index in range(len(ctrls) - 1):
-        readyRoutesArray.append({"setuplist": [[ctrls[index], ctrls[index+1], faLookup, saLookup, ssaLookup, vsaLookup, 0, pacemakerInd]], "route": None})
-
-    for ind in range(aiNumberOfSlots):
-        aiSlots[ind]["aiIndex"] = None
-        if aiSlots[ind]["aiResult"] != None:
-            aiSlots[ind]["aiResult"].wait()
-        aiSlots[ind]["aiResult"] = None
-
-
-def getReadyShortestRoutes():
-    global  aiSlots
-    global  readyRoutesArray
-
+#def getReadyShortestRoutes():
+#    global  aiSlots
+#    global  readyRoutesArray
+#
     # first check out any finished work
-    for ind in range(aiNumberOfSlots):
-        aiIndex = aiSlots[ind]["aiIndex"]
-        aiResult = aiSlots[ind]["aiResult"]
-        if aiResult is not None and aiResult.ready():
-            readyRoutesArray[aiIndex]["route"] = aiResult.get(timeout=getAiPoolMaxTimeLimit(1) * 2 + 2).copy()
-            aiSlots[ind]["aiIndex"] = None
-            aiSlots[ind]["aiResult"] = None
-
-    freeSlots = 0
-    for ind in range(aiNumberOfSlots):
-        if aiSlots[ind]["aiResult"] == None:
-            freeSlots = freeSlots + 1
-
+#    for ind in range(aiNumberOfSlots):
+#        aiIndex = aiSlots[ind]["aiIndex"]
+#        aiResult = aiSlots[ind]["aiResult"]
+#        if aiResult is not None and aiResult.ready():
+#            readyRoutesArray[aiIndex]["route"] = aiResult.get(timeout=getAiPoolMaxTimeLimit(1) * 2 + 2).copy()
+#            aiSlots[ind]["aiIndex"] = None
+#            aiSlots[ind]["aiResult"] = None
+#
+#    freeSlots = 0
+#    for ind in range(aiNumberOfSlots):
+#        if aiSlots[ind]["aiResult"] == None:
+#            freeSlots = freeSlots + 1
+#
     # then get the free slots running again
-    for ind in range(aiNumberOfSlots):
-        if aiSlots[ind]["aiResult"] == None:
-            for index in range(len(readyRoutesArray)):
-                if readyRoutesArray[index]["route"] == None:
-                    readyRoutesArray[index]["route"] = []
-                    aiSlots[ind]["aiIndex"] = index
-                    aiSlots[ind]["aiResult"] = aiSlots[ind]["aiPool"].map_async(calculateShortestRoute, readyRoutesArray[index]["setuplist"])
-                    break
+#    for ind in range(aiNumberOfSlots):
+#        if aiSlots[ind]["aiResult"] == None:
+#            for index in range(len(readyRoutesArray)):
+#                if readyRoutesArray[index]["route"] == None:
+#                    readyRoutesArray[index]["route"] = []
+#                    aiSlots[ind]["aiIndex"] = index
+#                    aiSlots[ind]["aiResult"] = aiSlots[ind]["aiPool"].map_async(calculateShortestRoute, readyRoutesArray[index]["setuplist"])
+#                    break
+#
+#    freeSlots = 0
+#    for ind in range(aiNumberOfSlots):
+#        if aiSlots[ind]["aiResult"] == None:
+#            freeSlots = freeSlots + 1
+#
+#    returnRoutesArray = []
+#    for item in readyRoutesArray:
+#        if item["route"] is None:
+#            returnRoutesArray.append([])
+#        else:
+#            returnRoutesArray.append(item["route"])
+#    return returnRoutesArray
+#
 
-    freeSlots = 0
-    for ind in range(aiNumberOfSlots):
-        if aiSlots[ind]["aiResult"] == None:
-            freeSlots = freeSlots + 1
-
-    returnRoutesArray = []
-    for item in readyRoutesArray:
-        if item["route"] is None:
-            returnRoutesArray.append([])
-        else:
-            returnRoutesArray.append(item["route"])
-    return returnRoutesArray
-
-
-if __name__ == "__main__":
-    print(calculateShortestRoute([(10,0), (11,3), {1:{(10,2):True,(11,2):True,(9,2):True}}, {1:{}},
-                                  {
-                                   ((3,0),2): [((4,0), 2, 2), ((3,1), 2, 2)],
-                                   ((4,0),2): [((3,0), 2, 2), ((8,2), 1, 2), ((5,0), 2, 2)],
-                                   ((5,0),2):[((6,0), 2, 2), ((4,0), 2, 2)],
-                                   ((6,0),2):[((5,0),2, 2), ((6,1),2, 2)],
-                                   ((3,1),2):[((3,0),2,2), ((8,2),1,2), ((8,3),1, 2.235)],
-                                   ((8,2),1):[((3,1),2, 2),((8,3),1, 1),((4,0), 2, 2)],
-                                   ((6,1),2):[((6,0),2, 2)],
-                                   ((8,3),1):[((8,2),1, 1), ((9,3),1,1), ((3,1),2, 2.235)],
-                                   ((9,3),1):[((8,3),1,1), ((10,3),1, 1)],
-                                   ((10,3),1):[((9,3),1, 1), ((11,3),1, 1)],
-                                   ((11,3),1):[((10,3),1, 1)],
-                                  }
-    ]))
+#if __name__ == "__main__":
+#    print(calculateShortestRoute([(10,0), (11,3), {1:{(10,2):True,(11,2):True,(9,2):True}}, {1:{}},
+#                                  {
+#                                   ((3,0),2): [((4,0), 2, 2), ((3,1), 2, 2)],
+#                                   ((4,0),2): [((3,0), 2, 2), ((8,2), 1, 2), ((5,0), 2, 2)],
+#                                   ((5,0),2):[((6,0), 2, 2), ((4,0), 2, 2)],
+#                                   ((6,0),2):[((5,0),2, 2), ((6,1),2, 2)],
+#                                   ((3,1),2):[((3,0),2,2), ((8,2),1,2), ((8,3),1, 2.235)],
+#                                   ((8,2),1):[((3,1),2, 2),((8,3),1, 1),((4,0), 2, 2)],
+#                                   ((6,1),2):[((6,0),2, 2)],
+#                                   ((8,3),1):[((8,2),1, 1), ((9,3),1,1), ((3,1),2, 2.235)],
+#                                   ((9,3),1):[((8,3),1,1), ((10,3),1, 1)],
+#                                   ((10,3),1):[((9,3),1, 1), ((11,3),1, 1)],
+#                                   ((11,3),1):[((10,3),1, 1)],
+#                                  }
+#    ]))
+#

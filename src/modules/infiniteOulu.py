@@ -18,7 +18,6 @@
 #
 
 from random import randrange
-import multiprocessing
 import pygame
 import math
 
@@ -1280,54 +1279,56 @@ def getInfiniteOuluArray(setupArray):
     return [ouluStr, ouluMaskStr, ouluSize]
 
 
-def setupPreGeneratedInfiniteOulu(preGeneratedSetup):
-    global preGenerated
-    multiprocessing.freeze_support()
-    preGenerated = preGeneratedSetup
-    for ind in range(len(preGenerated)):
-        preGenerated[ind].append(multiprocessing.Pool(processes = 1))
-        preGenerated[ind].append(None) # result descriptior
-        preGenerated[ind].append([]) # returned result data
-        preGenerated[ind][kAiResultDescSlot] = preGenerated[ind][kAiPoolSlot].map_async(getInfiniteOuluArray, [preGenerated[ind][:kAiPoolSlot]])
-
-
-def closePreGeneratedInfiniteOulu():
-    global preGenerated
-    for ind in range(len(preGenerated)):
-        preGenerated[ind][kAiPoolSlot].close()
-        preGenerated[ind][kAiPoolSlot].join()
-
-
-def deStringOuluResults(ouluSetup):
-    ouluStr = ouluSetup[0][0]
-    ouluMaskStr = ouluSetup[0][1]
-    ouluSize = ouluSetup[0][2]
-
-    oulu = pygame.image.fromstring(ouluStr, ouluSize, 'RGBA')
-    ouluMask = pygame.image.fromstring(ouluMaskStr, ouluSize, 'RGBA')
-    return [oulu, ouluMask]
-
-
-def getPreGeneratedInfiniteOulu():
-    global preGenerated
-
-    # find index of terrain, now only one in use
-    ind = 0
-
-    # if no map awailable yet, the wait
-    if preGenerated[ind][kAiResultArraySlot] == []:
-        if not preGenerated[ind][kAiResultDescSlot].ready():
-                preGenerated[ind][kAiResultDescSlot].wait()
-
-    # if old map available, use it
-    if not preGenerated[ind][kAiResultDescSlot].ready():
-        return deStringOuluResults(preGenerated[ind][kAiResultArraySlot])
-
-    # now get result to a table
-    preGenerated[ind][kAiResultArraySlot] = preGenerated[ind][kAiResultDescSlot].get(timeout=getAiPoolMaxTimeLimit(1) + 2).copy()
-
-    # put another one baking
-    preGenerated[ind][kAiResultDescSlot] = preGenerated[ind][kAiPoolSlot].map_async(getInfiniteOuluArray, [preGenerated[ind][:kAiPoolSlot]])
-
-    # use the new one
-    return deStringOuluResults(preGenerated[ind][kAiResultArraySlot])
+#import multiprocessing
+#def setupPreGeneratedInfiniteOulu(preGeneratedSetup):
+#    global preGenerated
+#    multiprocessing.freeze_support()
+#    preGenerated = preGeneratedSetup
+#    for ind in range(len(preGenerated)):
+#        preGenerated[ind].append(multiprocessing.Pool(processes = 1))
+#        preGenerated[ind].append(None) # result descriptior
+#        preGenerated[ind].append([]) # returned result data
+#        preGenerated[ind][kAiResultDescSlot] = preGenerated[ind][kAiPoolSlot].map_async(getInfiniteOuluArray, [preGenerated[ind][:kAiPoolSlot]])
+#
+#
+#def closePreGeneratedInfiniteOulu():
+#    global preGenerated
+#    for ind in range(len(preGenerated)):
+#        preGenerated[ind][kAiPoolSlot].close()
+#        preGenerated[ind][kAiPoolSlot].join()
+#
+#
+#def deStringOuluResults(ouluSetup):
+#    ouluStr = ouluSetup[0][0]
+#    ouluMaskStr = ouluSetup[0][1]
+#    ouluSize = ouluSetup[0][2]
+#
+#    oulu = pygame.image.fromstring(ouluStr, ouluSize, 'RGBA')
+#    ouluMask = pygame.image.fromstring(ouluMaskStr, ouluSize, 'RGBA')
+#    return [oulu, ouluMask]
+#
+#
+#def getPreGeneratedInfiniteOulu():
+#    global preGenerated
+#
+#    # find index of terrain, now only one in use
+#    ind = 0
+#
+#    # if no map awailable yet, the wait
+#    if preGenerated[ind][kAiResultArraySlot] == []:
+#        if not preGenerated[ind][kAiResultDescSlot].ready():
+#                preGenerated[ind][kAiResultDescSlot].wait()
+#
+#    # if old map available, use it
+#    if not preGenerated[ind][kAiResultDescSlot].ready():
+#        return deStringOuluResults(preGenerated[ind][kAiResultArraySlot])
+#
+#    # now get result to a table
+#    preGenerated[ind][kAiResultArraySlot] = preGenerated[ind][kAiResultDescSlot].get(timeout=getAiPoolMaxTimeLimit(1) + 2).copy()
+#
+#    # put another one baking
+#    preGenerated[ind][kAiResultDescSlot] = preGenerated[ind][kAiPoolSlot].map_async(getInfiniteOuluArray, [preGenerated[ind][:kAiPoolSlot]])
+#
+#    # use the new one
+#    return deStringOuluResults(preGenerated[ind][kAiResultArraySlot])
+#

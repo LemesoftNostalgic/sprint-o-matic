@@ -116,7 +116,7 @@ def createAutoControls(cfg, trackLength, distribution, metersPerPixel, faLookups
         if isDifficultControl:
             numDifficultControls = numDifficultControls + 1
         if ctrl is None:
-            return [], 0
+            return [], 0, []
 
         preComputed = calculateCoarseRoute(ctrls[-1], ctrl, faLookups[1])
         if len(preComputed) > 1 and len(calculateCoarseRoute(ctrl, ctrls[-1], faLookups[2])) > 1:
