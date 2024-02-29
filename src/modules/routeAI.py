@@ -451,6 +451,9 @@ def calculateShortestRoute(setupList):
     verySlowAreaLookup = setupList[5]
     tf = tfs[setupList[6]]
     pacemakerInd = setupList[7]
+    preComputed = []
+    if len(setupList) > 8:
+        preComputed = setupList[8]
 
     forbiddenLookup = forbiddenAreaLookup[tf]
     slowLookup = slowAreaLookup[tf]
@@ -460,18 +463,24 @@ def calculateShortestRoute(setupList):
     ptA = (pointA[0] // tf, pointA[1] // tf)
     ptB = (pointB[0] // tf, pointB[1] // tf)
 
-    shortestRoute = calculateCoarseRoute(ptA, ptB, forbiddenLookup)
+    if preComputed:
+        shortestRoute = preComputed
+    else:
+        shortestRoute = calculateCoarseRoute(ptA, ptB, forbiddenLookup)
+
+    if len(shortestRoute) < 2:
+        return []
+
     shortestRoute2 = calculateCoarseRoute(ptB, ptA, forbiddenLookup)
     shortestRoute.reverse()
 
     # Straighten the route into a beautiful one
     if pacemakerInd != 2:
         shortestRoute = pruneShortestRoute(shortestRoute, forbiddenLookup, slowLookup, semiSlowLookup, verySlowLookup)
-        shortestRoute2 = pruneShortestRoute(shortestRoute2, forbiddenLookup, slowLookup, semiSlowLookup, verySlowLookup)
-        if len(shortestRoute) < 2:
-            shortestRoute = shortestRoute2
-        elif len(shortestRoute2) > 1 and calculatePathDistance(shortestRoute2) < calculatePathDistance(shortestRoute):
-            shortestRoute = shortestRoute2
+        if len(shortestRoute2) > 1:
+            shortestRoute2 = pruneShortestRoute(shortestRoute2, forbiddenLookup, slowLookup, semiSlowLookup, verySlowLookup)
+            if len(shortestRoute2) > 1 and calculatePathDistance(shortestRoute2) < calculatePathDistance(shortestRoute):
+                shortestRoute = shortestRoute2
 
     shortestRoute = [(x[0] * tf, x[1] * tf) for x in shortestRoute.copy()]
 
@@ -479,23 +488,6 @@ def calculateShortestRoute(setupList):
         return []
 
     return shortestRoute
-
-
-def updateShortestRoutes(shortestRoutesArray, lookups, controls, faLookup, saLookup, ssaLookup, vsaLookup, first, last, pacemakerInd):
-    if first == 0:
-        shortestRoutesArray = []
-        for ind in range(len(lookups)):
-            shortestRoutesArray.append([])
-
-    for ind in range(first, last):
-        if ind >= len(lookups):
-            break
-        lookup = lookups[ind]
-        ptA = controls[ind]
-        ptB = controls[ind + 1]
-        shortestRoutesArray[ind] = [calculateShortestRoute(ptA, ptB, lookup, faLookup, saLookup, ssaLookup, vsaLookup, 1, pacemakerInd)]
-        print(ind, shortestRoutesArray[ind])
-    return shortestRoutesArray
 
 
 # Calculate shortest route between A and B, using pre-submitted lookups

@@ -23,7 +23,7 @@ import gc
 import time
 from datetime import datetime, timedelta
 
-from modules.routeAI import initializeAITables, closeAITables, initializeAINextTrack, getReadyShortestRoutes
+#from modules.routeAI import initializeAITables, closeAITables, initializeAINextTrack, getReadyShortestRoutes
 from modules.infiniteOulu import closePreGeneratedInfiniteOulu
 
 from modules.gameSettings import returnSettings, returnConfig
@@ -67,7 +67,7 @@ def setTheStageForNewRound(cfg):
 
     # Ensure we have a list of controls
     ctrls = []
-    ctrls, numberOfDifficultControls = createAutoControls(cfg, trackLengthInPixels, gameSettings.distributionOfControlLegs, gameSettings.metersPerPixel, faLookup, gameSettings.infiniteWorld)
+    ctrls, numberOfDifficultControls, shortestRoutesArray = createAutoControls(cfg, trackLengthInPixels, gameSettings.distributionOfControlLegs, gameSettings.metersPerPixel, faLookup, saLookup, ssaLookup, vsaLookup, gameSettings.pacemaker, gameSettings.infiniteWorld)
 
     # effects initialization
     uiControlEffectRestart()
@@ -88,8 +88,8 @@ def setTheStageForNewRound(cfg):
         playerRoutesArray = []
         playerRoutes = []
         startOverPlayerRoute()
-        initializeAINextTrack(ctrls, faLookup, saLookup, ssaLookup, vsaLookup, gameSettings.pacemaker)
-        shortestRoutesArray = getReadyShortestRoutes()
+#        initializeAINextTrack(ctrls, faLookup, saLookup, ssaLookup, vsaLookup, gameSettings.pacemaker)
+#        shortestRoutesArray = getReadyShortestRoutes()
         shortestRoutes = []
         futureShortestRoutes = []
         startTime = datetime.now()
@@ -162,7 +162,7 @@ def updateRoutesAndDistances():
     playerRoutes = [ getPlayerRoute() ]
     playerRoutesArray.append(playerRoutes)
     playerDistance = playerDistance + calculatePathDistance(playerRoutes[0])
-    shortestRoutesArray = getReadyShortestRoutes()
+    #shortestRoutesArray = getReadyShortestRoutes()
     shortestRoutes = shortestRoutesArray[reachedControl - 1] if reachedControl > 0 else []
     futureShortestRoutes = shortestRoutesArray[reachedControl] if reachedControl > 0 and reachedControl < len(shortestRoutesArray) else []
     uiFlushEvents()
@@ -177,7 +177,7 @@ def updateRoutesAndDistances():
 if __name__ == "__main__":
 
     # start AI processes
-    initializeAITables()
+    #initializeAITables()
 
     # all the initialization that happens only once at the startup
     gameSettings = returnSettings()
@@ -213,8 +213,8 @@ if __name__ == "__main__":
     pacemakerStep = -5
 
     # some counters to time the flushing/progressing the AI pools
-    aiCounter = 0
-    aiCounterThreshold = 30
+    #aiCounter = 0
+    #aiCounterThreshold = 30
 
     # threshold for the game to really start
     gameMovingStartThreshold = 5
@@ -296,16 +296,16 @@ if __name__ == "__main__":
 
             # Event handling
             if gameSettings.autoTest:
-                while True:
-                    shortestRoutesArray = getReadyShortestRoutes()
-                    allFound = True
-                    for item in shortestRoutesArray:
-                        if item == []:
-                            allFound = False
-                    if allFound:
-                        break
-                    
-                    time.sleep(1)
+                #while True:
+                    #shortestRoutesArray = getReadyShortestRoutes()
+                #    allFound = True
+                #    for item in shortestRoutesArray:
+                #        if item == []:
+                #            allFound = False
+                #    if allFound:
+                #        break
+                #    
+                #    time.sleep(1)
                 events = fakeUiEvent()
             else:
                 events = uiEvent(gameSettings.infoBox)
@@ -347,10 +347,10 @@ if __name__ == "__main__":
                             pacemakerPosition, pacemakerAngle, inTunnelPacemaker = getPacemakerPos(saLookup, ssaLookup, vsaLookup, tunnelLookup, pacemakerPath, pacemakerAdvancement, gameSettings.speed, gameSettings.metersPerPixel, gameSettings.pacemaker)
 
                     # Flush the AI pools every now and then
-                    aiCounter = aiCounter + 1
-                    if aiCounter > aiCounterThreshold:
-                        aiCounter = 0
-                        sa = getReadyShortestRoutes()
+                    #aiCounter = aiCounter + 1
+                    #if aiCounter > aiCounterThreshold:
+                    #    aiCounter = 0
+                    #    sa = getReadyShortestRoutes()
                     # Just for reading out some route calculation data
                     #    for item in sa:
                     #        if item:
@@ -478,5 +478,5 @@ if __name__ == "__main__":
     uiLateQuit()
 
     # free multiprocessing resources, too
-    closeAITables()
+    #closeAITables()
     closePreGeneratedInfiniteOulu()

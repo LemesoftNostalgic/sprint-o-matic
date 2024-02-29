@@ -23,7 +23,7 @@ import time
 
 from .mathUtils import angleBetweenLineSegments, distanceBetweenPoints
 from .pathPruning import pruneEnsureLineOfSight
-from .routeAI import calculateCoarseRoute
+from .routeAI import calculateCoarseRoute, calculateShortestRoute
 
 
 firstControlMinDistance = 100
@@ -103,9 +103,10 @@ def pickDistAutoControl(cfg, ctrls, distribution, metersPerPixel, faLookup):
         return candidate, dist, isDifficultControl
 
 
-def createAutoControls(cfg, trackLength, distribution, metersPerPixel, faLookups, isWorld):
+def createAutoControls(cfg, trackLength, distribution, metersPerPixel, faLookups, saLookups, ssaLookups, vsaLookups, pacemakerInd, isWorld):
     totdist = 0
     ctrls = []
+    shortests = []
     start_tot_time = time.time()
     ctrl = pickAutoControl(cfg, ctrls)
     ctrls.append(ctrl)
@@ -117,7 +118,9 @@ def createAutoControls(cfg, trackLength, distribution, metersPerPixel, faLookups
         if ctrl is None:
             return [], 0
 
-        if len(calculateCoarseRoute(ctrl, ctrls[-1], faLookups[1])) > 1 and len(calculateCoarseRoute(ctrl, ctrls[-1], faLookups[2])) > 1:
+        preComputed = calculateCoarseRoute(ctrls[-1], ctrl, faLookups[1])
+        if len(preComputed) > 1 and len(calculateCoarseRoute(ctrl, ctrls[-1], faLookups[2])) > 1:
+            shortests.append([calculateShortestRoute([ctrls[-1], ctrl, faLookups, saLookups, ssaLookups, vsaLookups, 0, pacemakerInd, preComputed])])
             ctrls.append(ctrl)
             totdist = totdist + dist
         elif len(ctrls) < 2:
@@ -128,7 +131,7 @@ def createAutoControls(cfg, trackLength, distribution, metersPerPixel, faLookups
         if time.time() - start_tot_time > totMaxTime:
             break
 
-    return ctrls, numDifficultControls
+    return ctrls, numDifficultControls, shortests
 
 
 def createPairedList(trivialList):

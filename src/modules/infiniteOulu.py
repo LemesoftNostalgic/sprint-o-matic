@@ -313,8 +313,8 @@ def rotateArea(area, png, mask):
     for y in range(len(area)):
         for x in range(len(area[0])):
             rotated[y][x] = area[len(area[0])-x-1][y]
-            pngCopy.fill(png.get_at((x, y)), ((len(area)-y-1, x), (1, 1)))
-            maskCopy.fill(mask.get_at((x, y)), ((len(area)-y-1, x), (1, 1)))
+    pngCopy = pygame.transform.rotate(png, -90)
+    maskCopy= pygame.transform.rotate(mask, -90)
     return rotated, pngCopy, maskCopy
 
 

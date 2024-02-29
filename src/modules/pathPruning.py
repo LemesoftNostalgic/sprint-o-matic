@@ -123,15 +123,13 @@ def pruneCheckLineOfSight(ptA, ptB, ptMid, forbiddenLookup, slowLookup, semiSlow
 def pruneShortestRouteRes(route, forbiddenLookup, slowLookup, semiSlowLookup, verySlowLookup, res):
     prunedRoute = route.copy()
 
-    while len(prunedRoute) > res * 2:
+    while len(prunedRoute) > res * 3:
         nextRoute = []
 
         maxDelta = 0
         maxDeltaInd = 0
 
-        thisStep = 1
-        if res//4 != res:
-            thisStep = thisStep + randrange(res//4, res)
+        thisStep = res
         for index in range(len(prunedRoute) - res * 2):
             pt1 = prunedRoute[index]
             ptMid = prunedRoute[index + thisStep]
@@ -147,7 +145,7 @@ def pruneShortestRouteRes(route, forbiddenLookup, slowLookup, semiSlowLookup, ve
             break
 
         toBeRemovedInd = maxDeltaInd + 1 - thisStep
-        for dummy in range(toBeRemovedInd, toBeRemovedInd + (thisStep * 2 - 1)):
+        for step in range(toBeRemovedInd, toBeRemovedInd + (thisStep * 2 - 1)):
             prunedRoute.pop(toBeRemovedInd)
 
     return prunedRoute
@@ -155,8 +153,10 @@ def pruneShortestRouteRes(route, forbiddenLookup, slowLookup, semiSlowLookup, ve
 
 def pruneShortestRoute(route, forbiddenLookup, slowLookup, semiSlowLookup, verySlowLookup):
     res = pruneDefaultRes
-    while res and res < len(route)//3:
+    for res in [13, 5, 1]:
         route = pruneShortestRouteRes(route, forbiddenLookup, slowLookup, semiSlowLookup, verySlowLookup, res)
-        res = res//2
+        route.reverse()
+        route = pruneShortestRouteRes(route, forbiddenLookup, slowLookup, semiSlowLookup, verySlowLookup, 14 - res)
+        route.reverse()
 
     return route
