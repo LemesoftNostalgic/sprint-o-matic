@@ -179,7 +179,7 @@ async def initScreen(imagePath, gameSettings, externalImageData, externalWorldCi
         "berdnikov2004, badoink, bronxio, cgoulao, fran_ky, iykqic0",
         "johaynes, josefpres, nomiqbomi, seth, szymalix, the_loner",
         "CC BY 3.0 DEED:",
-        "frodo89 for 84456__frodo89__standard-beep-pre-start.ogg"
+        "frodo89 for 84456__frodo89__standard-beep-pre-start-pygbag.ogg"
         ]
     titleTextPositions = [
         (xStart, yStart - yStep/5),
