@@ -23,18 +23,18 @@ import time
 import asyncio
 from datetime import datetime, timedelta
 
-from modules.gameSettings import returnSettings, returnConfig
-from modules.mathUtils import angleOfLine, calculatePathDistance
-from modules.trackCreator import createAutoControls
-from modules.gameUIUtils import uiEarlyInit, uiLateQuit, uiFlushEvents
-from modules.initScreenUI import initScreen
-from modules.gameUI import uiInit, uiInitStartTriangle, uiStartControlEffect, uiControlEffectEnded, uiCenterTurnZoomTheMap, uiAnimatePlayer, uiAnimatePacemaker, uiRenderRoutes, uiRenderControls, uiCompleteRender, uiEvent, uiClearCanvas, raiseControlApproachZoom, lowerControlApproachZoom, uiRenderPacemakerText, uiRenderAIText, uiControlEffectRestart, uiRenderExternalMapInfo, uiStoreAnalysis
-from modules.gameEngine import startOverPlayerRoute, playerRoute, calculateNextStep, closeToControl, quiteCloseToControl, longLapEveryOther, generateAngleStep, normalizeAngleStep, defaultAngle, getPlayerRoute, getPacemakerThreshold, getPacemakerPos
-from modules.pathPruning import calculatePathWeightedDistance
-from modules.gameSounds import initSounds, stopSounds, maintainRunningStepEffect, startMelody, stopMelody, startBirds, stopBirds, shoutEffect, pacemakerShoutEffect, finishEffect, startEffect, stopEffects
-from modules.imageDownloader import downloadExternalImageData, downloadExternalWorldCityMap, downloadNews
+from sprintomatic.modules.gameSettings import returnSettings, returnConfig
+from sprintomatic.modules.mathUtils import angleOfLine, calculatePathDistance
+from sprintomatic.modules.trackCreator import createAutoControls
+from sprintomatic.modules.gameUIUtils import uiEarlyInit, uiLateQuit, uiFlushEvents
+from sprintomatic.modules.initScreenUI import initScreen
+from sprintomatic.modules.gameUI import uiInit, uiInitStartTriangle, uiStartControlEffect, uiControlEffectEnded, uiCenterTurnZoomTheMap, uiAnimatePlayer, uiAnimatePacemaker, uiRenderRoutes, uiRenderControls, uiCompleteRender, uiEvent, uiClearCanvas, raiseControlApproachZoom, lowerControlApproachZoom, uiRenderPacemakerText, uiRenderAIText, uiControlEffectRestart, uiRenderExternalMapInfo, uiStoreAnalysis
+from sprintomatic.modules.gameEngine import startOverPlayerRoute, playerRoute, calculateNextStep, closeToControl, quiteCloseToControl, longLapEveryOther, generateAngleStep, normalizeAngleStep, defaultAngle, getPlayerRoute, getPacemakerThreshold, getPacemakerPos
+from sprintomatic.modules.pathPruning import calculatePathWeightedDistance
+from sprintomatic.modules.gameSounds import initSounds, stopSounds, maintainRunningStepEffect, startMelody, stopMelody, startBirds, stopBirds, shoutEffect, pacemakerShoutEffect, finishEffect, startEffect, stopEffects
+from sprintomatic.modules.imageDownloader import downloadExternalImageData, downloadExternalWorldCityMap, downloadNews
 
-from modules.autoTest import fakeInitScreen, fakeCalculateNextStep, fakeUiEvent, fakeResetAgain
+from sprintomatic.modules.autoTest import fakeInitScreen, fakeCalculateNextStep, fakeUiEvent, fakeResetAgain
 
 
 # Re-initialize the game state, done each time a new run is started

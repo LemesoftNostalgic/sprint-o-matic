@@ -17,7 +17,7 @@ rem specific language governing permissions and limitations
 rem under the License.
 rem
 
-cd sprint-o-matic
+cd sprintomatic
 pyinstaller main.spec --distpath ../bin
 cd ..
 cd bin

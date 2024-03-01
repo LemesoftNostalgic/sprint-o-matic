@@ -54,7 +54,7 @@ source code, because it is easy and safe:
   * python -m pip install argparse
   * python -m pip install overpy (sprint-o-matic v2.0.0 onwards)
 
-4. Start the "main.py" from sprint-o-matic folder of sprint-o-matic (click the "main" icon or use command "python main.py" from the command line)
+4. Start the "main.py" from sprintomatic folder of sprint-o-matic (click the "main" icon or use command "python main.py" from the command line)
   * or use command "python main.py --fullScreen yes" if you want to play in a fullscreen mode.
 
 The [Release folder](https://github.com/LemesoftNostalgic/sprint-o-matic/releases/latest) contains also pre-built applications for Linux and Windows as executables. The Windows PyInstaller executable is not signed by Microsoft, but I followed the [microsoft answer for cases when Pyinstaller-created executable is incorrectly flagged](https://answers.microsoft.com/en-us/windows/forum/all/where-executables-created-by-pyinstaller-are-being/09e58a6b-01f3-4e72-8765-6542ef7291f4).

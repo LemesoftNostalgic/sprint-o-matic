@@ -25,7 +25,7 @@ from .gameUIUtils import getApplicationTitle, getMasterFont, getStopKey, getUpKe
 
 from .mathUtils import distanceBetweenPoints
 from .infoBox import showInfoBoxTxt, updateInfoTxtByEvent
-from modules.gameSounds import stepEffect, finishEffect
+from .gameSounds import stepEffect, finishEffect
 from random import randrange
 
 

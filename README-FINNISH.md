@@ -51,7 +51,7 @@ Suositeltava tapa on ajaa ohjelmisto pythonilla suoraan lähdekoodina, koska se 
    * python -m pip install argparse
    * python -m pip install overpy (sprint-o-matic v2.0.0 versiosta lähtien)
  
-4. Käynnistä "main.py" sprint-o-matic:in sprint-o-matic -kansiosta (napsauta "main"-kuvaketta tai käytä komentoa "python main.py" komentoriviltä)
+4. Käynnistä "main.py" sprint-o-matic:in sprintomatic -kansiosta (napsauta "main"-kuvaketta tai käytä komentoa "python main.py" komentoriviltä)
    * tai käytä komentoa "python main.py --fullScreen yes" jos haluat pelata koko näytön tilassa.
 
 [Release-kansio](https://github.com/LemesoftNostalgic/sprint-o-matic/releases/latest) sisältää myös valmiiksi paketoidut sovellukset Linuxille ja Windowsille suoritettavina "exe"-tiedostoina. 
