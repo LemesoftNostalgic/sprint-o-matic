@@ -17,9 +17,7 @@ rem specific language governing permissions and limitations
 rem under the License.
 rem
 
-cd sprintomatic
-pyinstaller main.spec --distpath ../bin
-cd ..
+pyinstaller main.spec --distpath bin
 cd bin
 ren main.exe sprint-o-matic-notsigned.exe
 certutil -hashfile sprint-o-matic-notsigned.exe MD5 > sprint-o-matic-notsigned.exe.md5
