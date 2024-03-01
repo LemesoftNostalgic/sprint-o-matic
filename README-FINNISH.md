@@ -289,10 +289,6 @@ Helpot jutut:
 
 * lisää ulkoisia karttoja linkitettynä karttaluetteloon (katso yllä)
 * Salli kuhunkin karttaan liittyvien käsinsuunniteltujen ratojen julkaiseminen
-* Android (nykyinen buildozer-skripti dobuildozer.sh on tämän projektin juurikansiossa.
-Se pysähtyy tällä hetkellä seuraavaan virheeseen: src_c/_sdl2/sdl2.c:211:12:
-fataali virhe: 'longintrepr.h' tiedostoa ei löytynyt.)
-* Verkkosovellus, pygbag menetelmällä (onnistuu vai toimintoja riisumalla)
 * Tiettyyn suuntaan hidastava maastokuvaus, parantaisi portaikkojen ja kukkuloiden
 mallinnusta
 * Rastien numerointi, rastimääritteet, jne.

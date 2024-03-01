@@ -252,8 +252,6 @@ Low hanging fruits:
 
 * more external maps linked to the map listing (see above)
 * Allow publication of hand-crafted track designs for a given map
-* Android (the current attempt of a buildozer script dobuildozer.sh is at the root folder of this repository. It currently stops at the following error: src_c/_sdl2/sdl2.c:211:12: fatal error: 'longintrepr.h' file not found.)
-* Web application with pygbag (might have to be a lightweight version)
 * gradient slow terrain, for better modeling of staircases and hills
 * Add control numbering, control descriptions, etc.
 * graphics beautification
