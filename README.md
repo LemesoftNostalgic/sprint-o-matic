@@ -42,9 +42,8 @@ idea:
 
 ## Installation
 
-If you want to try the application quickly, or you are using a Mac,
-a tablet, or a phone, you can use the web version. It is not a full version,
-but it works well enough to give an idea.
+If you want to try the application quickly, or you are using a Mac. It is not a full version, but it works well enough to give an idea.
+You may need to restart the browser, if the app does not start properly.
 
   * [Link to web version](https://lemesoftnostalgic.github.io/sprint-o-matic/)
 
