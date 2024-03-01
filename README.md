@@ -42,6 +42,12 @@ idea:
 
 ## Installation
 
+If you want to try the application quickly, or you are using a Mac,
+a tablet, or a phone, you can use the web version. It is not a full version,
+but it works well enough to give an idea.
+
+  * [Link to web version](https://lemesoftnostalgic.github.io/sprint-o-matic/)
+
 The recommended method is to run the software with python, directly from
 source code, because it is easy and safe:
 

@@ -40,7 +40,15 @@ alustavan kuvan siitä miten peli toimii:
 
 ## Asennus
 
-Suositeltava tapa on ajaa ohjelmisto pythonilla suoraan lähdekoodina, koska se on helppoa ja turvallista:
+Jos haluat vain testata sovellusta pikaisesti,
+tai haluat ajaa sitä Macissa, puhelimessa tai tabletilla, käytä web-versiota.
+Se on vähän hidas eikä sisällä kaikkia toimintoja,
+mutta siitä saa nopeasti idean miten ohjelma toimii.
+
+  * [Link to web version](https://lemesoftnostalgic.github.io/sprint-o-matic/)
+  
+Suositeltava tapa on ajaa ohjelmisto pythonilla suoraan lähdekoodina,
+koska se on helppoa ja turvallista, sekä sillä saa kaikki toiminnot käyttöön:
 
 1. Lataa ja pura lähdekoodipaketti [Release-kansiosta](https://github.com/LemesoftNostalgic/sprint-o-matic/releases/latest) koneellesi.
 2. Asenna python3.10 tai uudempi: (python.org/Downloads)

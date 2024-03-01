@@ -301,6 +301,40 @@ async def initScreen(imagePath, gameSettings, externalImageData, externalWorldCi
                 if pygame.mouse.get_pressed()[0]:
                     if initScreenPos > 0:
                         initScreenPos = initScreenPos - 1
+                elif pygame.mouse.get_pressed()[2]:
+                    if initScreenPos < len(positions) - 1:
+                        initScreenPos = initScreenPos + 1
+            elif event.type == pygame.FINGERDOWN:
+                finger_x, finger_y = event.pos
+                leftThreshold = getBigScreen().get_size()[0] // 3
+                rightThreshold = leftThreshold * 2
+                upThreshold = getBigScreen().get_size()[1] // 3
+                if finger_x < leftThreshold:
+                    if initScreenPos > 0:
+                        initScreenPos = initScreenPos - 1
+                elif finger_x > rightThreshold:
+                    if initScreenPos < len(positions) - 1:
+                        initScreenPos = initScreenPos + 1
+                elif finger_y < upThreshold:
+                    stepEffect()
+                    if initScreenPos == len(positions) - 1:
+                        running = False
+                    else:
+                        if not (initScreenPos == len(selections) - 1 and len(externalImageData) == 0):
+                            for subindexes in indexes:
+                                if initScreenPos in subindexes:
+                                    for ind in subindexes:
+                                        selections[ind] = False
+                            selections[initScreenPos] = True
+                            if initScreenPos == len(selections) - 2:
+                                externalExampleTeamCtr = externalExampleTeamCtr + 1
+                                if externalExampleTeamCtr >= len(externalImageData):
+                                    externalExampleTeamCtr = 0
+                            if initScreenPos == len(selections) - 1:
+                                externalExampleCtr = externalExampleCtr + 1
+                                if externalExampleCtr >= len(externalImageData[externalExampleTeamCtr]["sub-listing"]):
+                                    externalExampleCtr = 0
+
             if event.type == pygame.QUIT:
                 quitting = True
                 running = False
@@ -324,9 +358,6 @@ async def initScreen(imagePath, gameSettings, externalImageData, externalWorldCi
                         externalExampleCtr = externalExampleCtr + 1
                         if externalExampleCtr >= len(externalImageData[externalExampleTeamCtr]["sub-listing"]):
                             externalExampleCtr = 0
-        elif pygame.mouse.get_pressed()[2]:
-            if initScreenPos < len(positions) - 1:
-                initScreenPos = initScreenPos + 1
 
         # renderer
         externalExampleTeamText = ""
