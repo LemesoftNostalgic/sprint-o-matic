@@ -53,7 +53,8 @@ def getControlMask():
     return (255, 0, 0)
 
 def getPackagePath():
-    return getattr(
-        sys,
+    t = getattr(sys,
         '_MEIPASS',
-        os.path.dirname(os.path.abspath(__file__))).removesuffix('/modules').removesuffix('\modules')
+        os.path.dirname(os.path.abspath(__file__)).removesuffix('/modules').removesuffix('\modules'))
+
+    return os.path.join(t.removesuffix('/sprintomatic').removesuffix('\sprintomatic'), "sprintomatic")
