@@ -1,0 +1,2 @@
+This cached data is licensed with https://opendatacommons.org/licenses/odbl
+Based on data from: OpenStreetMap
