@@ -373,7 +373,11 @@ async def constructWayDb(latlonMapOrigo, xyPictureSize, metersPerPixel):
                     poslistToAppend.append(xyPos)
                 waydb[waytype][subway].append(poslistToAppend)
     except Exception as err:
+        waydb = {}
+
+    if not waydb:
         waydb = checkIfWaydbInLocalCache(latlonMapOrigo)
+
     return waydb
 
 

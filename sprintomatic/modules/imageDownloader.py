@@ -42,6 +42,9 @@ async def downloadNews():
         response = requests.get(newsUrl)
         news = response.text
     except Exception as err:
+        news = ""
+
+    if not news:
         fname = os.path.join(getPackagePath(), offlineNews)
         if os.path.isfile(fname):
             with open(fname, 'r') as f:
@@ -50,6 +53,7 @@ async def downloadNews():
 
 
 async def downloadExternalWorldCityMap():
+    listingofmaps = []
     try:
         import requests
         import io
@@ -57,6 +61,9 @@ async def downloadExternalWorldCityMap():
         data = response.text
         listingofmaps = json.loads(data)
     except Exception as err:
+        listingofmaps = []
+
+    if not listingofmaps:
         fname = os.path.join(getPackagePath(), offlineMapsInCities)
         if os.path.isfile(fname):
             with open(fname, 'rb') as f:
@@ -65,6 +72,7 @@ async def downloadExternalWorldCityMap():
 
 
 async def downloadExternalImageData(ownMasterListing):
+    listingofteams = []
 
     offline = False
     try:
@@ -77,6 +85,9 @@ async def downloadExternalImageData(ownMasterListing):
         data = response.text
         listingofteams = json.loads(data)
     except Exception as err:
+        listingofteams = []
+
+    if not listingofteams:
         offline = True
         fname = os.path.join(getPackagePath(), offlineTeamsWithListing)
         if os.path.isfile(fname):
@@ -93,6 +104,8 @@ async def downloadExternalImageData(ownMasterListing):
             data = response.text
             teamdata = json.loads(data)
         except Exception as err:
+            teamdata = None
+        if teamdata is None:
             offline = True
             teamMapListingFile = "data/sprint-o-matic-external-map-links-main/" + team["map-listing-url"].rsplit('/', 1)[-1]
             fname = os.path.join(getPackagePath(), teamMapListingFile)
@@ -120,6 +133,9 @@ async def downloadMapSurfacesBasedOnUrl(item):
         img = io.BytesIO(r.content)
         imgsurf = pygame.image.load(img) # -> Surface
     except Exception as err:
+        imgsurf = None
+
+    if imgsurf is None:
         name = "data/sprint-o-matic-map-image-example-main/" + item["map-url"].rsplit('/', 1)[-1].rsplit('?', 1)[0]
         img = os.path.join(getPackagePath(), name)
         imgsurf = pygame.image.load(img) # -> Surface
@@ -132,6 +148,9 @@ async def downloadMapSurfacesBasedOnUrl(item):
         png = io.BytesIO(r.content)
         pngsurf = pygame.image.load(png) # -> Surface
     except Exception as err:
+        pngsurf = None
+
+    if pngsurf is None:
         name = "data/sprint-o-matic-map-image-example-main/" + item["lookup-png-url"].rsplit('/', 1)[-1].rsplit('?', 1)[0]
         img = os.path.join(getPackagePath(), name)
         pngsurf = pygame.image.load(img) # -> Surface
