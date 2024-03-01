@@ -17,7 +17,7 @@
 # specific language governing permissions and limitations
 # under the License.
 
-cd src
+cd sprint-o-matic
 python3.10 -m PyInstaller main.spec --distpath ../bin
 cd ..
 mv bin/main bin/sprint-o-matic

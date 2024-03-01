@@ -2,17 +2,17 @@ Sprint-O-Matic
 Copyright 2023-2024 Jyrki Leskelä
 Licensed under the Apache License, Version 2.0, from 23.2.2024 onwards.
 This software is contained mostly in this folder and the the subfolders
-src and src/modules.
+sprint-o-matic and sprint-o-matic/modules.
 
 Fonts
-Fonts are contained in the is src/fonts folder.
+Fonts are contained in the is sprint-o-matic/fonts folder.
 Licensed under the Apache License, Version 2.0.
-See the LICENSE.txt of the src/fonts folder.
+See the LICENSE.txt of the sprint-o-matic/fonts folder.
 
 Images
-Images are contained in the is src/images/lemesoftnostalgic folder.
+Images are contained in the is sprint-o-matic/images/lemesoftnostalgic folder.
 Licensed under the CC BY 3.0 Deed Attribution 3.0 Unported.
-See the LICENSE.txt of the src/images/lemesoftnostalgic folder.
+See the LICENSE.txt of the sprint-o-matic/images/lemesoftnostalgic folder.
 
 Documentation images
 Documentation are contained in the is doc folder.
@@ -23,28 +23,28 @@ Documentation images in subfolder doc/tartu.
 Licensed under CC BY-SA 4.0 Deed Attribution-ShareAlike 4.0 International.
 See the LICENSE.txt of the doc/tartu folder.
 
-Sounds in the subfolder src/sounds/frodo89.
+Sounds in the subfolder sprint-o-matic/sounds/frodo89.
 Licensed under the CC BY 3.0 Deed Attribution 3.0 Unported.
-See the license.txt of the src/sounds/frodo89 folder.
+See the license.txt of the sprint-o-matic/sounds/frodo89 folder.
 
 Sounds in the following subfolders:
-src/sounds/21608__ali_6868__gravel-footsteps
-src/sounds/bronxio
-src/sounds/crk365
-src/sounds/fupicat
-src/sounds/jackslay
-src/sounds/nomiqbomi
-src/sounds/szymalix
-src/sounds/badoink
-src/sounds/cgoulao
-src/sounds/fran_ky
-src/sounds/furbyguy
-src/sounds/johaynes
-src/sounds/the_loner
-src/sounds/berdnikov2004
-src/sounds/craigsmith
-src/sounds/iykqic0
-src/sounds/josefpres
-src/sounds/seth
+sprint-o-matic/sounds/21608__ali_6868__gravel-footsteps
+sprint-o-matic/sounds/bronxio
+sprint-o-matic/sounds/crk365
+sprint-o-matic/sounds/fupicat
+sprint-o-matic/sounds/jackslay
+sprint-o-matic/sounds/nomiqbomi
+sprint-o-matic/sounds/szymalix
+sprint-o-matic/sounds/badoink
+sprint-o-matic/sounds/cgoulao
+sprint-o-matic/sounds/fran_ky
+sprint-o-matic/sounds/furbyguy
+sprint-o-matic/sounds/johaynes
+sprint-o-matic/sounds/the_loner
+sprint-o-matic/sounds/berdnikov2004
+sprint-o-matic/sounds/craigsmith
+sprint-o-matic/sounds/iykqic0
+sprint-o-matic/sounds/josefpres
+sprint-o-matic/sounds/seth
 Licensed under the CC0 1.0 Deed CC0 1.0 Universal.
 See the license.txt of the corresponding folders.
