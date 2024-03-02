@@ -21,7 +21,7 @@ Se sisältää äärettömän määrän sprinttisuunnistuksen reitinvalintahaast
 hauskan 2D-pelin muodossa. Katso seuraavat esittelyvideot saadaksesi
 alustavan kuvan siitä miten peli toimii:
 
-* [Sprint-O-Matic 2.0: satoja sprinttisuunnistukseen soveltuvia karttoja ympäri maailmaa](https://youtu.be/lmbBzbUQUbc)
+* [Sprint-O-Matic 3.0: nopeampi, satoja sprinttisuunnistukseen soveltuvia karttoja ympäri maailmaa, sisältää myös web-sovelluksen](https://youtu.be/lmbBzbUQUbc)
 * [Sprint-O-Matic varhainen prototyyppi, automaattisesti luotu kartta, jänismoodi, juoksumatto](https://youtu.be/VikFxwu9e0Q).
 * [Sprint-O-Matic reittianalyysitila, kartta kuvitteellisesta keskiaikaisesta kaupungista](https://youtu.be/rI9zinYGOmc)
 * [Oikean sprinttisuunnistuskartan käyttö Sprint-O-Maticin kanssa. Pikavauhtinen pelitila](https://youtu.be/Kn53WGpEUgo)
