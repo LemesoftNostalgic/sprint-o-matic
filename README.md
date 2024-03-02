@@ -275,7 +275,6 @@ to map, which makes it difficult for a computer program to determine the
 meaning of the markings.
 * 3d (human eye is more sensitive to quality when the content is 3d,
 therefore this requires more polishing than 2d)
-* Integration to a geographical database. Exercise "everywhere".
 
 
 ## Misc topics

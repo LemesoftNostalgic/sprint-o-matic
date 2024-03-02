@@ -317,9 +317,6 @@ ja kartoittajasta johtuen, mikä tekee tietokoneohjelmalle vaikeaksi ymmärtää
 käytännön karttamerkintöjä, varsinkin vanhemmista kartoista.
 * 3d (ihmissilmä on herkempi laadulle, kun sisältö on 3d,
 siksi kunnollinen 3d-peli vaatii huomattavasti enemmän työtä kuin 2d-peli)
-* Integrointi maantieteelliseen tietokantaan, tyyliin "pullautin".
-Harjoittele "kaikkialla".
-
 
 ## Muut aiheet
 
