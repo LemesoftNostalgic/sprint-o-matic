@@ -42,15 +42,16 @@ idea:
 
 ## Installation
 
-If you want to try the application quickly, or you are using a Mac. It is not a full version, but it works well enough to give an idea.
+Use the web version if you want to try the application quickly, or you are using a Mac computer. It is not a full version, but it works well enough to give an idea.
 You may need to restart the browser, if the app does not start properly.
 
   * [Link to web version](https://lemesoftnostalgic.github.io/sprint-o-matic/)
 
 The recommended method is to run the software with python, directly from
-source code, because it is easy and safe:
+source code, because it is easy and safe. This method is tested in Windows
+and Linux, and might also work with MacBook with some adjustments:
 
-1. Download and unzip the source code package from the [Release folder](https://github.com/LemesoftNostalgic/sprint-o-matic/releases/latest) to your machine
+1. Download and unzip the Source code (zip) from the [Release folder](https://github.com/LemesoftNostalgic/sprint-o-matic/releases/latest) to your machine
 2. Install python3.10 or higher: (python.org/Downloads)
   * In the python installer package, ensure that python is set to path variable, by allowing environment variable modifications
 3. Install the required python modules from command prompt

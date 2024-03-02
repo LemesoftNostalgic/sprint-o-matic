@@ -49,9 +49,11 @@ Voit joutua uudelleenkäynnistämään selaimen jos sovellus ei starttaa kunnoll
   * [Link to web version](https://lemesoftnostalgic.github.io/sprint-o-matic/)
   
 Suositeltava tapa on ajaa ohjelmisto pythonilla suoraan lähdekoodina,
-koska se on helppoa ja turvallista, sekä sillä saa kaikki toiminnot käyttöön:
+koska se on helppoa ja turvallista, sekä sillä saa kaikki toiminnot käyttöön.
+Tämä tapa on testattu Linuxilla ja Windowsilla, saattaa myös toimia
+MackBookissa pienillä muutoksilla:
 
-1. Lataa ja pura lähdekoodipaketti [Release-kansiosta](https://github.com/LemesoftNostalgic/sprint-o-matic/releases/latest) koneellesi.
+1. Lataa ja pura Source code (zip) [Release-kansiosta](https://github.com/LemesoftNostalgic/sprint-o-matic/releases/latest) koneellesi.
 2. Asenna python3.10 tai uudempi: (python.org/Downloads)
    * Varmista python-asennuspakettia asentaessasi, että python on asetettu PATH-ympäristomuuttujaan sallimalla ympäristömuuttujien muutokset
 3. Asenna tarvittavat python-moduulit komentoriviltä:
@@ -59,13 +61,12 @@ koska se on helppoa ja turvallista, sekä sillä saa kaikki toiminnot käyttöö
    * python -m pip install requests
    * python -m pip install argparse
    * python -m pip install overpy (sprint-o-matic v2.0.0 versiosta lähtien)
- 
+
 4. Käynnistä "main.py" sprint-o-matic:in sprintomatic -kansiosta (napsauta "main"-kuvaketta tai käytä komentoa "python main.py" komentoriviltä)
    * tai käytä komentoa "python main.py --fullScreen yes" jos haluat pelata koko näytön tilassa.
 
 [Release-kansio](https://github.com/LemesoftNostalgic/sprint-o-matic/releases/latest) sisältää myös valmiiksi paketoidut sovellukset Linuxille ja Windowsille suoritettavina "exe"-tiedostoina. 
-Windows executable ei ole "Windows signed" sovellus, mutta seurasin ohjetta [microsoftin vastaus tapauksiin, joissa Pyinstallerin luoma suoritettava tiedosto on merkitty väärin](https://answers.microsoft.com/en-us/windows/forum/all/where-executables-created-by-pyinstaller-are-being/09e58a6b-01f3-4e72-8765-6542ef7291f4). Jos kuitenkin pelaat varman päälle niin käytä edellä mainitulla tavalla suoraan
-lähdekoodia "python"-ohjelman avulla.
+Windows executable ei ole "Windows signed" sovellus, mutta seurasin ohjetta [microsoftin vastaus tapauksiin, joissa Pyinstallerin luoma suoritettava tiedosto on merkitty väärin](https://answers.microsoft.com/en-us/windows/forum/all/where-executables-created-by-pyinstaller-are-being/09e58a6b-01f3-4e72-8765-6542ef7291f4). Jos kuitenkin pelaat varman päälle niin käytä edellä mainitulla tavalla suoraan lähdekoodia "python"-ohjelman avulla.
 
 Jos todella haluat, voit koota suoritettavat tiedostot itse lähdekoodista
 käyttäen dopyinstaller.sh (Linux) tai dopyinstaller.bat (Windows) komentoja,
