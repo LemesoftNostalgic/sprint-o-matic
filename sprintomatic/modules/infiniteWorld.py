@@ -8,7 +8,7 @@ from random import randrange, random
 from .utils import getSlowAreaMask, getSemiSlowAreaMask, getVerySlowAreaMask, getForbiddenAreaMask, getControlMask, getNoMask, getPackagePath
 from .mathUtils import calculatePathDistance
 
-offlineMapDataFolder = "data/offline-map-data/"
+offlineMapDataFolder = os.path.join("data", "offline-map-data", "")
 spotnessFactor = 4
 
 # types
