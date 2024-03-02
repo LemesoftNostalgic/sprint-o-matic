@@ -148,7 +148,7 @@ There are three different categories of maps in Sprint-O-Matic.
 
 ![Sprint-O-Matic gameplay map with an external map by Jyrki Leskelä](/doc/tartu/ExternalMapWithRouteAnalysis.png)
 
-The Sprint-O-Matic can also link to **external** maps. All you have to do is to send necessary details of a map to sprint-o-matic at gmail com. If the license of the map is permissive enough, I will then list it at [https://github.com/LemesoftNostalgic/sprint-o-matic-external-map-links](https://github.com/LemesoftNostalgic/sprint-o-matic-external-map-links) and it will become playable. I can even grant some teams a permission to maintain their own list of maps, if there is interest. The application checks the lists every time it starts, and shows the map selection one-by-one when user toggles the "external/team" and "external/map" buttons of the home screen. In the beginning there is one example team with some maps already. I hope more is coming.
+The Sprint-O-Matic can also link to **external** maps. All you have to do is to send necessary details of a map to sprint.o.matic at gmail.com. If the license of the map is permissive enough, I will then list it at [https://github.com/LemesoftNostalgic/sprint-o-matic-external-map-links](https://github.com/LemesoftNostalgic/sprint-o-matic-external-map-links) and it will become playable. I can even grant some teams a permission to maintain their own list of maps, if there is interest. The application checks the lists every time it starts, and shows the map selection one-by-one when user toggles the "external/team" and "external/map" buttons of the home screen. In the beginning there is one example team with some maps already. I hope more is coming.
 
 See the following chapter for the data that is needed, to make a map playable in Sprint-O-Matic.
 
@@ -164,7 +164,7 @@ with specific colors, see chapter [creating the terrain description](#creating-t
 
 Add a map to the Sprint-O-Matic's map listing, and everyone can play
 with it. Some information regarding the map needs to be sent to the
-sprint-o-matic gmail com to make the linkage happen:
+sprint.o.matic at gmail.com to make the linkage happen:
 
 - name, short one to fit it in the home screen
 - url-link to an image of the map (png format is encouraged)
@@ -195,7 +195,7 @@ Here is an example of an entry in the [sprint-o-matic's current listing of exter
 **Hint:** If you don't know how to publish files in the web to get an
 URL of the map: an easy way to do that is to [open a free account and
 repository in the GitHub](https://github.com/signup) and drag the files there.
-Sprint-o-Matic gmail com understands github repository names so you don't have
+Sprint.o.matic at gmail.com understands github repository names so you don't have
 to give the precise URL in that case.
 
 The two other things to pay attention is a) license of the map and b) creating the terrain description e.g "lookup-png".
@@ -237,8 +237,8 @@ between 1024-1280 pixels (width). The game engine is designed for
 sprint map scales approximately from 1:3000 to 1:5000.
 
 If you have an excellent map you wish to be included, but have no time or
-skills to create the terrain description, please propose it via sprint-o-matic
-at gmail com anyway. I can create a couple of terrain images myself as a
+skills to create the terrain description, please propose it via sprint.o.matic
+at gmail.com anyway. I can create a couple of terrain images myself as a
 pro-bono effort to get things rolling. A good map for Sprint-O-Matic is
 one that has enough fences and other obstacles to pose a challenge.
 Also slow green terrain is good but not mandatory.
@@ -322,7 +322,7 @@ I also live, work, sleep, and exercise.
 there is no infinite time for hobby programming. If you
 find some bugs or awkward programming patterns, it is probably due to
 the scarcity of time more than anything else. I still try to be awake
-regarding the biggest issues, if reported to the sprint-o-matic gmail com.
+regarding the biggest issues, if reported to the sprint.o.matic at gmail.com.
 
 ### About the track generator
 
@@ -336,13 +336,13 @@ reason to run without a proper track.
 The Sprint-O-Matic is an interactive application similar to games.
 Warning: the Sprint-O-Matic has not been properly tested for safety regarding
 the treadmill use. Therefore I have to advice against it, even though it is
-technically possible with a wireless mouse. Please inform me via sprint-o-matic
-at gmail com if your treadmill vendor shows green light for this use-case.
+technically possible with a wireless mouse. Please inform me via sprint.o.matic
+at gmail.com if your treadmill vendor shows green light for this use-case.
 
 ### Support
 
 Map proposals, team proposals, and application improvement
-ideas can be sent to sprint-o-matic at gmail com.
+ideas can be sent to sprint.o.matic at gmail.com. (the previously mentioned address _sprint-o-matic_ at gmail.com did not work, sorry)
 
 ## Command-line usage
 

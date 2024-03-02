@@ -166,7 +166,7 @@ Toiminto käyttää pohjana OpenStreetMap-järjestelmän karttadataa.
 
 Sprint-O-Matic:in voi myös linkittää **ulkoisiin** karttoihin. 
 Sinun tarvitsee vain lähettää tarvittavat tiedot kartasta osoitteeseen
-sprint-o-matic gmail com. Jos kartan lisenssi on riittävän salliva,
+sprint.o.matic miukumauku gmail.com. Jos kartan lisenssi on riittävän salliva,
 lisään sen linkkilistalle [https://github.com/LemesoftNostalgic/sprint-o-matic-external-map-links](https://github.com/LemesoftNostalgic/sprint-o-matic-external-map-links)
 jolloin se tulee näkyviin Sprint-O-Maticiin. Voin jopa myöntää joillekin joukkueille
 luvan pitää omaa karttalistaansa, jos kiinnostusta löytyy. Sovellus tarkistaa luettelot
@@ -197,7 +197,7 @@ tekee näkyväksi muille Sprint-O-Maticin käyttäjille.
 
 Lisää kartta Sprint-O-Maticin karttaluetteloon, niin kaikki voivat pelata
 sen kanssa. Karttaa koskevat perustiedot on lähetettävä osoitteeseen
-sprint-o-matic gmail com linkityksen toteuttamiseksi:
+sprint.o.matic miukumauku gmail.com linkityksen toteuttamiseksi:
 
 - kartan nimi, tarpeeksi lyhyt, jotta se sopii aloitusnäyttöön painikkeen alle
 - url-linkki karttakuvaan (png-muoto on suositeltavaa)
@@ -228,7 +228,7 @@ Tässä on esimerkki yhden kartan tiedoista [sprint-o-maticin tämänhetkisessä
 **Vihje:** Jos et tiedä kuinka julkaista tiedostoja verkossa saadaksesi
 kartan URL-osoitteen: helppo tapa tehdä se on [avaa ilmainen tili ja
 kansio GitHub:ssa](https://github.com/signup) ja raahaa tiedostot sinne.
-Sprint-o-Matic gmail com ymmärtää github-osoitteet, joten sinun ei ole
+Sprint.o.Matic miukumauku gmail.com ymmärtää github-osoitteet, joten sinun ei ole
 välttämätöntä kertoa tarkkaa URL-osoitetta github-osoitteiden kanssa.
 
 Kaksi muuta asiaa, joihin on kiinnitettävä huomiota, ovat a) kartan lisenssi
@@ -276,7 +276,7 @@ toimimaan parhaiten sprinttikartoilla joiden mittakaava on noin
 Jos sinulla on erinomainen kartta, ja haluat olla mukana,
 mutta sinulla ei ole aikaa tai
 taitoa luoda maastokuvausta, ehdota sitä sprint-o-matic
-gmail com:n kautta silti. Voin auttaa esimerkiksi muutaman maastokuvauksen
+sprint.o.matic miukumauku gmail.com:n kautta silti. Voin auttaa esimerkiksi muutaman maastokuvauksen
 luonnissa jotta saadaan uusia karttoja mukaan. Hyvä kartta Sprint-O-Matic:ille
 on sellainen, jossa on tarpeeksi aitoja ja muita esteitä, eli haastava sprinttikartta.
 Myös hidas vihreä maasto on hyvä, mutta ei välttämätön.
@@ -351,7 +351,7 @@ tätä harrasteprojektia varten.
 
 Aikani menee työhön, treeneihin, ja muuhun elämiseen. Harrasteohjelmointiin ei ole
 kovin paljon aikaa. Yritän silti vastata isoimpiin ongelmiin, jos niistä ilmoitetaan
-sprint-o-matic gmail com:iin.
+sprint.o.matic miukumauku gmail.com:iin.
 
 ### Tietoja ratageneraattorista
 
@@ -366,14 +366,14 @@ Sprint-O-Matic on pelin kaltainen interaktiivinen sovellus.
 Varoitus varsinkin ameriikan markkinoille: Sprint-O-Maticin turvallisuutta ei ole
 testattu kunnolla juoksumattokäytössä. Siksi minun on ohjeistettava että ei pelata
 samaan aikaan juoksumatolla juosten, vaikka se onkin
-teknisesti mahdollista langattomalla hiirellä. Ilmoita minulle sprint-o-matic gmail com:n
+teknisesti mahdollista langattomalla hiirellä. Ilmoita minulle sprint.o.matic miukumauku gmail.com:n
 kautta, jos jonkun juoksumaton edustaja näyttää vihreää valoa tämänkaltaiselle käytölle.
 
 ### Tuki
 
 Karttaehdotukset, ehdotukset joukkueista jotka ovat kiinnostuneita ylläpitämään
 omaa karttaluetteloa, ja sovelluksen parannusideat voi lähettää
-sprint-o-matic gmail com:iin.
+sprint.o.matic miukumauku gmail.com:iin. (aiemmin mainittu osoite _sprint-o-matic_ miukumauku gmail.com ei toiminut, sori siitä)
 
 ## Komentorivin käyttö
 
