@@ -78,10 +78,8 @@ jotka ovat lähdekoodissa mukana. Kokoaminen vaatii pyinstaller-asennuksen:
 ### Laitteistovaatimukset
 
 Sovellus on testattu Ubuntu 20.04 ja
-Windows 10 -laitteissa. Sprint-O-Maticin käyttäminen vaatii suhteellisen nykyaikaisen
+Windows 10 -laitteissa.  Web-versio tarvitsee suhteellisen modernin selaimen. **--accurate** komentoparametrin käyttäminen vaatii suhteellisen nykyaikaisen
 tietokoneen, koska sen hakualgoritmit suoritetaan useissa prosesseissa.
-Sovelluksessa voi olla hiukan viiveitä matkalla ensimmäiselle rastille,
-mutta viiveiden pitäisi kadota hetkisen päästä.
 
 World-sarjan karttojen alustaminen kestää hieman tavanomaista kauemmin,
 joskus jopa puolisen minuuttia.

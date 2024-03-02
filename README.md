@@ -76,10 +76,10 @@ of pyinstaller:
 ### Hardware requirements
 
 The application has been tested against Ubuntu 20.04 and
-Windows 10. Running the Sprint-O-Matic requires relatively modern PC due to
-its search algorithms that run in separate processes. There may be some
-lag on the way to the first control, as it often is the case with real life
-orienteering, but that lag should settle later on.
+Windows 10. The web version requires a relatively modern browser.
+Using the **--accurate** command-line parameter requires relatively modern PC
+due to
+its search algorithms that run in separate processes.
 
 The World series maps take a while to start, sometimes even half a minute
 or so. The time is well spent on map data downloading and track rendering. 
