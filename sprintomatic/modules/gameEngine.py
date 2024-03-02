@@ -83,7 +83,28 @@ def calculateNextStep(faLookup, saLookup, ssaLookup, vsaLookup, tunnelLookup, po
         break
 
     if safeToRun:
-        pos = stepAdvancer(saLookup, ssaLookup, vsaLookup, pos, angle, speed, 1.0 / metersPerPixel)
+        halfSafeToRun = True
+        for da in dangles:
+            xStep, yStep = rotateVector(angle + da, 1.0)
+            halfSafeToRun = True
+            if lookupContains(faLookup, (pos[0] + 2 * xStep, pos[1] + 2 * yStep)):
+                halfSafeToRun = False
+                continue
+
+            if da < 0:
+                if not movement:
+                    angle = angle - angleStep
+                halfSafeToRun = False # small step, not safe just yet
+            elif da > 0:
+                if not movement:
+                    angle = angle + angleStep
+                halfSafeToRun = False # small step, not safe just yet
+            break
+
+        safetyFactor = 1.0
+        if not halfSafeToRun:
+            safetyFactor = 0.5
+        pos = stepAdvancer(saLookup, ssaLookup, vsaLookup, pos, angle, speed, safetyFactor / metersPerPixel)
 
     playerRoute.append(pos)
 

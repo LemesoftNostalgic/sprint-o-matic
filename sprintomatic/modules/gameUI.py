@@ -170,8 +170,10 @@ def uiAnimateCharacter(where, origin, angle, color, scale, feetPlus, inTunnel, b
     if feetPlus <= -feetPlusStart:
         feetPlus = feetPlusStart
 
-    if not inTunnel:
+    if angle != 0 and effectStep and background and characterCloudCtr < characterCloudCtrMid//2:
+        return feetPlus
 
+    if not inTunnel:
         if background and characterCloudCtr > characterCloudCtrMid:
             pygame.draw.circle(where, getWhiteColor(), origin, int(7 * scale))
         characterCloudCtr = characterCloudCtr + 1

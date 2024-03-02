@@ -21,7 +21,7 @@ import asyncio
 import pygame
 import math
 
-from .gameUIUtils import getApplicationTitle, getMasterFont, getStopKey, getUpKey, getLeftKey, getRightKey, getDownKey, getEnterKey, getSpaceKey, getPlayerColor, getPacemakerColor, getTrackColor, getCreditColor, getGreyColor, convertXCoordinate, convertYCoordinate, getBigScreen, getTimerStep, uiDrawTriangle, checkAutoTestKey
+from .gameUIUtils import getApplicationTitle, getMasterFont, getStopKey, getUpKey, getLeftKey, getRightKey, getDownKey, getEnterKey, getSpaceKey, getBackKey, getPlayerColor, getPacemakerColor, getTrackColor, getCreditColor, getGreyColor, convertXCoordinate, convertYCoordinate, getBigScreen, getTimerStep, uiDrawTriangle, checkAutoTestKey
 
 from .mathUtils import distanceBetweenPoints
 from .infoBox import showInfoBoxTxt, updateInfoTxtByEvent
@@ -171,7 +171,7 @@ async def initScreen(imagePath, gameSettings, externalImageData, externalWorldCi
         "A trainer app for sprint orienteering,",
         "developer Jyrki Leskelä, Oulu. License: Apache-2.0.",
         "Use mouse keys or keyboard arrows",
-        "select: ENTER, quit: ESC",
+        "select: SPACE/BACKSPACE, quit: ESC",
         "Credits for the 'World' map data: OpenStreetMap",
         "Credits for sound effects (freesound.org):",
         "CC 1.0 DEED:",
@@ -297,6 +297,11 @@ async def initScreen(imagePath, gameSettings, externalImageData, externalWorldCi
                                 worldExampleCtr = worldExampleCtr + 1
                                 if worldExampleCtr >= len(externalWorldCityMap):
                                     worldExampleCtr = 0
+                elif event.scancode == getBackKey():
+                    if initScreenPos == len(selections) - 4:
+                        worldExampleCtr = worldExampleCtr - 1
+                        if worldExampleCtr < 0:
+                            worldExampleCtr =  len(externalWorldCityMap) - 1
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if pygame.mouse.get_pressed()[0]:
                     if initScreenPos > 0:

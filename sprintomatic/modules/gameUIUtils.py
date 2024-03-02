@@ -48,6 +48,9 @@ def getMasterFont():
 def getStopKey():
     return 41
 
+def getBackKey():
+    return 42
+
 # an easter egg to get the autotest running from UI
 autoTestCode = [23, 22, 8, 23, 18, 23, 24, 4]
 def checkAutoTestKey(key):
