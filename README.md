@@ -118,7 +118,8 @@ modes to choose from:
 
 It is also possible to get the analysis results as a file to your disk,
 after the session. This requires using the [command line](#command-line-usage)
-parameter **--analysis** when starting the application.
+parameter **--analysis** when starting the application. Use also **--accurate** parameter, if you have a fast PC and you want the shortest-route finder to
+be more accurate.
 
 The graphical analysis result looks like this:
 
@@ -353,9 +354,11 @@ It is also possible to play either fullscreen or in a window.
 
 **--fullScreen** Whether to play fullscreen, yes or no.
 
-It is also possible to write the route analyses to a file.
+Route analyses.
 
 **--analysis** Whether to write the route analyses into a file
+
+**--accurate** Use the slower but more accurate route analysis
 
 These options are useful if you want to play with your own map.
 When using them, you don't go to the home screen, but the game starts

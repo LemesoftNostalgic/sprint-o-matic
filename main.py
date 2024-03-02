@@ -23,6 +23,7 @@ import time
 import asyncio
 from datetime import datetime, timedelta
 
+from sprintomatic.modules.routeAI import initializeAITables, closeAITables, initializeAINextTrack, getReadyShortestRoutes
 from sprintomatic.modules.gameSettings import returnSettings, returnConfig
 from sprintomatic.modules.mathUtils import angleOfLine, calculatePathDistance
 from sprintomatic.modules.trackCreator import createAutoControls
@@ -86,6 +87,9 @@ async def setTheStageForNewRound(cfg):
         playerRoutesArray = []
         playerRoutes = []
         startOverPlayerRoute()
+        if gameSettings.accurate:
+            initializeAINextTrack(ctrls, faLookup, saLookup, ssaLookup, vsaLookup, gameSettings.pacemaker)
+            shortestRoutesArray = getReadyShortestRoutes()
         shortestRoutes = []
         futureShortestRoutes = []
         startTime = datetime.now()
@@ -158,6 +162,8 @@ async def updateRoutesAndDistances():
     playerRoutes = [ getPlayerRoute() ]
     playerRoutesArray.append(playerRoutes)
     playerDistance = playerDistance + calculatePathDistance(playerRoutes[0])
+    if gameSettings.accurate:
+        shortestRoutesArray = getReadyShortestRoutes()
     shortestRoutes = shortestRoutesArray[reachedControl - 1] if reachedControl > 0 else []
     futureShortestRoutes = shortestRoutesArray[reachedControl] if reachedControl > 0 and reachedControl < len(shortestRoutesArray) else []
     await uiFlushEvents()
@@ -217,6 +223,9 @@ async def main():
 
     # all the initialization that happens only once at the startup
     gameSettings = returnSettings()
+    if gameSettings.accurate:
+        # start AI processes
+        initializeAITables()
     uiEarlyInit(gameSettings.fullScreen)
     externalImageData, offline = await downloadExternalImageData(gameSettings.ownMasterListing)
     if offline:
@@ -239,7 +248,7 @@ async def main():
     shortestWeightedDistance = None
     playerWeightedDistance = None
     finishTexts = ["", "", ""]
-    
+
     # pacemaker parameters
     pacemakerSteps = 0
     pacemakerStartThreshold = 0
@@ -249,16 +258,19 @@ async def main():
     pacemakerAngle = 0
     pacemakerPrepareForShout = True
     pacemakerStep = -5
-    
+
     # some counters to time the flushing/progressing the AI pools
+    aiCounter = 0
+    aiCounterThreshold = 30
+
     # threshold for the game to really start
     gameMovingStartThreshold = 5
-    
+
     # the choice between specific route file and an automatic route
     autoControls = True
     if gameSettings.routeFileName:
         autoControls = False
-    
+
     # Show init screen only if no specific map file provided in command line
     showInitScreen = False 
     if not gameSettings.mapFileName:
@@ -367,6 +379,14 @@ async def main():
                             if pacemakerSteps > pacemakerStartThreshold:
                                 pacemakerAdvancement = pacemakerSteps - pacemakerStartThreshold
                             pacemakerPosition, pacemakerAngle, inTunnelPacemaker = getPacemakerPos(saLookup, ssaLookup, vsaLookup, tunnelLookup, pacemakerPath, pacemakerAdvancement, gameSettings.speed, gameSettings.metersPerPixel, gameSettings.pacemaker)
+
+                    if gameSettings.accurate:
+                        # Flush the AI pools every now and then
+                        aiCounter = aiCounter + 1
+                        if aiCounter > aiCounterThreshold:
+                            aiCounter = 0
+                            shortestRoutesArray = getReadyShortestRoutes()
+
 
                     # Now enter the rendering phase
                     uiClearCanvas()
@@ -482,6 +502,10 @@ async def main():
     # Final freeing of resources
     stopSounds()
     uiLateQuit()
+
+    if gameSettings.accurate:
+        # free multiprocessing resources, too
+        closeAITables()
 
 if __name__ == "__main__":
     asyncio.run(main())

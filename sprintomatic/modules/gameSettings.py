@@ -69,6 +69,7 @@ def returnSettings():
             self.ownMasterListing=""
             self.externalExample=""
             self.offline="no"
+            self.accurate="no"
             self.externalExampleTeam=""
             self.infiniteOuluTerrain="shortLeg"
             self.speed="regular"
@@ -93,7 +94,8 @@ def returnSettings():
         
         parser.add_argument("--imageRoot", type=str, help="Root folder of the sound resources", default=defaultSettings.imageRoot)
         
-        parser.add_argument("--offline", type=str, choices=["no", "yes"], help="Offline mode or not (yes, no)", default=defaultSettings.offline)
+        parser.add_argument("--offline", type=str, choices=["no", "yes"], help="Accurate (and slow) route AI mode or not (yes, no)", default=defaultSettings.offline)
+        parser.add_argument("--accurate", type=str, choices=["no", "yes"], help="Offline mode or not (yes, no)", default=defaultSettings.offline)
         parser.add_argument("--continuous", type=str, choices=["no", "yes"], help="Continuous game loop (or one-shot play)", default=defaultSettings.continuous)
         parser.add_argument("--pacemaker", type=int,choices=range(0, 4), help="A pacemaker runner to compete against", default=defaultSettings.pacemaker)
         parser.add_argument("--metersPerPixel", type=numRestrict(0, 1.8), help="How many meters per map pixel. 0 for autodetect.", default=defaultSettings.metersPerPixel)
@@ -130,6 +132,7 @@ def returnSettings():
     ]
     gameSettings.continuous = True if gameSettings.continuous=="yes" else False
     gameSettings.offline = True if gameSettings.offline=="yes" else False
+    gameSettings.accurate = True if gameSettings.accurate=="yes" else False
     gameSettings.fullScreen = True if gameSettings.fullScreen=="yes" else False
     gameSettings.infiniteOulu = True if gameSettings.infiniteOulu=="yes" else False
     gameSettings.infiniteWorld = True if gameSettings.infiniteWorld=="yes" else False

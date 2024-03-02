@@ -128,8 +128,10 @@ optimireittiin. Reittianalyysitiloja on kolme:
 * fast: kaksinkertaistaa juoksijan nopeuden antaakseen hieman enemmän haastetta
 
 On myös mahdollista saada analyysitulokset pelin jälkeen tiedostona levyllesi.
-Tämä edellyttää [komentoriviparametrin](#komentorivin-käyttö) **--analyysi** 
-käyttöä sovelluksen käynnistyksen yhteydessä.
+Tämä edellyttää [komentoriviparametrin](#komentorivin-käyttö) **--analysis** 
+käyttöä sovelluksen käynnistyksen yhteydessä. Voit käyttää myös
+komentoriviparametria **--accurate** jos sinulla on nopea PC ja haluat
+parhaan reitin arvion olevan tarkempi.
 
 Graafisen analyysin tulos näyttää tältä:
 
@@ -386,9 +388,11 @@ On myös mahdollista pelata joko koko näytöllä tai ikkunassa.
 
 **--fullScreen** Pelaatko koko näytöllä vai ikkunassa, yes tai no.
 
-Reittianalyysien tallentaminen tiedostoon.
+Reittianalyysit.
 
-**--analyysi** Tallennetaan reittianalyysit tiedostoon
+**--analysis** Tallennetaan reittianalyysit tiedostoon
+
+**--accurate** Käytä hitaampaa mutta huomattavasti tarkempaa reittianalyysiä.
 
 Vaihtoehdot, jotka ovat hyödyllisiä, jos haluat pelata omalla kartallasi.
 Kun käytät niitä, et mene aloitusnäyttöön, vaan peli alkaa
