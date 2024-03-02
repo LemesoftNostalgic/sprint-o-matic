@@ -62,7 +62,7 @@ def stepAdvancer(saLookup, ssaLookup, vsaLookup, pos, angle, speed, speedupFacto
 # tries to behave naturally with buildings, bushes, etc.
 def calculateNextStep(faLookup, saLookup, ssaLookup, vsaLookup, tunnelLookup, pos, angle, movement, speed, metersPerPixel):
     global angleStep
-    dangles = [0, -math.pi/32, math.pi/32, -math.pi/16, math.pi/16, -math.pi/8, math.pi/8, -math.pi/4, math.pi/4, -(math.pi/4 + math.pi/8), (math.pi/4 + math.pi/8)]
+    dangles = [0, -math.pi/16, math.pi/16, -math.pi/8, math.pi/8, -math.pi/8-math.pi/16, math.pi/8+math.pi/16, -math.pi/4, math.pi/4, -(math.pi/4 + math.pi/16), (math.pi/4 + math.pi/16)]
     safeToRun = True
     for da in dangles:
         xStep, yStep = rotateVector(angle + da, 1.0)
@@ -100,9 +100,28 @@ def calculateNextStep(faLookup, saLookup, ssaLookup, vsaLookup, tunnelLookup, po
                     angle = angle + angleStep
                 halfSafeToRun = False # small step, not safe just yet
             break
+        quarterSafeToRun = True
+        for da in dangles:
+            xStep, yStep = rotateVector(angle + da, 1.0)
+            quarterSafeToRun = True
+            if lookupContains(faLookup, (pos[0] + 3 * xStep, pos[1] + 3 * yStep)):
+                quarterSafeToRun = False
+                continue
+
+            if da < 0:
+                if not movement:
+                    angle = angle - angleStep
+                quarterSafeToRun = False # small step, not safe just yet
+            elif da > 0:
+                if not movement:
+                    angle = angle + angleStep
+                quarterSafeToRun = False # small step, not safe just yet
+            break
 
         safetyFactor = 1.0
         if not halfSafeToRun:
+            safetyFactor = 0.25
+        elif not quarterSafeToRun:
             safetyFactor = 0.5
         pos = stepAdvancer(saLookup, ssaLookup, vsaLookup, pos, angle, speed, safetyFactor / metersPerPixel)
 
