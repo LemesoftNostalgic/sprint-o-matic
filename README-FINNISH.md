@@ -130,7 +130,7 @@ optimireittiin. Reittianalyysitiloja on kolme:
 On myös mahdollista saada analyysitulokset pelin jälkeen tiedostona levyllesi.
 Tämä edellyttää [komentoriviparametrin](#komentorivin-käyttö) **--analysis** 
 käyttöä sovelluksen käynnistyksen yhteydessä. Voit käyttää myös
-komentoriviparametria **--accurate** jos sinulla on nopea PC ja haluat
+komentoriviparametria **--accurate** jos sinulla on nopea Linux PC ja haluat
 parhaan reitin arvion olevan tarkempi.
 
 Graafisen analyysin tulos näyttää tältä:
@@ -389,7 +389,7 @@ Reittianalyysit.
 
 **--analysis** Tallennetaan reittianalyysit tiedostoon
 
-**--accurate** Käytä hitaampaa mutta huomattavasti tarkempaa reittianalyysiä.
+**--accurate** Käytä hitaampaa mutta huomattavasti tarkempaa reittianalyysiä, vain Linux ympäristössä.
 
 Vaihtoehdot, jotka ovat hyödyllisiä, jos haluat pelata omalla kartallasi.
 Kun käytät niitä, et mene aloitusnäyttöön, vaan peli alkaa

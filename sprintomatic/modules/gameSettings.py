@@ -140,6 +140,15 @@ def returnSettings():
     gameSettings.infoBox = True if gameSettings.infoBox=="yes" else False
     gameSettings.analysis = True if gameSettings.analysis=="yes" else False
 
+    # cannot use accurate analysis in Windows machine for now
+    try:
+        sys.getwindowsversion()
+    except AttributeError:
+        pass
+    else:
+        print("Warning: cannot use the accurate and slow route analysis in Windows")
+        gameSettings.accurate = False
+
     if (gameSettings.lookupPngName != '' and gameSettings.mapFileName == '') or (gameSettings.mapFileName != '' and gameSettings.lookupPngName == ''):
         print("Error: please specify --lookupPngName and --mapFileName together")
         gameSettings.lookupPngName = ''
