@@ -40,40 +40,28 @@ alustavan kuvan siitä miten peli toimii:
 
 ## Asennus
 
+### Web-sovellus
+
 Jos haluat vain testata sovellusta pikaisesti,
 tai haluat ajaa sitä Macissa, käytä web-versiota.
-Web-version on vähän hidas eikä sisällä kaikkia toimintoja,
+Web-version ei ole yhtä hyvä kuin asennettava versio: äänet ovat huonommat,
+ja karttoja vähemmän,
 mutta siitä saa nopeasti idean miten ohjelma toimii.
 Voit joutua uudelleenkäynnistämään selaimen jos sovellus ei starttaa kunnolla.
 
   * [Link to web version](https://lemesoftnostalgic.github.io/sprint-o-matic/)
-  
-Suositeltava tapa on ajaa ohjelmisto pythonilla suoraan lähdekoodina,
-koska se on helppoa ja turvallista, sekä sillä saa kaikki toiminnot käyttöön.
-Tämä tapa on testattu Linuxilla ja Windowsilla, saattaa myös toimia
-MackBookissa pienillä muutoksilla:
 
-1. Lataa ja pura Source code (zip) [Release-kansiosta](https://github.com/LemesoftNostalgic/sprint-o-matic/releases/latest) koneellesi.
-2. Asenna python3.10 tai uudempi: (python.org/Downloads)
-   * Varmista python-asennuspakettia asentaessasi, että python on asetettu PATH-ympäristomuuttujaan sallimalla ympäristömuuttujien muutokset
-3. Asenna tarvittavat python-moduulit komentoriviltä:
-   * python -m pip install pygame
-   * python -m pip install requests
-   * python -m pip install argparse
-   * python -m pip install overpy (sprint-o-matic v2.0.0 versiosta lähtien)
+### Windows
 
-4. Käynnistä "main.py" sprint-o-matic:in sprintomatic -kansiosta (napsauta "main"-kuvaketta tai käytä komentoa "python main.py" komentoriviltä)
-   * tai käytä komentoa "python main.py --fullScreen yes" jos haluat pelata koko näytön tilassa.
+[Windows-asennus](/WINDOWS-FINNISH.md)
 
-[Release-kansio](https://github.com/LemesoftNostalgic/sprint-o-matic/releases/latest) sisältää myös valmiiksi paketoidut sovellukset Linuxille ja Windowsille suoritettavina "exe"-tiedostoina. 
-Windows executable ei ole "Windows signed" sovellus, mutta seurasin ohjetta [microsoftin vastaus tapauksiin, joissa Pyinstallerin luoma suoritettava tiedosto on merkitty väärin](https://answers.microsoft.com/en-us/windows/forum/all/where-executables-created-by-pyinstaller-are-being/09e58a6b-01f3-4e72-8765-6542ef7291f4). Jos kuitenkin pelaat varman päälle niin käytä edellä mainitulla tavalla suoraan lähdekoodia "python"-ohjelman avulla.
+### Linux
 
-Jos todella haluat, voit koota suoritettavat tiedostot itse lähdekoodista
-käyttäen dopyinstaller.sh (Linux) tai dopyinstaller.bat (Windows) komentoja,
-jotka ovat lähdekoodissa mukana. Kokoaminen vaatii pyinstaller-asennuksen:
+[Linux-asennus](/LINUX-FINNISH.md)
 
-* Python -m pip asennus pyinstaller
-   * Varmista, että pyinstaller on PATH-ympäristömuuttujasi polussa.
+### MacBook
+
+[MacBook-asennus](/MACBOOK-FINNISH.md)
 
 ### Laitteistovaatimukset
 

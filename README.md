@@ -51,15 +51,15 @@ You may need to restart the browser, if the app does not start properly.
 
 ### Windows
 
-[Windows installation](/WINDOWS.md).
+[Windows installation](/WINDOWS.md)
 
 ### Linux
 
-[Linux installation](/LINUX.md).
+[Linux installation](/LINUX.md)
 
 ### MacBook
 
-[MacBook installation](/MACBOOK.md).
+[MacBook installation](/MACBOOK.md)
 
 ### Hardware requirements
 
