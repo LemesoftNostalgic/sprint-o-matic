@@ -91,7 +91,7 @@ If you don't yet have python3.10 or newer installed, then install it.
 The instructions are in [python.org/Downloads](python.org/Downloads).
 There should be a button for the newest installation package. Follow the
 instructions to store the installation package to your Dowloads folder.
-Then navigate to the Downloads folder and CCLLLIICCKKK the python-3.10.2-amd64
+Then navigate to the Downloads folder and double-click the python-3.10.2-amd64
 icon and the python installer should start.
 Now you see the installer window. **first tick the small box left of "Add python.exe" to the PATH. Only after that click "Install Now"**.
 Wait for the installation to finish.
