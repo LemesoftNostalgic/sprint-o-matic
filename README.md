@@ -42,43 +42,173 @@ idea:
 
 ## Installation
 
-Use the web version if you want to try the application quickly, or you are using a Mac computer. It is not a full version, but it works well enough to give an idea.
+### Web application
+
+Use the web version if you want to try the application quickly, or you are using a MacBook. It might also work with a tablet, if you have a Bluetooth mouse paired with the tablet. The web version is not a full version, for example the sounds are awful and there is smaller amount of maps, but it gives you an idea what the application is like.
 You may need to restart the browser, if the app does not start properly.
 
   * [Link to web version](https://lemesoftnostalgic.github.io/sprint-o-matic/)
 
-The recommended method is to run the software with python, directly from
-source code, because it is easy and safe. This method is tested in Windows
-and Linux, and might also work with MacBook with some adjustments:
+### Windows
 
-1. Download and unzip the Source code (zip) from the [Release folder](https://github.com/LemesoftNostalgic/sprint-o-matic/releases/latest) to your machine
-2. Install python3.10 or higher: (python.org/Downloads)
-  * In the python installer package, ensure that python is set to path variable, by allowing environment variable modifications
-3. Install the required python modules from command prompt
+**The easy way:**
+
+go to [Release folder](https://github.com/LemesoftNostalgic/sprint-o-matic/releases/latest) and click the name of the Windows
+executable _sprint-o-matic-notsigned.exe_. Then accept the browsers request to store the file. It should be downloaded to the "Downloads" folder.
+
+Start the command prompt by writing "cmd" to the taskbar.
+Google more instructions for using the command prompt if not familiar with
+it. When at the command prompt, navigate to the correct folder and start
+the application. Usually the commands are like this:
+
+  * cd Downloads
+  * sprint-o-matic-notsigned.exe
+
+If you have downloaded multiple versions, Windows may have added extra text
+to the newer versions. If the newest is __sprint-o-matic-notsigned(1).exe_
+then start it like this:
+
+  * "sprint-o-matic-notsigned(1).exe"
+
+You can also use the [command-line parameters](#command-line-usage) like this, for example if you want to provide the analysis as a file:
+
+  * sprint-o-matic-notsigned.exe --analysis yes
+
+**The recommended and safer way:**
+
+This may be a little different depending on your web browser. I used Mozilla
+Firefox.
+
+go to [Release folder](https://github.com/LemesoftNostalgic/sprint-o-matic/releases/latest) and click the name of the source code package _Source code (zip)_. The browser should download it to the "Downloads" folder. Navigate to the "Downloads" folder and click the source code package "sprint-o-matic-3.0.3" with the right mouse button and select "extract all" from the menu.
+
+If you don't yet have python3.10 or newer installed, then install it.
+The instructions are in [python.org/Downloads](python.org/Downloads).
+There should be a button for the newest installation package. Follow the
+instructions to store the installation package to your Dowloads folder.
+Then navigate to the Downloads folder and CCLLLIICCKKK the python-3.10.2-amd64
+icon and the python installer should start.
+Now you see the installer window. **first tick the small box left of "Add python.exe" to the PATH. Only after that click "Install Now"**.
+Wait for the installation to finish.
+
+Start the command prompt by writing "cmd" to the taskbar.
+Google more instructions for using the command prompt if not familiar with
+it. When at the command prompt, install the necessary python modules with the
+following commands:
+
   * python -m pip install pygame
   * python -m pip install requests
   * python -m pip install argparse
-  * python -m pip install overpy (sprint-o-matic v2.0.0 onwards)
+  * python -m pip install overpy
 
-4. Start the "main.py" from sprintomatic folder of sprint-o-matic (click the "main" icon or use command "python main.py" from the command line)
-  * or use command "python main.py --fullScreen yes" if you want to play in a fullscreen mode.
+Start the command prompt by writing "cmd" to the taskbar.
+Google more instructions for using the command prompt if not familiar with
+it. When at the command prompt, navigate to the correct folder and start
+the application. Usually the commands are like this:
 
-The [Release folder](https://github.com/LemesoftNostalgic/sprint-o-matic/releases/latest) contains also pre-built applications for Linux and Windows as executables. The Windows PyInstaller executable is not signed by Microsoft, but I followed the [microsoft answer for cases when Pyinstaller-created executable is incorrectly flagged](https://answers.microsoft.com/en-us/windows/forum/all/where-executables-created-by-pyinstaller-are-being/09e58a6b-01f3-4e72-8765-6542ef7291f4).
+  * cd Downloads
+  * cd sprint-o-matic-3.0.3
+  * cd sprint-o-matic-3.0.3
+  * python main.py
 
-If you really want, you can re-build the executables
-from sources using dopyinstaller.sh (Linux) or dopyinstaller.bat (Windows)
-that are provided with the source code. The usage requires the installation
+You can also use the [command-line parameters](#command-line-usage) like this, for example if you want to provide the analysis as a file:
+
+  * python main.py --analysis yes
+
+**Advanced:**
+
+If you really want, you can re-build the executable
+from sources using dopyinstaller.bat (Windows) that is provided with the source code. The usage requires the installation
 of pyinstaller:
 
 * python -m pip install pyinstaller
   * Ensure that the pyinstaller is in your PATH.
 
+### Linux
+
+**The easy way:**
+
+go to [Release folder](https://github.com/LemesoftNostalgic/sprint-o-matic/releases/latest) and click the name of the Linux
+executable _sprint-o-matic_. Navigate to the "Downloads" folder with
+Terminal and start the application with:
+
+    * ./sprint-o-matic
+
+You can also use the [command-line parameters](#command-line-usage) like this, for example if you want to provide the analysis as a file:
+
+    * ./sprint-o-matic --analysis yes
+
+**The recommended and safer way:**
+
+This may be a little different depending on your web browser. I used Mozilla
+Firefox.
+
+go to [Release folder](https://github.com/LemesoftNostalgic/sprint-o-matic/releases/latest) and click the name of the source code package _Source code (zip)_. The browser should download it to the "Downloads" folder. Navigate to the "Downloads" folder and click the source code package "sprint-o-matic-3.0.3" with the right mouse button and select "extract all" from the menu.
+
+If you don't yet have python3.10 or newer installed, then install it.
+The instructions are in [python.org/Downloads](python.org/Downloads).
+With Ubuntu and Debian, open the Terminal and issue the following commands:
+
+* sudo apt update
+* sudo apt install python3
+* sudo apt install python3-pip
+
+Then install the necessary python modules:
+
+  * python3 -m pip install pygame
+  * python3 -m pip install requests
+  * python3 -m pip install argparse
+  * python3 -m pip install overpy
+
+Then you can start the application.
+Navigate to the correct folder and issue the following command:
+
+  * python3 main.py
+
+You can also use the [command-line parameters](#command-line-usage) like this, for example if you want to provide the analysis as a file:
+
+  * python3 main.py --analysis yes
+
+**Advanced:**
+
+If you really want, you can re-build the executable
+from sources using dopyinstaller.bat (Windows) that is provided with the source code. The usage requires the installation
+of pyinstaller:
+
+* python -m pip install pyinstaller
+  * Ensure that the pyinstaller is in your PATH.
+
+### MacBook
+
+This is my guess, but has not been tested. I don't have a MacBook to test with.
+
+go to [Release folder](https://github.com/LemesoftNostalgic/sprint-o-matic/releases/latest), download and extract _Source code (tar.gz)_ to your machine.
+
+If you don't yet have python3.10 or newer installed, then install it.
+The instructions are in [python.org/Downloads](python.org/Downloads).
+
+Then install the necessary python modules from the Terminal app:
+
+  * python -m pip install pygame
+  * python -m pip install requests
+  * python -m pip install argparse
+  * python -m pip install overpy
+
+Then you can start the application from Terminal app.
+Navigate to the correct folder and issue the following command:
+
+  * python main.py
+
+You can also use the [command-line parameters](#command-line-usage) like this, for example if you want to provide the analysis as a file:
+
+  * python main.py --analysis yes
+
+
 ### Hardware requirements
 
 The application has been tested against Ubuntu 20.04 and
 Windows 10. The web version requires a relatively modern browser.
-Using the **--accurate** command-line parameter requires relatively modern PC
-due to
+Using the **--accurate** command-line parameter requires relatively modern
+Linux PC due to
 its search algorithms that run in separate processes.
 
 The World series maps take a while to start, sometimes even half a minute
@@ -355,9 +485,9 @@ It is also possible to play either fullscreen or in a window.
 
 Route analyses.
 
-**--analysis** Whether to write the route analyses into a file
+**--analysis** Whether to write the route analyses into a file. yes or no.
 
-**--accurate** Use the slower but more accurate route analysis, Linux only
+**--accurate** Use the slow but a bit more accurate route analysis, Linux only. yes or no.
 
 These options are useful if you want to play with your own map.
 When using them, you don't go to the home screen, but the game starts
