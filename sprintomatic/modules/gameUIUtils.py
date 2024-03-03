@@ -155,4 +155,6 @@ def uiDrawTriangle(surf, radius, angle, pos, wd):
 
 
 def uiLateQuit():
+    getBigScreen().fill(getWhiteColor())
+    pygame.display.flip()
     pygame.quit()
