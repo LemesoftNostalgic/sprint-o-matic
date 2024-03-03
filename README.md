@@ -335,7 +335,7 @@ at gmail.com if your treadmill vendor shows green light for this use-case.
 ### Support
 
 Map proposals, team proposals, and application improvement
-ideas can be sent to sprint.o.matic at gmail.com. (the previously mentioned address _sprint-o-matic_ at gmail.com did not work, sorry)
+ideas can be sent to sprint.o.matic at gmail.com.
 
 ## Command-line usage
 

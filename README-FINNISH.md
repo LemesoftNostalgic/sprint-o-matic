@@ -361,7 +361,7 @@ kautta, jos jonkun juoksumaton edustaja näyttää vihreää valoa tämänkaltai
 
 Karttaehdotukset, ehdotukset joukkueista jotka ovat kiinnostuneita ylläpitämään
 omaa karttaluetteloa, ja sovelluksen parannusideat voi lähettää
-sprint.o.matic miukumauku gmail.com:iin. (aiemmin mainittu osoite _sprint-o-matic_ miukumauku gmail.com ei toiminut, sori siitä)
+sprint.o.matic miukumauku gmail.com:iin.
 
 ## Komentorivin käyttö
 
