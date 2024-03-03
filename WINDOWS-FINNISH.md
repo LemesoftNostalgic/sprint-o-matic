@@ -2,31 +2,33 @@
 
 **Helppo tapa:**
 
-mene [Release-kansioon](https://github.com/LemesoftNostalgic/sprint-o-matic/releases/latest) ja napsauta Windowsin nimeä
-suoritettava _sprint-o-matic-notsigned.exe_. Hyväksy sitten selaimen pyyntö tallentaa tiedosto. Se tulee ladata "Lataukset"-kansioon.
+Mene [Release-kansioon](https://github.com/LemesoftNostalgic/sprint-o-matic/releases/latest) ja napsauta suoritettavan tiedoston _sprint-o-matic-notsigned.exe_
+nimeä. Hyväksy sitten selaimen pyyntö tallentaa tiedosto. Se tulee ladata
+"Downloads"-kansioon (tai "Ladatut tiedostot" suomenkielisessä versiossa).
 
 Käynnistä komentokehote kirjoittamalla "cmd" tehtäväpalkkiin.
-Google lisää ohjeita komentokehotteen käyttöön, jos et tunne sitä
-se. Kun olet komentokehotteessa, siirry oikeaan kansioon ja aloita
-hakemus. Yleensä komennot ovat seuraavat:
+Katso Googlesta lisää ohjeita Windows-komentokehotteen käyttöön, jos et ole
+aiemmin tutustunut siihen. Kun olet komentokehotteessa,
+siirry oikeaan kansioon ja käynnistä sovellus. Yleensä komennot ovat seuraavat:
 
 ```
-    cd-lataukset
+    cd Downloads
     sprint-o-matic-notsigned.exe
 ```
 
-Jos olet ladannut useita versioita, Windows on saattanut lisätä ylimääräistä tekstiä
+Jos olet ladannut useita versioita, Windows on saattanut lisätä ylimääräistä
+tekstiä
 uudempiin versioihin. Jos uusin on _sprint-o-matic-notsigned(1).exe_
-aloita sitten näin:
+käynnistä sitten näin:
 
 ```
     "sprint-o-matic-notsigned(1).exe"
 ```
 
-Voit myös käyttää [komentoriviparametreja](#command-line-usage) näin, esimerkiksi jos haluat toimittaa analyysin tiedostona:
+Voit myös käyttää komentoriviparametreja näin, esimerkiksi jos haluat toimittaa analyysin tiedostona:
 
 ```
-    sprint-o-matic-notsigned.exe --analyysi kyllä
+    sprint-o-matic-notsigned.exe --analysis yes
 ```
 
 **Suositeltu ja turvallisempi tapa:**
@@ -46,36 +48,36 @@ Nyt näet asennusikkunan. **Valitse ensin pieni ruutu "Add python.exe" vasemmall
 Odota asennuksen päättymistä.
 
 Käynnistä komentokehote kirjoittamalla "cmd" tehtäväpalkkiin.
-Google lisää ohjeita komentokehotteen käyttöön, jos et tunne sitä
+Googleta lisää ohjeita komentokehotteen käyttöön, jos et tunne sitä
 se. Kun olet komentokehotteessa, asenna tarvittavat python-moduulit
-seuraavat komennot:
+seuraavin komennoin:
 
 ```
-    python -m pip asennus pygame
-    python -m pip -asennuspyynnöt
-    python -m pip asentaa argparse
-    python -m pip asennus overpy
+    python -m pip install pygame
+    python -m pip install requests
+    python -m pip install argparse
+    python -m pip install overpy
 ```
 
 Käynnistä komentokehote kirjoittamalla "cmd" tehtäväpalkkiin.
-Google lisää ohjeita komentokehotteen käyttöön, jos et tunne sitä
-se. Kun olet komentokehotteessa, siirry oikeaan kansioon ja aloita
-hakemus. Yleensä komennot ovat seuraavanlaiset:
+Googleta lisää ohjeita komentokehotteen käyttöön, jos et tunne sitä
+se. Kun olet komentokehotteessa, siirry oikeaan kansioon ja käynnistä
+sovellus. Yleensä komennot ovat seuraavanlaiset:
 
 ```
-    cd-lataukset
+    cd Downloads
     cd sprint-o-matic-3.0.3
     cd sprint-o-matic-3.0.3
     python main.py
 ```
 
-Voit myös käyttää [komentoriviparametreja](#command-line-usage) näin, esimerkiksi jos haluat toimittaa analyysin tiedostona:
+Voit myös käyttää komentoriviparametreja näin, esimerkiksi jos haluat toimittaa analyysin tiedostona:
 
 ```
-    python main.py --analyysi kyllä
+    python main.py --analysis yes
 ```
 
 **Pitkälle kehittynyt:**
 
 Jos todella haluat, voit rakentaa suoritettavan tiedoston uudelleen
-lähteistä käyttämällä dopyinstaller.bat-tiedostoa, joka toimitetaan lähdekoodin mukana.
+lähdekoodista käyttämällä dopyinstaller.bat-tiedostoa, joka toimitetaan lähdekoodin mukana.

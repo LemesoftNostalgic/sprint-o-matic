@@ -49,7 +49,7 @@ ja karttoja vähemmän,
 mutta siitä saa nopeasti idean miten ohjelma toimii.
 Voit joutua uudelleenkäynnistämään selaimen jos sovellus ei starttaa kunnolla.
 
-  * [Link to web version](https://lemesoftnostalgic.github.io/sprint-o-matic/)
+  * [Web-sovellus käynnistyyn tästä](https://lemesoftnostalgic.github.io/sprint-o-matic/)
 
 ### Windows
 
@@ -373,9 +373,9 @@ On myös mahdollista pelata joko koko näytöllä tai ikkunassa.
 
 Reittianalyysit.
 
-**--analysis** Tallennetaan reittianalyysit tiedostoon
+**--analysis** Tallennetaan reittianalyysit tiedostoon, yes tai no
 
-**--accurate** Käytä hitaampaa mutta huomattavasti tarkempaa reittianalyysiä, vain Linux ympäristössä.
+**--accurate** Käytä hitaampaa mutta huomattavasti tarkempaa reittianalyysiä, vain Linux ympäristössä., yes tai no
 
 Vaihtoehdot, jotka ovat hyödyllisiä, jos haluat pelata omalla kartallasi.
 Kun käytät niitä, et mene aloitusnäyttöön, vaan peli alkaa

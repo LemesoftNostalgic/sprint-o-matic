@@ -47,7 +47,7 @@ idea:
 Use the web version if you want to try the application quickly, or you are using a MacBook. It might also work with a tablet, if you have a Bluetooth mouse paired with the tablet. The web version is not a full version, for example the sounds are awful and there is smaller amount of maps, but it gives you an idea what the application is like.
 You may need to restart the browser, if the app does not start properly.
 
-  * [Link to web version](https://lemesoftnostalgic.github.io/sprint-o-matic/)
+  * [Web application starts here](https://lemesoftnostalgic.github.io/sprint-o-matic/)
 
 ### Windows
 
