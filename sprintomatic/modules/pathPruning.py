@@ -17,6 +17,7 @@
 # under the License.
 #
 
+import asyncio
 from random import randrange
 
 from .mathUtils import distanceBetweenPoints
@@ -120,7 +121,7 @@ def pruneCheckLineOfSight(ptA, ptB, ptMid, forbiddenLookup, slowLookup, semiSlow
     return False, 0.0
 
 # Straighten the rudimentary angular route that was found intially
-def pruneShortestRouteRes(route, forbiddenLookup, slowLookup, semiSlowLookup, verySlowLookup, res):
+async def pruneShortestRouteRes(route, forbiddenLookup, slowLookup, semiSlowLookup, verySlowLookup, res):
     prunedRoute = route.copy()
 
     while len(prunedRoute) > res * 3:
@@ -140,6 +141,7 @@ def pruneShortestRouteRes(route, forbiddenLookup, slowLookup, semiSlowLookup, ve
                 if delta > maxDelta:
                     maxDelta = delta
                     maxDeltaInd = index + thisStep
+            await asyncio.sleep(0)
 
         if maxDeltaInd == 0:
             break
@@ -151,12 +153,12 @@ def pruneShortestRouteRes(route, forbiddenLookup, slowLookup, semiSlowLookup, ve
     return prunedRoute
 
 
-def pruneShortestRoute(route, forbiddenLookup, slowLookup, semiSlowLookup, verySlowLookup):
+async def pruneShortestRoute(route, forbiddenLookup, slowLookup, semiSlowLookup, verySlowLookup):
     res = pruneDefaultRes
     for res in [13, 5, 1]:
-        route = pruneShortestRouteRes(route, forbiddenLookup, slowLookup, semiSlowLookup, verySlowLookup, res)
+        route = await pruneShortestRouteRes(route, forbiddenLookup, slowLookup, semiSlowLookup, verySlowLookup, res)
         route.reverse()
-        route = pruneShortestRouteRes(route, forbiddenLookup, slowLookup, semiSlowLookup, verySlowLookup, 14 - res)
+        route = await pruneShortestRouteRes(route, forbiddenLookup, slowLookup, semiSlowLookup, verySlowLookup, 14 - res)
         route.reverse()
 
     return route

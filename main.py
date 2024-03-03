@@ -23,7 +23,7 @@ import time
 import asyncio
 from datetime import datetime, timedelta
 
-from sprintomatic.modules.routeAI import initializeAITables, closeAITables, initializeAINextTrack, getReadyShortestRoutes
+from sprintomatic.modules.routeAI import initializeAITables, closeAITables, initializeAINextTrack, initializeAINextTrackAsync, getReadyShortestRoutes, getReadyShortestRoutesAsync
 from sprintomatic.modules.gameSettings import returnSettings, returnConfig
 from sprintomatic.modules.mathUtils import angleOfLine, calculatePathDistance
 from sprintomatic.modules.trackCreator import createAutoControls
@@ -60,6 +60,7 @@ async def setTheStageForNewRound(cfg):
     global pacemakerStep
     global aiCounter
     global shortestRoutesArray
+    global shortestRoutesArrayAsync
     global shortestRoutes
     global futureShortestRoutes
     global trackLengthInPixels
@@ -90,6 +91,9 @@ async def setTheStageForNewRound(cfg):
         if gameSettings.accurate:
             initializeAINextTrack(ctrls, faLookup, saLookup, ssaLookup, vsaLookup, gameSettings.pacemaker)
             shortestRoutesArray = getReadyShortestRoutes()
+        else:
+            await initializeAINextTrackAsync(ctrls, faLookup, saLookup, ssaLookup, vsaLookup, gameSettings.pacemaker)
+            shortestRoutesArrayAsync = await getReadyShortestRoutesAsync(reachedControl)
         shortestRoutes = []
         futureShortestRoutes = []
         startTime = datetime.now()
@@ -164,8 +168,14 @@ async def updateRoutesAndDistances():
     playerDistance = playerDistance + calculatePathDistance(playerRoutes[0])
     if gameSettings.accurate:
         shortestRoutesArray = getReadyShortestRoutes()
+    else:
+        shortestRoutesArrayAsync = await getReadyShortestRoutesAsync(reachedControl)
     shortestRoutes = shortestRoutesArray[reachedControl - 1] if reachedControl > 0 else []
     futureShortestRoutes = shortestRoutesArray[reachedControl] if reachedControl > 0 and reachedControl < len(shortestRoutesArray) else []
+    if not gameSettings.accurate and reachedControl > 0:
+        if shortestRoutesArrayAsync[reachedControl - 1]:
+            shortestRoutes = [shortestRoutesArrayAsync[reachedControl - 1]]
+
     await uiFlushEvents()
     if shortestRoutes:
         shortestDistance = shortestDistance + calculatePathDistance(shortestRoutes[0])
@@ -212,6 +222,7 @@ async def main():
     global shortestDistance
     global shortestRoutes
     global shortestRoutesArray
+    global shortestRoutesArrayAsync
     global shortestWeightedDistance
     global showInitScreen
     global ssaLookup
@@ -380,13 +391,12 @@ async def main():
                                 pacemakerAdvancement = pacemakerSteps - pacemakerStartThreshold
                             pacemakerPosition, pacemakerAngle, inTunnelPacemaker = getPacemakerPos(saLookup, ssaLookup, vsaLookup, tunnelLookup, pacemakerPath, pacemakerAdvancement, gameSettings.speed, gameSettings.metersPerPixel, gameSettings.pacemaker)
 
-                    if gameSettings.accurate:
-                        # Flush the AI pools every now and then
-                        aiCounter = aiCounter + 1
-                        if aiCounter > aiCounterThreshold:
-                            aiCounter = 0
+                    # Flush the AI pools every now and then
+                    aiCounter = aiCounter + 1
+                    if aiCounter > aiCounterThreshold:
+                        aiCounter = 0
+                        if gameSettings.accurate:
                             shortestRoutesArray = getReadyShortestRoutes()
-
 
                     # Now enter the rendering phase
                     uiClearCanvas()
@@ -420,6 +430,9 @@ async def main():
                             finishEffect()
                             await updateRoutesAndDistances()
                             shortestRoutes = shortestRoutesArray[reachedControl - 1]
+                            if not gameSettings.accurate:
+                                if shortestRoutesArrayAsync[reachedControl - 1]:
+                                    shortestRoutes = [shortestRoutesArrayAsync[reachedControl - 1]]
                             futureShortestRoutes = []
                             uiStartControlEffect(reachedControl)
                             # calculate statistics at finish
@@ -429,7 +442,13 @@ async def main():
                                 totalTime = timedelta(seconds=0)
                             finishTexts = generateFinishTexts(totalTime, shortestDistance, shortestWeightedDistance, playerWeightedDistance)
                             if gameSettings.analysis:
-                                uiStoreAnalysis(shortestRoutesArray, playerRoutesArray, controls, finishTexts)
+                                mergedArray = shortestRoutesArray.copy()
+                                if not gameSettings.accurate:
+                                    shortestRoutesArrayAsync = await getReadyShortestRoutesAsync(len(mergedArray)-1)
+                                    for ind in range(len(mergedArray)):
+                                        if ind < len(shortestRoutesArrayAsync) and shortestRoutesArrayAsync[ind]:
+                                            mergedArray[ind] = [shortestRoutesArrayAsync[ind]]
+                                uiStoreAnalysis(mergedArray, playerRoutesArray, controls, finishTexts)
 
                         # 3. the track is totally done
                         elif finishFanfareStarted(reachedControl, nextControl) and uiControlEffectEnded():
