@@ -123,11 +123,10 @@ async def createAutoControls(cfg, trackLength, distribution, metersPerPixel, faL
         if ctrl is None:
             return [], 0, []
 
-        await asyncio.sleep(0)
 
-        preComputed = await calculateCoarseRoute(ctrls[-1], ctrl, faLookups[1])
-        if len(preComputed) > 1 and len(await calculateCoarseRoute(ctrl, ctrls[-1], faLookups[2])) > 1:
-            shortests.append([await calculateShortestRoute([ctrls[-1], ctrl, faLookups, saLookups, ssaLookups, vsaLookups, 0, pacemakerInd, preComputed])])
+        preComputed = calculateCoarseRoute(ctrls[-1], ctrl, faLookups[1])
+        if len(preComputed) > 1 and len(calculateCoarseRoute(ctrl, ctrls[-1], faLookups[2])) > 1:
+            shortests.append([calculateShortestRoute([ctrls[-1], ctrl, faLookups, saLookups, ssaLookups, vsaLookups, 0, pacemakerInd, preComputed])])
             ctrls.append(ctrl)
             totdist = totdist + dist
         elif len(ctrls) < 2:

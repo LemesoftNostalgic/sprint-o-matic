@@ -23,7 +23,7 @@ from random import randrange
 
 import sys
 
-from .pathPruning import pruneShortestRoute, pruneEnsureGoodShortcut, pruneEnsureLineOfSight
+from .pathPruning import pruneShortestRoute, pruneShortestRouteAsync, pruneEnsureGoodShortcut, pruneEnsureLineOfSight
 from .mathUtils import getBoundingBox, getNearestPointOfList, distanceBetweenPoints, calculatePathDistance
 from .utils import getSlowdownFactor, getSemiSlowdownFactor, getVerySlowdownFactor, getAiPoolMaxTimeLimit
 
@@ -334,7 +334,7 @@ def nearby(ptA, ptB):
 
 
 # and fastest checker for route availability
-async def calculateCoarseRoute(ptA, ptB, forbiddenLookup):
+def calculateCoarseRoute(ptA, ptB, forbiddenLookup):
     currentPt2 = (-100, -100)
 
     leftGuyIndex = 0
@@ -360,8 +360,6 @@ async def calculateCoarseRoute(ptA, ptB, forbiddenLookup):
 
         if not ptList:
             return []
-
-        await asyncio.sleep(0)
 
         if state == 0:
             # currentscore test not madatory?
@@ -445,7 +443,7 @@ async def calculateCoarseRoute(ptA, ptB, forbiddenLookup):
     return shortestRoute
 
 # fastest one so far
-async def calculateShortestRoute(setupList):
+def calculateShortestRoute(setupList):
 
     pointA = setupList[0]
     pointB = setupList[1]
@@ -470,19 +468,19 @@ async def calculateShortestRoute(setupList):
     if preComputed:
         shortestRoute = preComputed
     else:
-        shortestRoute = await calculateCoarseRoute(ptA, ptB, forbiddenLookup)
+        shortestRoute = calculateCoarseRoute(ptA, ptB, forbiddenLookup)
 
     if len(shortestRoute) < 2:
         return []
 
-    shortestRoute2 = await calculateCoarseRoute(ptB, ptA, forbiddenLookup)
+    shortestRoute2 = calculateCoarseRoute(ptB, ptA, forbiddenLookup)
     shortestRoute.reverse()
 
     # Straighten the route into a beautiful one
     if pacemakerInd != 2:
-        shortestRoute = await pruneShortestRoute(shortestRoute, forbiddenLookup, slowLookup, semiSlowLookup, verySlowLookup)
+        shortestRoute = pruneShortestRoute(shortestRoute, forbiddenLookup, slowLookup, semiSlowLookup, verySlowLookup)
         if len(shortestRoute2) > 1:
-            shortestRoute2 = await pruneShortestRoute(shortestRoute2, forbiddenLookup, slowLookup, semiSlowLookup, verySlowLookup)
+            shortestRoute2 = pruneShortestRoute(shortestRoute2, forbiddenLookup, slowLookup, semiSlowLookup, verySlowLookup)
             if len(shortestRoute2) > 1 and calculatePathDistance(shortestRoute2) < calculatePathDistance(shortestRoute):
                 shortestRoute = shortestRoute2
 
@@ -643,7 +641,7 @@ async def slowAccurateCalculateShortestRouteAsync(setupList):
 
         # Straighten the route into a beautiful one
         if pacemakerInd != 2:
-            shortestRoute = await pruneShortestRoute(shortestRoute, forbiddenLookup, slowLookup, semiSlowLookup, verySlowLookup)
+            shortestRoute = await pruneShortestRouteAsync(shortestRoute, forbiddenLookup, slowLookup, semiSlowLookup, verySlowLookup)
         scaledShortestRoute = []
         for point in shortestRoute:
             scaledShortestRoute.append((point[0] * tf, point[1] * tf))

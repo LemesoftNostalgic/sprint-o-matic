@@ -146,7 +146,6 @@ def returnSettings():
     except AttributeError:
         pass
     else:
-        print("Warning: cannot use the accurate and slow route analysis in Windows")
         gameSettings.accurate = False
 
     if (gameSettings.lookupPngName != '' and gameSettings.mapFileName == '') or (gameSettings.mapFileName != '' and gameSettings.lookupPngName == ''):
