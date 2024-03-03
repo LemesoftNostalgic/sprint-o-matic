@@ -10,7 +10,7 @@ Terminal and start the application with:
      ./sprint-o-matic
 ```
 
-You can also use the [command-line parameters](#command-line-usage) like this, for example if you want to provide the analysis as a file:
+You can also use the command-line parameters like this, for example if you want to provide the analysis as a file:
 
 ```
      ./sprint-o-matic --analysis yes
@@ -49,7 +49,7 @@ Navigate to the correct folder and issue the following command:
    python3 main.py
 ```
 
-You can also use the [command-line parameters](#command-line-usage) like this, for example if you want to provide the analysis as a file:
+You can also use the command-line parameters like this, for example if you want to provide the analysis as a file:
 
 ```
    python3 main.py --analysis yes

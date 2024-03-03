@@ -23,7 +23,7 @@ Navigate to the correct folder and issue the following command:
    python main.py
 ```
 
-You can also use the [command-line parameters](#command-line-usage) like this, for example if you want to provide the analysis as a file:
+You can also use the command-line parameters like this, for example if you want to provide the analysis as a file:
 
 ```
    python main.py --analysis yes

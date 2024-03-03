@@ -28,6 +28,11 @@ idea:
 * [Trying out Sprint-O-Matic route analysis mode with a fantasy map](https://youtu.be/rI9zinYGOmc)
 * [Using a real sprint orienteering map with Sprint-O-Matic. Fast mode.](https://youtu.be/Kn53WGpEUgo)
 
+I have high hopes that exercising with the application will improve the
+sprint orienteering skills for beginners, and even for seasoned runners.
+Unfortunately, I don't yet have evidence other than my own results,
+which have improved a little bit during this winter.
+
 ## Table of Contents
 
   * [Installation](#installation)
@@ -298,7 +303,7 @@ from the golden age of the genre, the one and only, Pertti Keinonen, RIP.
 runner. The most controversial figure due to his specialty in chemical
 engineering. Under suspicion on doping, but never got caught.
 
-### About the creator of this application
+### About the author
 
 You may wonder about LemesoftNostalgic, the nickname of this github account.
 I used to develop games for 8-bit computers in the

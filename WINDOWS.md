@@ -23,7 +23,7 @@ then start it like this:
    "sprint-o-matic-notsigned(1).exe"
 ```
 
-You can also use the [command-line parameters](#command-line-usage) like this, for example if you want to provide the analysis as a file:
+You can also use the command-line parameters like this, for example if you want to provide the analysis as a file:
 
 ```
    sprint-o-matic-notsigned.exe --analysis yes
@@ -69,7 +69,7 @@ the application. Usually the commands are like this:
    python main.py
 ```
 
-You can also use the [command-line parameters](#command-line-usage) like this, for example if you want to provide the analysis as a file:
+You can also use the command-line parameters like this, for example if you want to provide the analysis as a file:
 
 ```
    python main.py --analysis yes
