@@ -755,18 +755,22 @@ def drawArtificialSpots(png, mask):
     return png, mask
 
 
-def initWorldCreator(size):
+def initWorldCreator(size, imagePath):
     png = pygame.Surface(size)
     mask = pygame.Surface(size)
-    png.fill(colors[OPENAREA])
-    mask.fill(getSemiSlowAreaMask())
+    pattern = pygame.image.load(imagePath + "lemesoftnostalgic/OpenPattern.png")
+    psize = pattern.get_size()
+    for x in range(size[0]//psize[0]):
+        for y in range(size[1]//psize[1]):
+            png.blit(pattern, (x * psize[0], y * psize[1]))
+    mask.fill(getSlowAreaMask())
     return png, mask
 
 
-async def getInfiniteWorld(latlonMapOrigo, xyPictureSize, metersPerPixel):
+async def getInfiniteWorld(latlonMapOrigo, xyPictureSize, metersPerPixel, imagePath):
     db = await constructWayDb(latlonMapOrigo, xyPictureSize, metersPerPixel)
     await asyncio.sleep(0)
-    world, worldMask = initWorldCreator(xyPictureSize)
+    world, worldMask = initWorldCreator(xyPictureSize, imagePath)
     await asyncio.sleep(0)
     world, worldMask = drawForestArea(world, worldMask, db)
     await asyncio.sleep(0)
@@ -800,7 +804,7 @@ async def getInfiniteWorld(latlonMapOrigo, xyPictureSize, metersPerPixel):
     return world, worldMask
 
 
-async def getInfiniteWorldDefault(city, citymap):
+async def getInfiniteWorldDefault(city, citymap, imagePath):
     currmap = []
     for tentative in citymap:
         if tentative[0] == city:
@@ -811,5 +815,5 @@ async def getInfiniteWorldDefault(city, citymap):
         latlonMapOrigo = tuple(setup[0])
         metersPerPixel = setup[1] * (0.9 + 0.2 *random())
         xyPictureSize = (1280, 720)
-        return await getInfiniteWorld(latlonMapOrigo, xyPictureSize, metersPerPixel)
+        return await getInfiniteWorld(latlonMapOrigo, xyPictureSize, metersPerPixel, imagePath)
     return None, None
