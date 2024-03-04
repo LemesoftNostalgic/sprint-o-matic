@@ -149,6 +149,8 @@ sprinttikarttoja maailman parhaista sprinttimaastoita.
 Oulusta Helsinkiin, Tokiosta Pariisiin. Ensimmäinen versio kattaa 72
 kaupunkia ja 662 karttaa. Määrä tulee tuosta vielä kasvamaan.
 Toiminto käyttää pohjana OpenStreetMap-järjestelmän karttadataa.
+Uusia kaupunkeja tai sijainteja voi ehdottaa yksinkertaisesti
+lähettämällä viesti sähköpostiin sprint.o.matic miukumauku gmail.com.
 
 ![Sprint-O-Matic-pelikartta ulkoisella kartalla, kirjoittanut Jyrki Leskelä](/doc/tartu/ExternalMapWithRouteAnalysis.png)
 
