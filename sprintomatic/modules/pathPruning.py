@@ -24,6 +24,7 @@ from .mathUtils import distanceBetweenPoints
 from .utils import getSlowdownFactor, getSemiSlowdownFactor, getVerySlowdownFactor
 
 pruneDefaultRes = 16
+tfs = [1, 2, 4, 8, 16]
 
 def pruneDistanceWeighter(testPt, lookup, semilookup, verylookup):
     testPtInt = (int(testPt[0]), int(testPt[1]))
@@ -85,6 +86,20 @@ def pruneEnsureLineOfSight(ptA, ptB, lookup):
     return testPtList
 
 
+def pruneEnsureLineOfSightExt(pointA, pointB, forbiddenAreaLookup, tfNum):
+    tf = tfs[tfNum]
+    forbiddenLookup = forbiddenAreaLookup[tf]
+    ptA = (pointA[0] // tf, pointA[1] // tf)
+    ptB = (pointB[0] // tf, pointB[1] // tf)
+    tmpTestPtList = pruneEnsureLineOfSight(ptA, ptB, forbiddenLookup)
+    if tmpTestPtList is None:
+        return None
+    testPtList = []
+    for item in tmpTestPtList:
+        testPtList.append((item[0]*tf, item[1]*tf))
+    return testPtList
+
+
 # Check if decent direct route between point A and B
 slowCheckPeriod = 4
 def pruneEnsureGoodShortcut(ptA, ptB, lookup1, lookup2, lookup3):
@@ -120,48 +135,6 @@ def pruneCheckLineOfSight(ptA, ptB, ptMid, forbiddenLookup, slowLookup, semiSlow
             return True, origScore - newScore
     return False, 0.0
 
-# Straighten the rudimentary angular route that was found intially
-def pruneShortestRouteRes(route, forbiddenLookup, slowLookup, semiSlowLookup, verySlowLookup, res):
-    prunedRoute = route.copy()
-
-    while len(prunedRoute) > res * 3:
-        nextRoute = []
-
-        maxDelta = 0
-        maxDeltaInd = 0
-
-        thisStep = res
-        for index in range(len(prunedRoute) - res * 2):
-            pt1 = prunedRoute[index]
-            ptMid = prunedRoute[index + thisStep]
-            pt2 = prunedRoute[index + thisStep * 2]
-
-            shortcutFound, delta = pruneCheckLineOfSight(pt1, pt2, ptMid, forbiddenLookup, slowLookup, semiSlowLookup, verySlowLookup)
-            if shortcutFound:
-                if delta > maxDelta:
-                    maxDelta = delta
-                    maxDeltaInd = index + thisStep
-
-        if maxDeltaInd == 0:
-            break
-
-        toBeRemovedInd = maxDeltaInd + 1 - thisStep
-        for step in range(toBeRemovedInd, toBeRemovedInd + (thisStep * 2 - 1)):
-            prunedRoute.pop(toBeRemovedInd)
-
-    return prunedRoute
-
-
-def pruneShortestRoute(route, forbiddenLookup, slowLookup, semiSlowLookup, verySlowLookup):
-    res = pruneDefaultRes
-    for res in [13, 5, 1]:
-        route = pruneShortestRouteRes(route, forbiddenLookup, slowLookup, semiSlowLookup, verySlowLookup, res)
-        route.reverse()
-        route = pruneShortestRouteRes(route, forbiddenLookup, slowLookup, semiSlowLookup, verySlowLookup, 14 - res)
-        route.reverse()
-
-    return route
-
 
 # Straighten the rudimentary angular route that was found intially
 def pruneShortestRouteRes(route, forbiddenLookup, slowLookup, semiSlowLookup, verySlowLookup, res):
@@ -205,6 +178,22 @@ def pruneShortestRoute(route, forbiddenLookup, slowLookup, semiSlowLookup, veryS
 
     return route
 
+
+def pruneShortestRouteExt(route, forbiddenAreaLookup, slowAreaLookup, semiSlowAreaLookup, verySlowAreaLookup, tfNum):
+    tf = tfs[tfNum]
+    forbiddenLookup = forbiddenAreaLookup[tf]
+    slowLookup = slowAreaLookup[tf]
+    semiSlowLookup = semiSlowAreaLookup[tf]
+    verySlowLookup = verySlowAreaLookup[tf]
+
+    scaledRoute = []
+    for item in route:
+        scaledRoute.append((item[0] // tf, item[1] // tf))
+    tmpRoute = pruneShortestRoute(scaledRoute, forbiddenLookup, slowLookup, semiSlowLookup, verySlowLookup)
+    route = []
+    for item in tmpRoute:
+        route.append((item[0]*tf, item[1]*tf))
+    return route
 
 
 # Straighten the rudimentary angular route that was found intially

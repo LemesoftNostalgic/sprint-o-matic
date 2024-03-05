@@ -32,7 +32,7 @@ from random import randrange
 selections = [
     False, True, False, False, False, False,
     False, True, False, False, False, False,
-    True, False, False, False,
+    True, False, False, False, False,
     True, False, False, False]
 
 arrowScale = 4
@@ -158,7 +158,7 @@ async def initScreen(imagePath, gameSettings, externalImageData, externalWorldCi
         # second row 6
         (xStart + 2* xStep, yStart + yStep), (xStart + 3 * xStep, yStart + yStep), (xStart + 4 * xStep, yStart + yStep), (xStart + 5 * xStep, yStart + yStep), (xStart + 6 * xStep, yStart + yStep), (xStart + 7 * xStep, yStart + yStep),
         # third row 4
-         (xStart + 5 * xStep, yStart + 2 * yStep),(xStart + 6 * xStep, yStart + 2 * yStep), (xStart + 7 * xStep, yStart + 2 * yStep), (xStart + 8 * xStep, yStart + 2 * yStep),
+         (xStart + 5 * xStep, yStart + 2 * yStep),(xStart + 6 * xStep, yStart + 2 * yStep), (xStart + 7 * xStep, yStart + 2 * yStep), (xStart + 8 * xStep, yStart + 2 * yStep), (xStart + 9 * xStep, yStart + 2 * yStep),
         # fourth row 4
         (xStart + 5.6 * xStep, yStart + 3 * yStep), (xStart + 6.6 * xStep, yStart + 3 * yStep), (xStart + 7.6 * xStep, yStart + 3 * yStep), (xStart + 8.6 * xStep, yStart + 3 * yStep), (xStart + 9.6 * xStep, yStart + 3 * yStep)]
     titleTexts = [
@@ -208,15 +208,15 @@ async def initScreen(imagePath, gameSettings, externalImageData, externalWorldCi
         # second row 6
         "micro", "    mini", "short", "regular", "longish", "long",
         # third row 2
-        "once", "    repeat", "fast  ", "pacemaker",
+        "once", "    repeat", "fast  ", "pacemaker ", " amaze",
         # fourth row 3
             "World", "", "team", "map", "start"
         ]
     indexes = [
         [0, 1, 2, 3,  4,  5],
         [6, 7, 8, 9, 10, 11],
-        [12, 13, 14, 15],
-        [16, 17, 18, 19],
+        [12, 13, 14, 15, 16],
+        [17, 18, 19, 20],
         ]
     values = [
         [600, 1000, 1400, 2000,  2400,  3000],
@@ -227,7 +227,7 @@ async def initScreen(imagePath, gameSettings, externalImageData, externalWorldCi
            [0.10, 0.10, 0.20, 0.30, 0.30],
            [0.00, 0.05, 0.15, 0.35, 0.45]
            ],
-        ["one-shot", "repeat", "superfast", "pacemaker"],
+        ["one-shot", "repeat", "superfast", "pacemaker", "amaze"],
         ["infinite-world", "infinite-oulu", "external-team", "external-map"],
         ]
     infiniteOuluTerrains = ["shortLeg", "mediumLeg", "mediumLeg", "mediumLeg", "longLeg", "longLeg"]
@@ -399,20 +399,28 @@ async def initScreen(imagePath, gameSettings, externalImageData, externalWorldCi
         gameSettings.continuous = True if retSettings[2]=="repeat" else False
         gameSettings.speed = "regular"
         gameSettings.pacemaker = 0
+        gameSettings.amaze = False
     elif retSettings[2] == "pacemaker":
         gameSettings.pacemaker = randrange(1, 4)
         gameSettings.speed = "regular"
         gameSettings.continuous = False
+        gameSettings.amaze = False
+    elif retSettings[2] == "amaze":
+        gameSettings.amaze = True
+        gameSettings.pacemaker = False
+        gameSettings.speed = "regular"
+        gameSettings.continuous = True
     else:
         gameSettings.speed = "superfast"
         gameSettings.pacemaker = 0
         gameSettings.continuous = False
+        gameSettings.amaze = False
 
     if retSettings[3] == "infinite-oulu":
         gameSettings.infiniteOulu = True
         gameSettings.infiniteWorld = False
         gameSettings.externalExample = ""
-    if retSettings[3] == "infinite-world":
+    elif retSettings[3] == "infinite-world":
         gameSettings.infiniteOulu = False
         gameSettings.infiniteWorld = True
         gameSettings.infiniteWorldCity = worldExampleText

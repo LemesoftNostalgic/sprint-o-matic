@@ -55,6 +55,7 @@ def returnSettings():
             self.soundRoot=os.path.join("sounds", "")
             self.imageRoot=os.path.join("images", "")
             self.continuous="yes"
+            self.amaze="no"
             self.pacemaker=1
             self.metersPerPixel=0
             self.autoTest="no"
@@ -98,6 +99,7 @@ def returnSettings():
         parser.add_argument("--accurate", type=str, choices=["no", "yes"], help="Offline mode or not (yes, no)", default=defaultSettings.offline)
         parser.add_argument("--continuous", type=str, choices=["no", "yes"], help="Continuous game loop (or one-shot play)", default=defaultSettings.continuous)
         parser.add_argument("--pacemaker", type=int,choices=range(0, 4), help="A pacemaker runner to compete against", default=defaultSettings.pacemaker)
+        parser.add_argument("--amaze", type=int,choices=range(0, 4), help="A maze (yes or no)", default=defaultSettings.pacemaker)
         parser.add_argument("--metersPerPixel", type=numRestrict(0, 1.8), help="How many meters per map pixel. 0 for autodetect.", default=defaultSettings.metersPerPixel)
         parser.add_argument("--autoTest", type=str, choices=["no", "yes"], help="An automatic test mode", default=defaultSettings.autoTest)
         parser.add_argument("--infoBox", type=str, choices=["no", "yes"], help="An info box feature", default=defaultSettings.infoBox)
@@ -131,6 +133,7 @@ def returnSettings():
         [200.0,  300.0, gameSettings.extraLongLegProbability]
     ]
     gameSettings.continuous = True if gameSettings.continuous=="yes" else False
+    gameSettings.amaze = True if gameSettings.amaze=="yes" else False
     gameSettings.offline = True if gameSettings.offline=="yes" else False
     gameSettings.accurate = True if gameSettings.accurate=="yes" else False
     gameSettings.fullScreen = True if gameSettings.fullScreen=="yes" else False

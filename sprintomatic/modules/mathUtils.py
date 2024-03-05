@@ -26,7 +26,26 @@ from .utils import getNoMask, getForbiddenAreaMask
 longDistance = 10000000.0
 
 def fromRadiansToDegrees(angle):
-    return (math.pi - angle)/(math.pi/180)
+    return angle/(math.pi/180)
+
+
+def angleDifference(angle1, angle2):
+    while angle1 < 0.0:
+        angle1 = angle1 + 2*math.pi
+    while angle2 < 0.0:
+        angle2 = angle2 + 2*math.pi
+    while angle1 > 2*math.pi:
+        angle1 = angle1 - 2*math.pi
+    while angle2 > 2*math.pi:
+        angle2 = angle2 - 2*math.pi
+    first = (angle1 - angle2) % (2*math.pi)
+    second = (angle2 - angle1) % (2*math.pi)
+    num = abs(second)
+    if first < second:
+        num = abs(first)
+    if num > math.pi:
+        num = (2*math.pi) - num
+    return num
 
 
 def triangleCreator(radius, angle, pos):
@@ -73,6 +92,8 @@ def angleOfLine(line):
         angle = angle + math.pi
     return angle
 
+def getRandomAngle():
+    return random.random() * math.pi * 2
 
 def distanceBetweenPoints(point1, point2):
     return math.sqrt((point1[0]-point2[0])**2 + (point1[1]-point2[1])**2)

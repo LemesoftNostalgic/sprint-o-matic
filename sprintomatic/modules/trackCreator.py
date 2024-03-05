@@ -22,9 +22,9 @@ import random
 import time
 import asyncio
 
-from .mathUtils import angleBetweenLineSegments, distanceBetweenPoints
-from .pathPruning import pruneEnsureLineOfSight
-from .routeAI import calculateCoarseRoute, calculateShortestRoute
+from .mathUtils import angleBetweenLineSegments, distanceBetweenPoints, calculatePathDistance
+from .pathPruning import pruneEnsureLineOfSightExt, pruneShortestRouteExt
+from .routeAI import calculateCoarseRouteExt, calculateShortestRoute, slowAccurateCalculateShortestRouteAsync
 
 
 firstControlMinDistance = 100
@@ -113,7 +113,7 @@ def pickAutoControl(cfg, ctrls, minlen, maxlen):
     return cfg[index], dist
 
 
-def pickDistAutoControl(cfg, ctrls, distribution, metersPerPixel, faLookup):
+def pickDistAutoControl(cfg, ctrls, distribution, metersPerPixel, faLookups):
     start_time = time.time()
     easyOneOutOf = 2
     isDifficultControl = True
@@ -134,7 +134,7 @@ def pickDistAutoControl(cfg, ctrls, distribution, metersPerPixel, faLookup):
         if time.time() - start_time > pickDistMaxTime:
             return None, None, None
 
-        if pruneEnsureLineOfSight(candidate, ctrls[-1], faLookup) != None:
+        if pruneEnsureLineOfSightExt(candidate, ctrls[-1], faLookups, 0) != None:
             isDifficultControl = False
 
         if not isDifficultControl and difficultAttemptCtr > 0:
@@ -145,7 +145,7 @@ def pickDistAutoControl(cfg, ctrls, distribution, metersPerPixel, faLookup):
         return candidate, dist, isDifficultControl
 
 
-async def createAutoControls(cfg, trackLength, distribution, metersPerPixel, faLookups, saLookups, ssaLookups, vsaLookups, pacemakerInd, isWorld):
+async def createAutoControls(cfg, trackLength, distribution, metersPerPixel, faLookups, saLookups, ssaLookups, vsaLookups, pacemakerInd):
     totdist = 0
     ctrls = []
     shortests = []
@@ -154,12 +154,13 @@ async def createAutoControls(cfg, trackLength, distribution, metersPerPixel, faL
     ctrls.append(ctrl)
     numDifficultControls = 0
     while (len(ctrls) < 25 and totdist < trackLength) or len(ctrls) < 3:
-        ctrl, dist, isDifficultControl = pickDistAutoControl(cfg, ctrls, distribution, metersPerPixel, faLookups[1])
+        ctrl, dist, isDifficultControl = pickDistAutoControl(cfg, ctrls, distribution, metersPerPixel, faLookups)
         if isDifficultControl:
             numDifficultControls = numDifficultControls + 1
         if ctrl is None:
             return [], 0, []
-        preComputed = calculateCoarseRoute(ctrls[-1], ctrl, faLookups[1])
+
+        preComputed, dummy_jumps = calculateCoarseRouteExt(ctrls[-1], ctrl, faLookups, 1, True, True)
         if len(preComputed) > 1:
             ctrls.append(ctrl)
             totdist = totdist + dist
@@ -179,7 +180,70 @@ async def createAutoControls(cfg, trackLength, distribution, metersPerPixel, faL
         if time.time() - start_tot_time > totMaxTime:
             break
 
-    return ctrls, numDifficultControls, shortests
+    return ctrls, shortests
+
+
+deAmazeFactor = 4 # how small challenges are accepted. the bigger the smaller
+async def createAmazeControls(cfg, distribution, metersPerPixel, faLookups, saLookups, ssaLookups, vsaLookups):
+    normalizedDifference = 0.0
+    start_tot_time = time.time()
+    ctrls = []
+    while True:
+        if time.time() - start_tot_time > totMaxTime:
+            return [], [], [], [], 0.0
+        ctrls = []
+        ctrl, dummy_dist = pickAutoControl(cfg, ctrls, 0, 1000000)
+        ctrls.append(ctrl)
+
+        ctrl, dist, isDifficultControl = pickDistAutoControl(cfg, ctrls, distribution, metersPerPixel, faLookups)
+        if ctrl is None:
+            return [], [],[], [],  0.0
+        if not isDifficultControl:
+            continue
+        dist = distanceBetweenPoints(ctrls[-1], ctrl)
+
+        # check there is both right and left alternative
+        preComputedLeft, jumps = calculateCoarseRouteExt(ctrls[-1], ctrl, faLookups, 2, True, False)
+        if jumps < 1 or len(preComputedLeft) < 3 or calculatePathDistance(preComputedLeft) < dist + dist / deAmazeFactor:
+            continue
+        if time.time() - start_tot_time > totMaxTime:
+            return [], [], [], [], 0.0
+
+        preComputedRight, jumps = calculateCoarseRouteExt(ctrls[-1], ctrl, faLookups, 2, False, True)
+        if len(preComputedRight) < 3 or calculatePathDistance(preComputedRight) < dist + dist / deAmazeFactor:
+            continue
+        if time.time() - start_tot_time > totMaxTime:
+            return [], [], [], [], 0.0
+
+        beautifiedLeft = pruneShortestRouteExt(preComputedLeft, faLookups, saLookups, ssaLookups, vsaLookups, 2)
+        if calculatePathDistance(beautifiedLeft) < dist + dist / deAmazeFactor:
+            continue
+        if time.time() - start_tot_time > totMaxTime:
+            return [], [], [], [], 0.0
+
+        beautifiedRight = pruneShortestRouteExt(preComputedRight, faLookups, saLookups, ssaLookups, vsaLookups, 2)
+        if calculatePathDistance(beautifiedRight) < dist + dist / deAmazeFactor:
+            continue
+        if time.time() - start_tot_time > totMaxTime:
+            return [], [], [], [], 0.0
+
+        normalizedDifference = 2 * abs(calculatePathDistance(beautifiedRight) - calculatePathDistance(beautifiedLeft)) / abs(calculatePathDistance(beautifiedRight) + calculatePathDistance(beautifiedLeft))
+        if normalizedDifference < 0.01 or normalizedDifference > 0.2:
+            continue
+
+        ctrls.append(ctrl)
+        break
+
+    shortests = []
+
+    for ind in range(len(ctrls) - 1):
+        shortests.append([await slowAccurateCalculateShortestRouteAsync([ctrls[ind], ctrls[ind + 1], faLookups, saLookups, ssaLookups, vsaLookups, 2, 0])])
+        if not shortests[ind][0]:
+            shortests[ind] = [await slowAccurateCalculateShortestRouteAsync([ctrls[ind], ctrls[ind + 1], faLookups, saLookups, ssaLookups, vsaLookups, 3, 0])]
+            if not shortests[ind][0]:
+                return [], [], [], [], 0.0
+
+    return ctrls, shortests, beautifiedLeft, beautifiedRight, normalizedDifference
 
 
 def createPairedList(trivialList):

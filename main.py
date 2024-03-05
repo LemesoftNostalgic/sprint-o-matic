@@ -20,13 +20,14 @@
 __version__ = "1.0.3"
 
 import time
+import math
 import asyncio
 from datetime import datetime, timedelta
 
 from sprintomatic.modules.routeAI import initializeAITables, closeAITables, initializeAINextTrack, initializeAINextTrackAsync, getReadyShortestRoutes, getReadyShortestRoutesAsync
 from sprintomatic.modules.gameSettings import returnSettings, returnConfig
-from sprintomatic.modules.mathUtils import angleOfLine, calculatePathDistance
-from sprintomatic.modules.trackCreator import createAutoControls
+from sprintomatic.modules.mathUtils import angleOfLine, getRandomAngle, calculatePathDistance, angleDifference, fromRadiansToDegrees
+from sprintomatic.modules.trackCreator import createAutoControls, createAmazeControls
 from sprintomatic.modules.gameUIUtils import uiEarlyInit, uiLateQuit, uiFlushEvents
 from sprintomatic.modules.initScreenUI import initScreen
 from sprintomatic.modules.gameUI import uiInit, uiInitStartTriangle, uiStartControlEffect, uiControlEffectEnded, uiCenterTurnZoomTheMap, uiAnimatePlayer, uiAnimatePacemaker, uiRenderRoutes, uiRenderControls, uiCompleteRender, uiEvent, uiClearCanvas, raiseControlApproachZoom, lowerControlApproachZoom, uiRenderPacemakerText, uiRenderAIText, uiControlEffectRestart, uiRenderExternalMapInfo, uiStoreAnalysis
@@ -64,10 +65,21 @@ async def setTheStageForNewRound(cfg):
     global shortestRoutes
     global futureShortestRoutes
     global trackLengthInPixels
+    global amazeCounter
+    global normalizedDifference
+    global beautifiedLeft
+    global beautifiedRight
 
     # Ensure we have a list of controls
     ctrls = []
-    ctrls, numberOfDifficultControls, shortestRoutesArray = await createAutoControls(cfg, trackLengthInPixels, gameSettings.distributionOfControlLegs, gameSettings.metersPerPixel, faLookup, saLookup, ssaLookup, vsaLookup, gameSettings.pacemaker, gameSettings.infiniteWorld)
+    if gameSettings.amaze:
+        ctrls, shortestRoutesArray, beautifiedLeft, beautifiedRight, normalizedDifference = await createAmazeControls(cfg, gameSettings.distributionOfControlLegs, gameSettings.metersPerPixel, faLookup, saLookup, ssaLookup, vsaLookup)
+        if normalizedDifference < 0.01:
+            normalizedDifference = 0.01
+        normalizedDifference = round(1/ normalizedDifference, 0)
+
+    else:
+        ctrls, shortestRoutesArray = await createAutoControls(cfg, trackLengthInPixels, gameSettings.distributionOfControlLegs, gameSettings.metersPerPixel, faLookup, saLookup, ssaLookup, vsaLookup, gameSettings.pacemaker)
 
     # effects initialization
     uiControlEffectRestart()
@@ -82,6 +94,8 @@ async def setTheStageForNewRound(cfg):
         angle = angleOfLine(ctrls[:2])
         position = ctrls[0]
         uiInitStartTriangle(angle, position)
+        if gameSettings.amaze:
+            angle = getRandomAngle()
         nextControl = 1
         reachedControl = 0
         inTunnel = False
@@ -231,6 +245,10 @@ async def main():
     global trackLengthInPixels
     global tunnelLookup
     global vsaLookup
+    global amazeCounter
+    global normalizedDifference
+    global beautifiedLeft
+    global beautifiedRight
 
     # all the initialization that happens only once at the startup
     gameSettings = returnSettings()
@@ -262,6 +280,7 @@ async def main():
 
     # pacemaker parameters
     pacemakerSteps = 0
+    amazeCounter = 0
     pacemakerStartThreshold = 0
     pacemakerPosition = None
     pacemakerPath = None
@@ -276,6 +295,11 @@ async def main():
 
     # threshold for the game to really start
     gameMovingStartThreshold = 5
+    amazeTimeThreshold = 10
+    amazeMidTimeThreshold = 15
+    amazeSecondTimeThreshold = 20
+    amazeAcceptedAngleDifference = math.pi / 16
+    normalizedDifference = 0
 
     # the choice between specific route file and an automatic route
     autoControls = True
@@ -323,6 +347,8 @@ async def main():
             if externalZoom > 0:
                 zoom = externalZoom
 
+            amazeCounter = 0
+
             # Special case: in case external map selected but network down
             if generatedOrDownloadedMap is None and not gameSettings.mapFileName:
                 running = False
@@ -356,7 +382,7 @@ async def main():
                 events = await uiEvent(gameSettings.infoBox, gameSettings.speed)
 
             for event in events:
-                if datetime.now() - startTime > timedelta(seconds=gameMovingStartThreshold):
+                if datetime.now() - startTime > timedelta(seconds=gameMovingStartThreshold) and not (gameSettings.amaze and datetime.now() - startTime > timedelta(seconds=amazeTimeThreshold)):
                     if event == "left":
                         angle = angle + generateAngleStep()
                         movement = True
@@ -380,7 +406,7 @@ async def main():
                         # Progress the player position
                         if gameSettings.autoTest:
                             position, angle = fakeCalculateNextStep(controls)
-                        else:
+                        elif not gameSettings.amaze:
                             position, angle, inTunnel = calculateNextStep(faLookup, saLookup, ssaLookup, vsaLookup, tunnelLookup, position, angle, movement, gameSettings.speed, gameSettings.metersPerPixel)
 
                         # Progress the pacemaker position
@@ -422,6 +448,41 @@ async def main():
                                 pacemakerSteps = 0
                             uiStartControlEffect(reachedControl)
 
+
+                        # 1.99 separate ending for "amaze"
+                        elif gameSettings.amaze and datetime.now() - startTime > timedelta(seconds=amazeSecondTimeThreshold):
+                            amazeCounter = amazeCounter + 1
+                            position = controls[-1]
+                            reachedControl = len(controls) - 1
+                            nextControl = 0
+                            if amazeCounter >= 3:
+                                running = False
+                            else:
+                                controls = await setTheStageForNewRound(config)
+
+                        elif gameSettings.amaze and datetime.now() - startTime > timedelta(seconds=amazeMidTimeThreshold):
+                            beautifiedLeft.reverse()
+                            playerRoutes = [ beautifiedLeft + beautifiedRight ]
+
+                        # 1.999 separate pre-ending for "amaze"
+                        elif gameSettings.amaze and datetime.now() - startTime > timedelta(seconds=amazeTimeThreshold):
+                            reachedControl, nextControl = startFinishFanfare(nextControl)
+                            stopMelody()
+                            finishEffect()
+                            await updateRoutesAndDistances()
+                            shortestRoutes = shortestRoutesArray[reachedControl - 1]
+                            sRoutes = shortestRoutes[0].copy()
+                            sRoutes.reverse()
+                            uiStartControlEffect(reachedControl)
+                            wantedAngle = angleOfLine(sRoutes[:2])
+                            angleDiff = angleDifference(angle, wantedAngle)
+                            if angleDiff < amazeAcceptedAngleDifference:
+                                finishTexts[1] = "SUCCESS!"
+                            else:
+                                finishTexts[1] = "FAIL!"
+                            finishTexts[2] = str(round(fromRadiansToDegrees(angleDiff), 0))
+                            finishTexts[0] = str(normalizedDifference)
+
                         # 2. the finish line is found
                         elif finishFound(controls, position, nextControl):
                             reachedControl, nextControl = startFinishFanfare(nextControl)
@@ -457,7 +518,7 @@ async def main():
                             if not autoControls or not gameSettings.continuous: # then run only once
                                 running = False
                             else:
-                                controls = setTheStageForNewRound(config)
+                                controls = await setTheStageForNewRound(config)
                                 # There might have been a delay
                                 await uiFlushEvents()
 
@@ -467,7 +528,7 @@ async def main():
                             if gameSettings.pacemaker == 0:
                                 uiRenderRoutes(shortestRoutes, "shortest")
                                 uiRenderRoutes(playerRoutes, "player")
-                            uiRenderControls(controls, gameSettings.pacemaker)
+                            uiRenderControls(controls, gameSettings.pacemaker, gameSettings.amaze)
                             if gameSettings.pacemaker != 0 and pacemakerPath is not None and pacemakerPosition is not None:
                                 if pacemakerPosition == pacemakerPath[-1]:
                                     uiAnimatePacemaker(pacemakerPosition, pacemakerAngle, 1.0, gameSettings.pacemaker, inTunnelPacemaker, True)
@@ -497,9 +558,10 @@ async def main():
 
                         # After that it is ok to draw to "big screen"
                         moveLegs = True if datetime.now() - startTime > timedelta(seconds=gameMovingStartThreshold) else False
-                        uiAnimatePlayer(moveLegs, inTunnel)
+                        uiAnimatePlayer(moveLegs, inTunnel, gameSettings.amaze)
                         aiTextNeeded = False
                         pacemakerTextNeeded = False
+                        amazeTextNeeded = False
                         if gameSettings.pacemaker != 0:
                             if (len(futureShortestRoutes) == 0 or len(futureShortestRoutes[0]) == 0) and (reachedControl > 0 and reachedControl < len(controls) - 1):
                                 aiTextNeeded = True
@@ -515,7 +577,7 @@ async def main():
                                             externalMapInfoTexts = [stripMapName(subitem["map-url"]), subitem["map-license"], subitem["map-credits"], stripMapName(subitem["lookup-png-url"]), subitem["lookup-png-license"], subitem["lookup-png-credits"]]
                                             break
                         if gameSettings.noUiTest != "yes":
-                            uiCompleteRender(finishTexts, externalMapInfoTexts, gameSettings.pacemaker, pacemakerTextNeeded, aiTextNeeded)
+                            uiCompleteRender(finishTexts, externalMapInfoTexts, gameSettings.pacemaker, pacemakerTextNeeded, aiTextNeeded, gameSettings.amaze, normalizedDifference)
             await asyncio.sleep(0)
 
     # Final freeing of resources

@@ -266,15 +266,19 @@ def calculateRightSpot(spot, directionIndex):
 
 def setInitialLeftGuyDirection(spot, lookup):
     directionIndex = 0
-    while calculateLeftSpot(spot, directionIndex) not in lookup:
+    for dummy in range(4):
+        if calculateLeftSpot(spot, directionIndex) in lookup:
+            return directionIndex
         directionIndex = turnLeft(directionIndex)
-    return directionIndex
+    return -1
 
 def setInitialRightGuyDirection(spot, lookup):
     directionIndex = 0
-    while calculateRightSpot(spot, directionIndex) not in lookup:
+    for dummy in range(4):
+        if calculateRightSpot(spot, directionIndex) in lookup:
+            return directionIndex
         directionIndex = turnRight(directionIndex)
-    return directionIndex
+    return -1
 
 def calculateNextSpot(spot, directionIndex):
     direction = movementDirections[directionIndex]
@@ -334,17 +338,21 @@ def nearby(ptA, ptB):
 
 
 # and fastest checker for route availability
-def calculateCoarseRoute(ptA, ptB, forbiddenLookup):
+def calculateCoarseRoute(ptA, ptB, forbiddenLookup, left, right):
     currentPt2 = (-100, -100)
 
     leftGuyIndex = 0
     prevEasy = True
+    jumps = 0
     ptList, scoreList = getTestPointList(ptA, ptB, forbiddenLookup)
 
     if not ptList:
-        return []
+        return [], 0
 
     start_time = time.time()
+    timeThreshold = bddTimeThreshold
+    if left == False or right == False:
+        timeThreshold = timeThreshold / 4
 
     shortestRoute = []
 
@@ -355,11 +363,11 @@ def calculateCoarseRoute(ptA, ptB, forbiddenLookup):
     state = 0
 
     while distanceBetweenPoints(currentPt, ptB) > closenessThreshold and distanceBetweenPoints(currentPt2, ptB) > closenessThreshold:
-        if time.time() - start_time > bddTimeThreshold:
-            return []
+        if time.time() - start_time > timeThreshold:
+            return [], 0
 
         if not ptList:
-            return []
+            return [], 0
 
         if state == 0:
             # currentscore test not madatory?
@@ -377,38 +385,43 @@ def calculateCoarseRoute(ptA, ptB, forbiddenLookup):
                 currentPt2 = moveToWallSide(currentPt, forbiddenLookup)
                 leftGuyIndex = setInitialLeftGuyDirection(currentPt, forbiddenLookup)
                 rightGuyIndex = setInitialRightGuyDirection(currentPt2, forbiddenLookup)
+                if leftGuyIndex == -1 or rightGuyIndex == -1:
+                    return [], 0
                 leftGuyRoute = []
                 rightGuyRoute = []
                 prevEasy = False
+                jumps = jumps + 1
 
             anyMoves = False
-             # the clockwise-moving seeker
-            if calculateNextSpot(currentPt, leftGuyIndex) not in forbiddenLookup:
-                anyMoves = True
-                currentPt = calculateNextSpot(currentPt, leftGuyIndex)
-                currentScore = currentScore + 0.0001
-                if calculateLeftSpot(currentPt, leftGuyIndex) not in forbiddenLookup:
-                    leftGuyIndex = turnLeft(leftGuyIndex)
+            # the clockwise-moving seeker
+            if left:
+                if calculateNextSpot(currentPt, leftGuyIndex) not in forbiddenLookup:
+                    anyMoves = True
                     currentPt = calculateNextSpot(currentPt, leftGuyIndex)
+                    currentScore = currentScore + 0.0001
+                    if calculateLeftSpot(currentPt, leftGuyIndex) not in forbiddenLookup:
+                        leftGuyIndex = turnLeft(leftGuyIndex)
+                        currentPt = calculateNextSpot(currentPt, leftGuyIndex)
 
-            for dummy in range(4):
-                if calculateNextSpot(currentPt, leftGuyIndex) in forbiddenLookup:
-                    leftGuyIndex = turnRight(leftGuyIndex)
+                for dummy in range(4):
+                    if calculateNextSpot(currentPt, leftGuyIndex) in forbiddenLookup:
+                        leftGuyIndex = turnRight(leftGuyIndex)
 
             # the counter-clockwise-moving seeker
-            if calculateNextSpot(currentPt2, rightGuyIndex) not in forbiddenLookup:
-                anyMoves = True
-                currentPt2 = calculateNextSpot(currentPt2, rightGuyIndex)
-                if calculateRightSpot(currentPt2, rightGuyIndex) not in forbiddenLookup:
-                    rightGuyIndex = turnRight(rightGuyIndex)
+            if right:
+                if calculateNextSpot(currentPt2, rightGuyIndex) not in forbiddenLookup:
+                    anyMoves = True
                     currentPt2 = calculateNextSpot(currentPt2, rightGuyIndex)
+                    if calculateRightSpot(currentPt2, rightGuyIndex) not in forbiddenLookup:
+                        rightGuyIndex = turnRight(rightGuyIndex)
+                        currentPt2 = calculateNextSpot(currentPt2, rightGuyIndex)
 
-            for dummy in range(4):
-                if calculateNextSpot(currentPt2, rightGuyIndex) in forbiddenLookup:
-                    rightGuyIndex = turnLeft(rightGuyIndex)
+                for dummy in range(4):
+                    if calculateNextSpot(currentPt2, rightGuyIndex) in forbiddenLookup:
+                        rightGuyIndex = turnLeft(rightGuyIndex)
 
             if not anyMoves:
-                return []
+                return [], 0
 
             leftGuyRoute.append(currentPt)
             rightGuyRoute.append(currentPt2)
@@ -440,11 +453,25 @@ def calculateCoarseRoute(ptA, ptB, forbiddenLookup):
 
     shortestRoute.append(ptB)
 
-    return shortestRoute
+    return shortestRoute, jumps
+
+
+def calculateCoarseRouteExt(pointA, pointB, forbiddenAreaLookup, tfNum, left, right):
+    tf = tfs[tfNum]
+    forbiddenLookup = forbiddenAreaLookup[tf]
+    ptA = (pointA[0] // tf, pointA[1] // tf)
+    ptB = (pointB[0] // tf, pointB[1] // tf)
+    tmpShortestRoute, jumps = calculateCoarseRoute(ptA, ptB, forbiddenLookup, left, right)
+    shortestRoute = []
+    for item in tmpShortestRoute:
+        shortestRoute.append((item[0]*tf, item[1]*tf))
+    return shortestRoute, jumps
+
 
 # fastest one so far
 def calculateShortestRoute(setupList):
-
+    left = True
+    right = True
     pointA = setupList[0]
     pointB = setupList[1]
     forbiddenAreaLookup = setupList[2]
@@ -456,6 +483,10 @@ def calculateShortestRoute(setupList):
     preComputed = []
     if len(setupList) > 8:
         preComputed = setupList[8]
+    if len(setupList) > 9:
+        left = setupList[9]
+    if len(setupList) > 10:
+        right = setupList[10]
 
     forbiddenLookup = forbiddenAreaLookup[tf]
     slowLookup = slowAreaLookup[tf]
@@ -468,12 +499,12 @@ def calculateShortestRoute(setupList):
     if preComputed:
         shortestRoute = preComputed
     else:
-        shortestRoute = calculateCoarseRoute(ptA, ptB, forbiddenLookup)
+        shortestRoute, dummy_jumps = calculateCoarseRoute(ptA, ptB, forbiddenLookup, left, right)
 
     if len(shortestRoute) < 2:
         return []
 
-    shortestRoute2 = calculateCoarseRoute(ptB, ptA, forbiddenLookup)
+    shortestRoute2, dummy_jumps = calculateCoarseRoute(ptB, ptA, forbiddenLookup, left, right)
     shortestRoute.reverse()
 
     # Straighten the route into a beautiful one

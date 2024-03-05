@@ -41,6 +41,16 @@ finishTextStr2 =     "    Distance: "
 finishTextStr3 =     " m"
 finishTextStr4 =     "    Runner error: "
 finishTextStr5 =     " %"
+
+amazeStr1 =      "A MAZE BEGINS!   LEVEL: "
+amazeStr2 =      "   TURN TO RUNNING DIRECTION"
+
+amazeTextStr =      "Difficulty: "
+amazeTextStr2 =     "    Result: "
+amazeTextStr3 =     "  "
+amazeTextStr4 =     "    Angle error: "
+amazeTextStr5 =     "° "
+
 pacemakerTextStr =    ["", "Pacemaker: Aino Inkeri (A.I.) Kiburtz", "Pacemaker: Pertti-Uolevi (P.A.) Keinonen, e.v.v.k.", "Pacemaker: Lex Martin Luthoer, Chem. Engr."]
 pacemakerInitTextStr =    "Prepare, a pacemaker waiting in 1st control!"
 aiTextStr =    "AI computing dilemma, sorry for the inconvenience..."
@@ -84,7 +94,7 @@ def uiInit(fileName, generatedMap, metersPerPixerInput):
     return me
 
 
-def uiShowFinishText(someSurface, finishTexts):
+def uiShowFinishText(someSurface, finishTexts, amaze):
     timeConsumed = finishTexts[0]
     distance = finishTexts[1]
     error = finishTexts[2]
@@ -92,10 +102,24 @@ def uiShowFinishText(someSurface, finishTexts):
     if timeConsumed and distance and error:
         middle = tuple(ti/2.0 for ti in someSurface.get_size())
         finishTextCenter = (middle[0], middle[1] * 0.05)
-        finishText = pygame.font.Font(getMasterFont(), convertXCoordinateSpecificSurface(someSurface, 32)).render(finishTextStr + timeConsumed + finishTextStr2 + distance + finishTextStr3 + finishTextStr4 + error + finishTextStr5, True, getFinishTextColor())
+        textItself = finishTextStr + timeConsumed + finishTextStr2 + distance + finishTextStr3 + finishTextStr4 + error + finishTextStr5
+        if amaze:
+            textItself = amazeTextStr + timeConsumed + amazeTextStr2 + distance + amazeTextStr3 + amazeTextStr4 + error + amazeTextStr5
+        finishText = pygame.font.Font(getMasterFont(), convertXCoordinateSpecificSurface(someSurface, 32)).render(textItself, True, getFinishTextColor())
         finishTextRect = finishText.get_rect()
         finishTextRect.center = finishTextCenter
         someSurface.blit(finishText, finishTextRect)
+
+
+def uiRenderAmazeText(amazeNum):
+    if effectStep and effectControl < 1:
+        middle = tuple(ti/2.0 for ti in getBigScreen().get_size())
+        pacemakerTextCenter = (middle[0], middle[1] * 0.1)
+        pacemakerText = pygame.font.Font(getMasterFont(), convertXCoordinate(40)).render(amazeStr1 + str(amazeNum) + amazeStr2, True, getPacemakerColor(2))
+        pacemakerTextRect = pacemakerText.get_rect()
+        pacemakerTextRect.center = pacemakerTextCenter
+        pygame.draw.rect(getBigScreen(), getWhiteColor(), pacemakerTextRect, 0)
+        getBigScreen().blit(pacemakerText, pacemakerTextRect)
 
 
 def uiRenderPacemakerText(pacemakerInd):
@@ -155,7 +179,7 @@ def uiCenterTurnZoomTheMap(pos, zoom, angle):
     if controlApproachZoomUsed:
         zoom = zoom * controlApproachZoom
     surf.blit(pygame.transform.smoothscale_by(oMapCopy, zoom), tuple(map(lambda i, j: i - j * zoom, me, pos)))
-    oMapRotated = pygame.transform.rotate(surf, fromRadiansToDegrees(angle))
+    oMapRotated = pygame.transform.rotate(surf, fromRadiansToDegrees(math.pi - angle))
     new_rect = oMapRotated.get_rect(center = surf.get_rect().center)
     screen.blit(oMapRotated, new_rect)
     # just a good point to get prepared
@@ -165,7 +189,7 @@ def uiCenterTurnZoomTheMap(pos, zoom, angle):
 characterCloudCtr = 0
 characterCloudCtrMid = 10
 characterCloudCtrMax = 14
-def uiAnimateCharacter(where, origin, angle, color, scale, feetPlus, inTunnel, background):
+def uiAnimateCharacter(where, origin, angle, color, scale, feetPlus, inTunnel, background, amaze):
     global characterCloudCtr
     feetPlus = feetPlus - 1.0
     if feetPlus <= -feetPlusStart:
@@ -194,34 +218,42 @@ def uiAnimateCharacter(where, origin, angle, color, scale, feetPlus, inTunnel, b
         pygame.draw.line(where, color, leftHand, rightHand, width=int(3 * scale))
 
     pygame.draw.circle(where, color, origin, int(3 * scale))
+
+    if amaze:
+        pygame.draw.line(where, color, (origin[0], origin[1]  - 7 * scale), (origin[0], origin[1]  - 17 * scale), width=int(3 * scale))
+        pygame.draw.line(where, color, (origin[0] - 3 * scale, origin[1]  - 12 * scale), (origin[0], origin[1]  - 17 * scale), width=int(3 * scale))
+        pygame.draw.line(where, color, (origin[0] + 3 * scale, origin[1]  - 12 * scale), (origin[0], origin[1]  - 17 * scale), width=int(3 * scale))
+
     return feetPlus
 
 
 feetPlusPlayer = feetPlusStart
-def uiAnimatePlayer(legsMoving, inTunnel):
+def uiAnimatePlayer(legsMoving, inTunnel, amaze):
     global feetPlusPlayer
     if not legsMoving:
-        uiAnimateCharacter(screen, me, 0, getPlayerColor(), 1, 0, inTunnel, True)
+        uiAnimateCharacter(screen, me, 0, getPlayerColor(), 1, 0, inTunnel, True, amaze)
     else:
-        feetPlusPlayer = uiAnimateCharacter(screen, me, 0, getPlayerColor(), 1, feetPlusPlayer, inTunnel, False)
+        feetPlusPlayer = uiAnimateCharacter(screen, me, 0, getPlayerColor(), 1, feetPlusPlayer, inTunnel, False, amaze)
 
 
 feetPlusPacemaker = feetPlusStart
 def uiAnimatePacemaker(pos, angle, scale, pacemakerInd, inTunnel, background):
     global feetPlusPacemaker
-    feetPlusPacemaker = uiAnimateCharacter(oMapCopy, pos, math.pi - angle, getPacemakerColor(pacemakerInd), 0.6 * scale / metersPerPixel, feetPlusPacemaker, inTunnel, background)
+    feetPlusPacemaker = uiAnimateCharacter(oMapCopy, pos, math.pi - angle, getPacemakerColor(pacemakerInd), 0.6 * scale / metersPerPixel, feetPlusPacemaker, inTunnel, background, False)
 
 
-def uiCompleteRender(finishTexts, mapInfoTextList, pacemakerInd, pacemakerTextNeeded, aiTextNeeded):
+def uiCompleteRender(finishTexts, mapInfoTextList, pacemakerInd, pacemakerTextNeeded, aiTextNeeded, amaze, amazeNumber):
     xShift = (getBigScreen().get_size()[0] - screen.get_size()[0]) / 2
     yShift = (getBigScreen().get_size()[1] - screen.get_size()[1]) / 2
     getBigScreen().blit(screen, (xShift, yShift))
     if pacemakerTextNeeded:
         uiRenderPacemakerText(pacemakerInd)
+    if amaze:
+        uiRenderAmazeText(amazeNumber)
     if aiTextNeeded:
         uiRenderAIText()
         
-    uiShowFinishText(getBigScreen(), finishTexts)
+    uiShowFinishText(getBigScreen(), finishTexts, amaze)
     if mapInfoTextList:
         uiRenderExternalMapInfo(mapInfoTextList)
     showInfoBoxTxt(getBigScreen())
@@ -305,7 +337,7 @@ def uiInitStartTriangle(angle, pos):
     triangle = triangleCreator(triangleRadius / metersPerPixel, angle, pos)
 
 
-def uiRenderControls(controls, usePacemaker):
+def uiRenderControls(controls, usePacemaker, amaze):
     global effectStep
     global effectControl
 
@@ -326,7 +358,7 @@ def uiRenderControls(controls, usePacemaker):
             if controlApproachZoomUsed:
                 pygame.draw.circle(oMapCopy, getTrackColor(), control, int(2/metersPerPixel))
             pygame.draw.circle(oMapCopy, (255, tmpEffectStep * 3, tmpEffectStep * 2), control, circleRadius/metersPerPixel, width = max(2, int(2/metersPerPixel)))
-            if control == controls[-1]:
+            if control == controls[-1] and not amaze:
                 pygame.draw.circle(oMapCopy, (255, tmpEffectStep * 3, tmpEffectStep * 2), control, (circleRadius - circleSpacing)/metersPerPixel, width = max(2, int(2/metersPerPixel)))
         if previousControl:
             fraction = (circleRadiusMargin/metersPerPixel) / distanceBetweenPoints(control, previousControl)
@@ -382,7 +414,7 @@ def uiStoreAnalysis(shortestRoutesArray, playerRoutesArray, controls, finishText
         for playerRoute in playerRoutes:
             uiRenderRoute(theMap, playerRoute, getPlayerColor())
     uiDrawControlCircles(theMap, controls)
-    uiShowFinishText(theMap, finishTexts)
+    uiShowFinishText(theMap, finishTexts, False)
 
     try:
         pygame.image.save(theMap, getAnalysisResultsFileBase() + datetime.now().strftime("%m-%d-%Y__%H-%M-%S") + ".png")
