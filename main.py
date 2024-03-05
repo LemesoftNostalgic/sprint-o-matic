@@ -77,6 +77,7 @@ async def setTheStageForNewRound(cfg):
         if normalizedDifference < 0.01:
             normalizedDifference = 0.01
         normalizedDifference = round(1/ normalizedDifference, 0)
+        beautifiedLeft.reverse()
 
     else:
         ctrls, shortestRoutesArray = await createAutoControls(cfg, trackLengthInPixels, gameSettings.distributionOfControlLegs, gameSettings.metersPerPixel, faLookup, saLookup, ssaLookup, vsaLookup, gameSettings.pacemaker)
@@ -461,7 +462,6 @@ async def main():
                                 controls = await setTheStageForNewRound(config)
 
                         elif gameSettings.amaze and datetime.now() - startTime > timedelta(seconds=amazeMidTimeThreshold):
-                            beautifiedLeft.reverse()
                             playerRoutes = [ beautifiedLeft + beautifiedRight ]
 
                         # 1.999 separate pre-ending for "amaze"
