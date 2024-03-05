@@ -28,9 +28,10 @@ from .routeAI import calculateCoarseRoute, calculateShortestRoute
 
 
 firstControlMinDistance = 100
-pickMaxTime = 0.1
-pickDistMaxTime = 2.0
-totMaxTime = 30.0
+maxDifficultAttempts = 3
+pickDistMaxTime = 1.0
+pickMaxTime = pickDistMaxTime / maxDifficultAttempts
+totMaxTime = 20.0
 
 def pickLegLen(distribution, metersPerPixel):
     a = random.random()
@@ -44,64 +45,100 @@ def pickLegLen(distribution, metersPerPixel):
     return distribution[0][0] / metersPerPixel, distribution[-1][1] / metersPerPixel
 
 
-def pickAutoControl(cfg, ctrls):
+def pickAutoControl(cfg, ctrls, minlen, maxlen):
     index = 0
     start_time = time.time()
+    secondBestIndex = None
+    secondBestDist = 0
+    secondBestScore = 10000000000
+    dist = 0.0
+
     while True:
         index = int(len(cfg) * random.random())
-        if index >= len(cfg):
-            index = len(cfg) - 1
-        elif index < 0:
-            index = 0
+
+        dist = 0.0
+        toContinue = False
+        smallestOvershoot = 10000
+        smallestAngleOvershoot = 10000
+        smallestAvgNearness = 10000
+
         if type(cfg[index]) is not tuple:
             if time.time() - start_time > pickMaxTime:
-                return None
+                return None, None
             continue
-        if cfg[index] in ctrls:
+        elif cfg[index] in ctrls:
             if time.time() - start_time > pickMaxTime:
-                return None
+                return None, None
             continue
+        elif ctrls:
+            totNearness = 0
+            for ctrl in ctrls[:-1]:
+                nearness = distanceBetweenPoints(cfg[index], ctrl)
+                if nearness < minlen:
+                    if time.time() - start_time > pickMaxTime:
+                        return None, None
+                    continue
+                totNearness = totNearness + nearness
+            if len(ctrls) > 1 and totNearness / (len(ctrls) - 1) < smallestAvgNearness:
+                smallestAvgNearness = totNearness / (len(ctrls) - 1)
+
+            dist = distanceBetweenPoints(cfg[index], ctrls[-1])
+            if dist < minlen or dist > maxlen:
+                if dist > maxlen:
+                    if dist < smallestOvershoot:
+                        smallestOvershoot = dist
+                toContinue = True
+            if len(ctrls) > 1:
+                anglebtw = angleBetweenLineSegments([ctrls[-2], ctrls[-1]], [ctrls[-1], cfg[index]])
+                if anglebtw > math.pi:
+                    anglebtw = 2 * (2 * math.pi - anglebtw)
+                if anglebtw > 0.65 * math.pi:
+                    if anglebtw < smallestAngleOvershoot:
+                        smallestAngleOvershoot = anglebtw
+                    toContinue = True
+
+        if toContinue:
+            score = (smallestOvershoot - maxlen) / maxlen + 2 * (smallestAngleOvershoot - 0.65 * math.pi ) / (0.65 * math.pi) + 4 * smallestAvgNearness
+            if score < secondBestScore:
+                secondBestIndex = index
+                secondBestScore = score
+                secondBestDist = smallestOvershoot
+
+            if time.time() - start_time > pickMaxTime:
+                return cfg[secondBestIndex], secondBestDist
+
+            continue
+
         break
-    return cfg[index]
+    return cfg[index], dist
 
 
 def pickDistAutoControl(cfg, ctrls, distribution, metersPerPixel, faLookup):
     start_time = time.time()
     easyOneOutOf = 2
     isDifficultControl = True
+    difficultAttemptCtr = maxDifficultAttempts
     while True:
         minlen, maxlen = pickLegLen(distribution, metersPerPixel)
+
+        # first leg cannot be very short
         if len(ctrls) == 1:
             lenadjust =  max(minlen, firstControlMinDistance) - minlen
             maxlen = maxlen + lenadjust
             minlen = minlen + lenadjust
-        for index in range(0,50):
-            candidate = pickAutoControl(cfg, ctrls)
-            if candidate is None:
+
+        candidate, dist = pickAutoControl(cfg, ctrls, minlen, maxlen)
+        if candidate is None:
                 return None, None, None
-            # compare to all the ones so far
-            nearnessGood = True
-            for ctrl in ctrls[:-1]:
-                if distanceBetweenPoints(candidate, ctrl) < minlen/2:
-                    nearnessGood = False
-            if not nearnessGood:
-                continue
-            # then more strictly to the previous one
-            dist = distanceBetweenPoints(candidate, ctrls[-1])
-            if dist >= minlen and dist < maxlen:
-                break
+
         if time.time() - start_time > pickDistMaxTime:
             return None, None, None
-
-        if dist < minlen or dist >= maxlen:
-            continue
-        if len(ctrls) > 1 and angleBetweenLineSegments([ctrls[-2], ctrls[-1]], [ctrls[-1], candidate]) > 0.65 * math.pi:
-            continue
 
         if pruneEnsureLineOfSight(candidate, ctrls[-1], faLookup) != None:
             isDifficultControl = False
 
-        if not isDifficultControl and random.randrange(easyOneOutOf) != 0:
+        if not isDifficultControl and difficultAttemptCtr > 0:
+            difficultAttemptCtr = difficultAttemptCtr - 1
             continue
 
         # first time no continue -> success
@@ -113,7 +150,7 @@ async def createAutoControls(cfg, trackLength, distribution, metersPerPixel, faL
     ctrls = []
     shortests = []
     start_tot_time = time.time()
-    ctrl = pickAutoControl(cfg, ctrls)
+    ctrl, dummy_dist = pickAutoControl(cfg, ctrls, 0, 1000000)
     ctrls.append(ctrl)
     numDifficultControls = 0
     while (len(ctrls) < 25 and totdist < trackLength) or len(ctrls) < 3:
@@ -122,23 +159,25 @@ async def createAutoControls(cfg, trackLength, distribution, metersPerPixel, faL
             numDifficultControls = numDifficultControls + 1
         if ctrl is None:
             return [], 0, []
-
-
         preComputed = calculateCoarseRoute(ctrls[-1], ctrl, faLookups[1])
-        if len(preComputed) > 1 and len(calculateCoarseRoute(ctrl, ctrls[-1], faLookups[2])) > 1:
-            shortests.append([calculateShortestRoute([ctrls[-1], ctrl, faLookups, saLookups, ssaLookups, vsaLookups, 0, pacemakerInd, preComputed])])
+        if len(preComputed) > 1:
             ctrls.append(ctrl)
             totdist = totdist + dist
-        elif len(ctrls) < 2:
+            shortests.append([preComputed])
+        elif len(ctrls) < 2: # also change first one in this case
             ctrls = []
-            ctrl = pickAutoControl(cfg, ctrls)
+            ctrl, dummy_dist = pickAutoControl(cfg, ctrls, 0, 1000000)
             ctrls.append(ctrl)
-
         if time.time() - start_tot_time > totMaxTime:
             break
 
         await asyncio.sleep(0)
 
+    # only complete the work afterwards
+    for ind in range(len(shortests)):
+        shortests[ind] = [calculateShortestRoute([ctrls[ind], ctrls[ind + 1], faLookups, saLookups, ssaLookups, vsaLookups, 0, pacemakerInd, shortests[ind][0].copy()])]
+        if time.time() - start_tot_time > totMaxTime:
+            break
 
     return ctrls, numDifficultControls, shortests
 

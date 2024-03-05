@@ -109,6 +109,7 @@ def uiRenderPacemakerText(pacemakerInd):
         pacemakerText = pygame.font.Font(getMasterFont(), convertXCoordinate(48)).render(warningStr, True, getPacemakerColor(pacemakerInd))
         pacemakerTextRect = pacemakerText.get_rect()
         pacemakerTextRect.center = pacemakerTextCenter
+        pygame.draw.rect(getBigScreen(), getWhiteColor(), pacemakerTextRect, 0)
         getBigScreen().blit(pacemakerText, pacemakerTextRect)
 
 
