@@ -48,7 +48,7 @@ amazeStr2 =      "   TURN TO RUNNING DIRECTION"
 amazeTextStr =      "Difficulty: "
 amazeTextStr2 =     "    Result: "
 amazeTextStr3 =     "  "
-amazeTextStr4 =     "    Angle error: "
+amazeTextStr4 =     "    Angle difference: "
 amazeTextStr5 =     "° "
 
 pacemakerTextStr =    ["", "Pacemaker: Aino Inkeri (A.I.) Kiburtz", "Pacemaker: Pertti-Uolevi (P.A.) Keinonen, e.v.v.k.", "Pacemaker: Lex Martin Luthoer, Chem. Engr."]

@@ -487,10 +487,10 @@ async def main():
                                 wantedAngle = angleOfPath(sRoutes, 5)
                                 angleDiff = angleDifference(angle, wantedAngle)
                                 if angleDiff < amazeAcceptedAngleDifference:
-                                    finishTexts[1] = "SUCCESS!"
+                                    finishTexts[1] = "I AGREE!"
                                     shoutEffect()
                                 else:
-                                    finishTexts[1] = "FAIL!"
+                                    finishTexts[1] = "REALLY?"
                                     pacemakerShoutEffect()
                                 finishTexts[2] = str(round(fromRadiansToDegrees(angleDiff), 0))
                                 finishTexts[0] = str(normalizedDifference)

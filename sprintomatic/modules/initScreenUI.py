@@ -132,6 +132,7 @@ def showInitSelections(surf, positions, selections, inScale, texts, titleTexts, 
     showTextShadowed(worldPosition, 32, worldText, getTrackColor(), 2)
     if news:
         showTextShadowed(newsPosition, 24, "News: " + news, getPacemakerColor(2), 2)
+    showTextShadowed((newsPosition[0], newsPosition[1] * 1.2), 24, "Homepage: tinyurl.com/sprint-o-matic", getPacemakerColor(2), 2)
 
 
 initScreenPos = 0
