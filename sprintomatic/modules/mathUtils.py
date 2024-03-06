@@ -92,11 +92,28 @@ def angleOfLine(line):
         angle = angle + math.pi
     return angle
 
-def getRandomAngle():
-    return random.random() * math.pi * 2
 
 def distanceBetweenPoints(point1, point2):
     return math.sqrt((point1[0]-point2[0])**2 + (point1[1]-point2[1])**2)
+
+
+def angleOfPath(path, maxdist):
+    if len(path) < 2:
+        return 0.0
+    dist = 0
+    previous = path[0]
+    current = (0,0)
+    for item in path[1:]:
+        current = item
+        dist = dist + distanceBetweenPoints(previous, current)
+        previous = current
+        if dist > maxdist:
+            break
+    return angleOfLine([path[0], previous])
+
+
+def getRandomAngle():
+    return random.random() * math.pi * 2
 
 
 def getNearestPointOfList(backrouteLookupAdditions, newPoint):

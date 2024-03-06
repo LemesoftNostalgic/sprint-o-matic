@@ -108,6 +108,7 @@ def uiShowFinishText(someSurface, finishTexts, amaze):
         finishText = pygame.font.Font(getMasterFont(), convertXCoordinateSpecificSurface(someSurface, 32)).render(textItself, True, getFinishTextColor())
         finishTextRect = finishText.get_rect()
         finishTextRect.center = finishTextCenter
+        pygame.draw.rect(someSurface, getWhiteColor(), finishTextRect, 0)
         someSurface.blit(finishText, finishTextRect)
 
 
@@ -342,7 +343,10 @@ def uiRenderControls(controls, usePacemaker, amaze):
     global effectControl
 
     if effectStep:
-        effectStep = effectStep - 1
+        if amaze:
+            effectStep = effectStep - 0.5
+        else:
+            effectStep = effectStep - 1            
 
     previousControl = None
     for control in controls:

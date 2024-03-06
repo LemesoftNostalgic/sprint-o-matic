@@ -32,6 +32,7 @@ maxDifficultAttempts = 3
 pickDistMaxTime = 1.0
 pickMaxTime = pickDistMaxTime / maxDifficultAttempts
 totMaxTime = 20.0
+totMaxTimeAmaze = 40.0
 
 def pickLegLen(distribution, metersPerPixel):
     a = random.random()
@@ -160,7 +161,7 @@ async def createAutoControls(cfg, trackLength, distribution, metersPerPixel, faL
         if ctrl is None:
             return [], 0, []
 
-        preComputed, dummy_jumps = calculateCoarseRouteExt(ctrls[-1], ctrl, faLookups, 1, True, True)
+        preComputed, dummy_jumps = calculateCoarseRouteExt(ctrls[-1], ctrl, faLookups, 1, True, True, 0)
         if len(preComputed) > 1:
             ctrls.append(ctrl)
             totdist = totdist + dist
@@ -187,9 +188,16 @@ deAmazeFactor = 4 # how small challenges are accepted. the bigger the smaller
 async def createAmazeControls(cfg, distribution, metersPerPixel, faLookups, saLookups, ssaLookups, vsaLookups):
     normalizedDifference = 0.0
     start_tot_time = time.time()
-    ctrls = []
+
+    secondBestCtr = 4
+    secondBestBeautifiedRight = []
+    secondBestBeautifiedLeft = []
+    secondBestNormalizedDifference = 0.0
+    secondBestCtrls = []
+    secondBestCtrl = (0,0)
+    
     while True:
-        if time.time() - start_tot_time > totMaxTime:
+        if time.time() - start_tot_time > totMaxTimeAmaze:
             return [], [], [], [], 0.0
         ctrls = []
         ctrl, dummy_dist = pickAutoControl(cfg, ctrls, 0, 1000000)
@@ -197,45 +205,54 @@ async def createAmazeControls(cfg, distribution, metersPerPixel, faLookups, saLo
 
         ctrl, dist, isDifficultControl = pickDistAutoControl(cfg, ctrls, distribution, metersPerPixel, faLookups)
         if ctrl is None:
-            return [], [],[], [],  0.0
+            continue
         if not isDifficultControl:
             continue
         dist = distanceBetweenPoints(ctrls[-1], ctrl)
 
         # check there is both right and left alternative
-        preComputedLeft, jumps = calculateCoarseRouteExt(ctrls[-1], ctrl, faLookups, 2, True, False)
+        preComputedLeft, jumps = calculateCoarseRouteExt(ctrls[-1], ctrl, faLookups, 2, True, False, dist * 20)
         if jumps < 1 or len(preComputedLeft) < 3 or calculatePathDistance(preComputedLeft) < dist + dist / deAmazeFactor:
             continue
-        if time.time() - start_tot_time > totMaxTime:
+        if time.time() - start_tot_time > totMaxTimeAmaze:
             return [], [], [], [], 0.0
 
-        preComputedRight, jumps = calculateCoarseRouteExt(ctrls[-1], ctrl, faLookups, 2, False, True)
+        preComputedRight, jumps = calculateCoarseRouteExt(ctrls[-1], ctrl, faLookups, 2, False, True, dist * 20)
         if len(preComputedRight) < 3 or calculatePathDistance(preComputedRight) < dist + dist / deAmazeFactor:
             continue
-        if time.time() - start_tot_time > totMaxTime:
+        if time.time() - start_tot_time > totMaxTimeAmaze:
             return [], [], [], [], 0.0
 
         beautifiedLeft = pruneShortestRouteExt(preComputedLeft, faLookups, saLookups, ssaLookups, vsaLookups, 2)
-        if calculatePathDistance(beautifiedLeft) < dist + dist / deAmazeFactor:
-            continue
-        if time.time() - start_tot_time > totMaxTime:
+        if time.time() - start_tot_time > totMaxTimeAmaze:
             return [], [], [], [], 0.0
 
         beautifiedRight = pruneShortestRouteExt(preComputedRight, faLookups, saLookups, ssaLookups, vsaLookups, 2)
-        if calculatePathDistance(beautifiedRight) < dist + dist / deAmazeFactor:
-            continue
-        if time.time() - start_tot_time > totMaxTime:
+        if time.time() - start_tot_time > totMaxTimeAmaze:
             return [], [], [], [], 0.0
 
         normalizedDifference = 2 * abs(calculatePathDistance(beautifiedRight) - calculatePathDistance(beautifiedLeft)) / abs(calculatePathDistance(beautifiedRight) + calculatePathDistance(beautifiedLeft))
         if normalizedDifference < 0.01 or normalizedDifference > 0.2:
-            continue
+            if secondBestCtr > 0:
+                secondBestCtr = secondBestCtr - 1
+                secondBestBeautifiedRight = beautifiedRight.copy()
+                secondBestBeautifiedLeft = beautifiedLeft.copy()
+                secondBestNormalizedDifference = normalizedDifference
+                secondBestCtrls = ctrls.copy()
+                secondBestCtrl = ctrl
+                continue
+            else:
+                beautifiedRight = secondBestBeautifiedRight
+                beautifiedLeft = secondBestBeautifiedLeft
+                normalizedDifference = secondBestNormalizedDifference
+                ctrls = secondBestCtrls
+                ctrl = secondBestCtrl
+                # proceed bravely ahead
 
         ctrls.append(ctrl)
         break
 
     shortests = []
-
     for ind in range(len(ctrls) - 1):
         shortests.append([await slowAccurateCalculateShortestRouteAsync([ctrls[ind], ctrls[ind + 1], faLookups, saLookups, ssaLookups, vsaLookups, 2, 0])])
         if not shortests[ind][0]:

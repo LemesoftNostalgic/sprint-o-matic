@@ -420,6 +420,7 @@ async def initScreen(imagePath, gameSettings, externalImageData, externalWorldCi
         gameSettings.infiniteOulu = True
         gameSettings.infiniteWorld = False
         gameSettings.externalExample = ""
+        uiRenderImmediate(loadingPosition, loadingText)
     elif retSettings[3] == "infinite-world":
         gameSettings.infiniteOulu = False
         gameSettings.infiniteWorld = True
@@ -431,5 +432,6 @@ async def initScreen(imagePath, gameSettings, externalImageData, externalWorldCi
         gameSettings.infiniteWorld = False
         gameSettings.externalExample = externalExampleText
         gameSettings.externalExampleTeam = externalExampleTeamText
+        uiRenderImmediate(loadingPosition, loadingText)
     pygame.time.set_timer(TIMER_EVENT, 0)
     return quitting, gameSettings

@@ -338,7 +338,7 @@ def nearby(ptA, ptB):
 
 
 # and fastest checker for route availability
-def calculateCoarseRoute(ptA, ptB, forbiddenLookup, left, right):
+def calculateCoarseRoute(ptA, ptB, forbiddenLookup, left, right, maxdist):
     currentPt2 = (-100, -100)
 
     leftGuyIndex = 0
@@ -351,10 +351,11 @@ def calculateCoarseRoute(ptA, ptB, forbiddenLookup, left, right):
 
     start_time = time.time()
     timeThreshold = bddTimeThreshold
-    if left == False or right == False:
+    if left != right:
         timeThreshold = timeThreshold / 4
 
     shortestRoute = []
+    dist = 0
 
     currentPt = ptList.pop(0) # turn to pop() to give a bit more perf?
     currentScore=scoreList.pop(0)
@@ -376,6 +377,7 @@ def calculateCoarseRoute(ptA, ptB, forbiddenLookup, left, right):
                 currentPt2 = (-100, -100)
                 currentScore = scoreList.pop(0)
                 shortestRoute.append(currentPt)
+                dist = dist + 1
             else:
                 state = 1
                 prevEasy = True
@@ -424,8 +426,15 @@ def calculateCoarseRoute(ptA, ptB, forbiddenLookup, left, right):
                 return [], 0
 
             leftGuyRoute.append(currentPt)
+            if left and len(leftGuyRoute) > 1:
+                dist = dist + 1
             rightGuyRoute.append(currentPt2)
+            if right and len(rightGuyRoute) > 1:
+                dist = dist + 1
 
+            if maxdist and dist > maxdist:
+                return [], 0
+                
             if currentPt in ptList:
                 ind = ptList.index(currentPt)
                 for subind in range(ind):
@@ -456,12 +465,12 @@ def calculateCoarseRoute(ptA, ptB, forbiddenLookup, left, right):
     return shortestRoute, jumps
 
 
-def calculateCoarseRouteExt(pointA, pointB, forbiddenAreaLookup, tfNum, left, right):
+def calculateCoarseRouteExt(pointA, pointB, forbiddenAreaLookup, tfNum, left, right, maxdist):
     tf = tfs[tfNum]
     forbiddenLookup = forbiddenAreaLookup[tf]
     ptA = (pointA[0] // tf, pointA[1] // tf)
     ptB = (pointB[0] // tf, pointB[1] // tf)
-    tmpShortestRoute, jumps = calculateCoarseRoute(ptA, ptB, forbiddenLookup, left, right)
+    tmpShortestRoute, jumps = calculateCoarseRoute(ptA, ptB, forbiddenLookup, left, right, maxdist)
     shortestRoute = []
     for item in tmpShortestRoute:
         shortestRoute.append((item[0]*tf, item[1]*tf))
@@ -499,12 +508,12 @@ def calculateShortestRoute(setupList):
     if preComputed:
         shortestRoute = preComputed
     else:
-        shortestRoute, dummy_jumps = calculateCoarseRoute(ptA, ptB, forbiddenLookup, left, right)
+        shortestRoute, dummy_jumps = calculateCoarseRoute(ptA, ptB, forbiddenLookup, left, right, 0)
 
     if len(shortestRoute) < 2:
         return []
 
-    shortestRoute2, dummy_jumps = calculateCoarseRoute(ptB, ptA, forbiddenLookup, left, right)
+    shortestRoute2, dummy_jumps = calculateCoarseRoute(ptB, ptA, forbiddenLookup, left, right, 0)
     shortestRoute.reverse()
 
     # Straighten the route into a beautiful one

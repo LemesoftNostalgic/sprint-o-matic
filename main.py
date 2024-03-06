@@ -26,7 +26,7 @@ from datetime import datetime, timedelta
 
 from sprintomatic.modules.routeAI import initializeAITables, closeAITables, initializeAINextTrack, initializeAINextTrackAsync, getReadyShortestRoutes, getReadyShortestRoutesAsync
 from sprintomatic.modules.gameSettings import returnSettings, returnConfig
-from sprintomatic.modules.mathUtils import angleOfLine, getRandomAngle, calculatePathDistance, angleDifference, fromRadiansToDegrees
+from sprintomatic.modules.mathUtils import angleOfLine, angleOfPath, getRandomAngle, calculatePathDistance, angleDifference, fromRadiansToDegrees
 from sprintomatic.modules.trackCreator import createAutoControls, createAmazeControls
 from sprintomatic.modules.gameUIUtils import uiEarlyInit, uiLateQuit, uiFlushEvents
 from sprintomatic.modules.initScreenUI import initScreen
@@ -48,6 +48,7 @@ async def setTheStageForNewRound(cfg):
     global nextControl
     global reachedControl
     global playerRoutes
+    global playerRoutesArray
     global shortestDistance
     global playerDistance
     global shortestWeightedDistance
@@ -69,6 +70,7 @@ async def setTheStageForNewRound(cfg):
     global normalizedDifference
     global beautifiedLeft
     global beautifiedRight
+    global amazeThresholdWaiting
 
     # Ensure we have a list of controls
     ctrls = []
@@ -82,15 +84,17 @@ async def setTheStageForNewRound(cfg):
     else:
         ctrls, shortestRoutesArray = await createAutoControls(cfg, trackLengthInPixels, gameSettings.distributionOfControlLegs, gameSettings.metersPerPixel, faLookup, saLookup, ssaLookup, vsaLookup, gameSettings.pacemaker)
 
-    # effects initialization
-    uiControlEffectRestart()
-    startEffect()
-    uiStartControlEffect(0)
 
     news = await downloadNews()
 
     # Initialize evereything that has to be initialized for a new run
     if ctrls and len(ctrls) > 1:
+
+        # effects initialization
+        uiControlEffectRestart()
+        startEffect()
+        uiStartControlEffect(0)
+
         zoom = gameSettings.zoom
         angle = angleOfLine(ctrls[:2])
         position = ctrls[0]
@@ -123,6 +127,7 @@ async def setTheStageForNewRound(cfg):
         pacemakerSteps = 0
         pacemakerStartThreshold = 0
         pacemakerPosition = None
+        amazeThresholdWaiting = 0
         pacemakerAngle = 0
         pacemakerStep = -5
         aiCounter = 0
@@ -169,8 +174,9 @@ def finishFanfareStarted(reachedC, nextC):
 
 
 # Update the player and pacemaker route statistics at each control and at finish
-async def updateRoutesAndDistances():
+async def updateRoutesAndDistances(amaze):
     global playerRoutes
+    global playerRoutesArray
     global playerDistance
     global shortestDistance
     global shortestWeightedDistance
@@ -178,7 +184,8 @@ async def updateRoutesAndDistances():
     global shortestRoutesArray
     global shortestRoutes
     global futureShortestRoutes
-    playerRoutes = [ getPlayerRoute() ]
+    if not amaze or not playerRoutes:
+        playerRoutes = [ getPlayerRoute() ]
     playerRoutesArray.append(playerRoutes)
     playerDistance = playerDistance + calculatePathDistance(playerRoutes[0])
     if gameSettings.accurate:
@@ -250,6 +257,7 @@ async def main():
     global normalizedDifference
     global beautifiedLeft
     global beautifiedRight
+    global amazeThresholdWaiting
 
     # all the initialization that happens only once at the startup
     gameSettings = returnSettings()
@@ -296,10 +304,11 @@ async def main():
 
     # threshold for the game to really start
     gameMovingStartThreshold = 5
+    amazeThresholdWaiting = 0
     amazeTimeThreshold = 10
     amazeMidTimeThreshold = 15
     amazeSecondTimeThreshold = 20
-    amazeAcceptedAngleDifference = math.pi / 16
+    amazeAcceptedAngleDifference = math.pi / 10
     normalizedDifference = 0
 
     # the choice between specific route file and an automatic route
@@ -442,21 +451,21 @@ async def main():
                             shoutEffect()
                             if longLapEveryOther(controls[reachedControl], controls[nextControl]):
                                 startMelody()
-                            await updateRoutesAndDistances()
+                            await updateRoutesAndDistances(gameSettings.amaze)
                             if futureShortestRoutes and len(futureShortestRoutes[0]) > 1:
                                 pacemakerPath = futureShortestRoutes[0].copy()
                                 pacemakerStartThreshold = getPacemakerThreshold(pacemakerPath, gameSettings.pacemaker)
                                 pacemakerSteps = 0
                             uiStartControlEffect(reachedControl)
 
-
                         # 1.99 separate ending for "amaze"
                         elif gameSettings.amaze and datetime.now() - startTime > timedelta(seconds=amazeSecondTimeThreshold):
+                            amazeThresholdWaiting = 0
                             amazeCounter = amazeCounter + 1
                             position = controls[-1]
                             reachedControl = len(controls) - 1
                             nextControl = 0
-                            if amazeCounter >= 3:
+                            if amazeCounter >= 5:
                                 running = False
                             else:
                                 controls = await setTheStageForNewRound(config)
@@ -466,22 +475,25 @@ async def main():
 
                         # 1.999 separate pre-ending for "amaze"
                         elif gameSettings.amaze and datetime.now() - startTime > timedelta(seconds=amazeTimeThreshold):
-                            reachedControl, nextControl = startFinishFanfare(nextControl)
-                            stopMelody()
-                            finishEffect()
-                            await updateRoutesAndDistances()
-                            shortestRoutes = shortestRoutesArray[reachedControl - 1]
-                            sRoutes = shortestRoutes[0].copy()
-                            sRoutes.reverse()
-                            uiStartControlEffect(reachedControl)
-                            wantedAngle = angleOfLine(sRoutes[:2])
-                            angleDiff = angleDifference(angle, wantedAngle)
-                            if angleDiff < amazeAcceptedAngleDifference:
-                                finishTexts[1] = "SUCCESS!"
-                            else:
-                                finishTexts[1] = "FAIL!"
-                            finishTexts[2] = str(round(fromRadiansToDegrees(angleDiff), 0))
-                            finishTexts[0] = str(normalizedDifference)
+                            if amazeThresholdWaiting == 0:
+                                amazeThresholdWaiting = amazeMidTimeThreshold
+                                reachedControl, nextControl = startFinishFanfare(nextControl)
+                                stopMelody()
+                                await updateRoutesAndDistances(gameSettings.amaze)
+                                shortestRoutes = shortestRoutesArray[reachedControl - 1]
+                                sRoutes = shortestRoutes[0].copy()
+                                sRoutes.reverse()
+                                uiStartControlEffect(reachedControl)
+                                wantedAngle = angleOfPath(sRoutes, 5)
+                                angleDiff = angleDifference(angle, wantedAngle)
+                                if angleDiff < amazeAcceptedAngleDifference:
+                                    finishTexts[1] = "SUCCESS!"
+                                    shoutEffect()
+                                else:
+                                    finishTexts[1] = "FAIL!"
+                                    pacemakerShoutEffect()
+                                finishTexts[2] = str(round(fromRadiansToDegrees(angleDiff), 0))
+                                finishTexts[0] = str(normalizedDifference)
 
                         # 2. the finish line is found
                         elif finishFound(controls, position, nextControl):
