@@ -126,8 +126,15 @@ In the pacemaker mode, you complete the track together with a pacemaker,
 your personal virtual coach. The pacemaker waits you at each control,
 and competes against/with you in between the controls.
 
-In some rare circumstances, the pacemaker decides to skip a control,
-and wait at the next one. In that case, don't worry. Shit happens.
+### A Maze
+
+![Sprint-O-Matic gameplay in a maze mode by Jyrki Leskelä](/doc/AMaze.png)
+
+In the A Maze -mode, you exercise the 1st control challenge. You get five maps with only the first control shown. You have 10 seconds to turn the map in
+the best running direction.
+
+After 10 seconds, you get the verdict, and the Sprint-O-Matic proposal
+for the best direction.
 
 ### Map types (World series / Infinite Oulu / External)
 
@@ -145,97 +152,12 @@ The Sprint-O-Matic can also link to **external** maps. All you have to do is to 
 
 See the following chapter for the data that is needed, to make a map playable in Sprint-O-Matic.
 
-
 ## Adding new maps to Sprint-O-Matic
 
-### Playing with your private maps
+There are two ways to provide maps so Sprint-O-Matic:
 
-Using the [command line](#command-line-usage) parameters **--mapFileName** and **--lookupPngName** you can play with a map stored in your local filesystem. The map file is just an image of the map, preferably in png format, and the lookup file (i.e. terrain description) is an equally sized png image where the terrain characteristics are marked
-with specific colors, see chapter [creating the terrain description](#creating-the-terrain-description).
-
-### Make your map visible to Sprint-O-Matic users
-
-Add a map to the Sprint-O-Matic's map listing, and everyone can play
-with it. Some information regarding the map needs to be sent to the
-sprint.o.matic at gmail.com to make the linkage happen:
-
-- name, short one to fit it in the home screen
-- url-link to an image of the map (png format is encouraged)
-- license information for the map
-- credit text for the owner/creator of the map
-- url to a terrain description (equally sized png image as the map)
-- license information for the terrain description
-- credit text for the owner/creator of the terrain description
-- meters-per-pixel factor
-- default zoom factor
-
-Here is an example of an entry in the [sprint-o-matic's current listing of external maps](https://github.com/LemesoftNostalgic/sprint-o-matic-external-map-links):
-
-   ```json
-    {
-        "name": "Fantasy",
-        "map-url": "https://raw.githubusercontent.com/LemesoftNostalgic/sprint-o-matic-map-image-example/main/FantasySprintMap.png?raw=true",
-        "map-license": "CC BY-SA 4.0 Deed",
-         "map-credits": "Jyrki Leskelä, 2024",
-         "lookup-png-url": "https://raw.githubusercontent.com/LemesoftNostalgic/sprint-o-matic-map-image-example/main/fantasylookup.png?raw=true",
-         "lookup-png-license": "CC BY-SA 4.0 Deed",
-         "lookup-png-credits": "Jyrki Leskela, 2024",
-         "meters-per-pixel": 0.5
-         "default-zoom": 1.0
-    }
-   ```
-
-**Hint:** If you don't know how to publish files in the web to get an
-URL of the map: an easy way to do that is to [open a free account and
-repository in the GitHub](https://github.com/signup) and drag the files there.
-Sprint.o.matic at gmail.com understands github repository names so you don't have
-to give the precise URL in that case.
-
-The two other things to pay attention is a) license of the map and b) creating the terrain description e.g "lookup-png".
-
-a) Regarding the license, it is only possible to include map images
-with relatively permissive license to the listing. In practice, the map
-image will become visible to all the Sprint-O-Matic users when included.
-The best way would be to license an
-image of a candidate map with one of the creative commons license types.
-This will probably limit the selection to older maps that have no more use
-for live sprint orienteering events. For me, that sounds a good trade-off.
-
-b) A bit more involved is the creation of the terrain description
-e.g. "lookup-png". The following subchapter tells how to do that.
-
-### Creating the terrain description
-
-Basically, you have to create equally sized image as the map image.
-One easy method is to make a copy of the original map image, re-paint
-each terrain type with a correct color code and save the result as png.
-
-The color codes are the following:
-
-![Sprint-O-Matic lookup colors by Jyrki Leskelä](/doc/lookupcolors.png)
-
-Please use an editor where you can choose the colors accurately.
-I have used [GIMP](https://www.gimp.org) because I am familiar with it. The
-terrain markings must represent exactly the color codes shown in the image
-above. Then you need to review the edits. Pay attention to the black color of
-sprint map notation: usually it marks an area that you cannot run through,
-but some black features such as forest paths and fence symbol
-slashes are actually runnable, so do not mark them forbidden.
-
-See the [examples repository](https://github.com/LemesoftNostalgic/sprint-o-matic-map-image-example) for some examples of a map image and the
-corresponding terrain description. I have also [a YouTube video showing
-how to do the edits with GIMP](https://youtu.be/_n0IRG1GfLI).
-The best working resolutions for map images and terrain descriptions are
-between 1024-1280 pixels (width). The game engine is designed for
-sprint map scales approximately from 1:3000 to 1:5000.
-
-If you have an excellent map you wish to be included, but have no time or
-skills to create the terrain description, please propose it via sprint.o.matic
-at gmail.com anyway. I can create a couple of terrain images myself as a
-pro-bono effort to get things rolling. A good map for Sprint-O-Matic is
-one that has enough fences and other obstacles to pose a challenge.
-Also slow green terrain is good but not mandatory.
-
+- Find an interesting place from e.g. Google Maps and send a hint about it to sprint.o.matic at gmail.com.
+- Use a real sprint orienteering map with the Sprint-O-Matic: [Guide of using maps with Sprint-O-Matic](/README-MAPS.md)
 
 ## Software developent and license
 
@@ -245,30 +167,22 @@ game.
 
 The software is licensed under Apache-2.0 license. You are therefore free to
 branch it for extra development or propose pull requests for it.
-Due to the nature of a hobby project, all help is of course appreciated.
-An initial to-do list is the following:
 
-Low hanging fruits:
+The following ideas are next on the table:
 
-* more external maps linked to the map listing (see above)
-* Allow publication of hand-crafted track designs for a given map
-* gradient slow terrain, for better modeling of staircases and hills
+* more maps to the map listing [using this procedure](/README-MAPS.md)
+* Gradient slow terrain, for better modeling of staircases and hills
 * Add control numbering, control descriptions, etc.
-* graphics beautification
+* Graphics beautification
 * Score-O mode (collect contols with score in any order, time limit)
+* Allow creation of hand-crafted track designs for a given map
 * events/multiplayer support (might have to be a paid subcription to cover the
 server costs)
 
 A bit more involved:
 
-* automatic creation of terrain descriptions. With sprint orienteering maps,
-the black color is a problem. It is used for symbols that you can run through
-and symbols that you can't run through. There is even some variation from map
-to map, which makes it difficult for a computer program to determine the
-meaning of the markings.
-* 3d (human eye is more sensitive to quality when the content is 3d,
-therefore this requires more polishing than 2d)
-
+* Automatic creation of terrain descriptions, making [this procedure](/README-MAPS.md) easier.
+* 3d mode
 
 ## Misc topics
 
@@ -328,9 +242,8 @@ reason to run without a proper track.
 
 The Sprint-O-Matic is an interactive application similar to games.
 Warning: the Sprint-O-Matic has not been properly tested for safety regarding
-the treadmill use. Therefore I have to advice against it, even though it is
-technically possible with a wireless mouse. Please inform me via sprint.o.matic
-at gmail.com if your treadmill vendor shows green light for this use-case.
+the treadmill use. If you do it, please consider it is not one of the
+planned use-cases of the software.
 
 ### Support
 

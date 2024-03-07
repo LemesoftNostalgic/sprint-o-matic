@@ -123,16 +123,6 @@ Graafisen analyysin tulos näyttää tältä:
 
 ![Sprint-O-Matic-analyysin tulos, Jyrki Leskela](/doc/Analysis.png)
 
-### A Maze
-
-![Sprint-O-Matic gameplay in a maze mode by Jyrki Leskelä](/doc/AMaze.png)
-
-A Maze -tilassa harjoittelet ensimmäiselle rastille lähtöä. Saat näkyviisi viisi karttaa yksi kerrallaan. Tehtäväsi on kääntää kartta kymmenessä sekunnissa
-optimaaliseen lähtösuuntaan.
-
-Kymmenen sekunnin päästä saat tuloksen, sekä Sprint-O-Maticin ehdotuksen
-parhaasta lähtösuunnasta.
-
 ### Jänistila
 
 ![Sprint-O-Maticin pelattavuus tahdistimessa, kirjoittanut Jyrki Leskelä](/doc/GeneratedMapWithPacemaker.png)
@@ -181,10 +171,106 @@ Sprint-O-Maticin käyttäjille.
 
 ## Uusien karttojen käyttäminen Sprint-O-Matic:in kanssa
 
-On olemassa kaksi tapaa saata lisää karttoja Sprint-O-Matic:iin
+### Pelaaminen yksityisillä kartoillasi
 
-- Etsi kinnostava sijainti vaikkapa Google Maps sovelluksesta ja lähetä ehdotus eli paikan koordinaatit osoitteeseen sprint.o.matic at gmail.com.
-- Oikeiden sprittisuunnistuskarttojen käyttäminen Sprint-O-Maticin kanssa: [ohje](/README-MAPS-FINNISH.md)
+Käyttämällä [komentorivi](#komentorivin-käyttö) parametreja **--mapFileName** ja 
+**--lookupPngName** voit pelata paikalliseen tiedostojärjestelmääsi tallennetulla kartalla.
+Karttatiedosto on vain kuva kartasta, mieluiten png-muodossa, ja 
+"maaston kuvaus" on samankokoinen png-kuva, johon on merkitty 
+maaston ominaisuudet tietyillä väreillä, katso luku
+[maaston kuvauksen luominen](#maaston-kuvauksen-luominen).
+
+Yksityisillä kartoilla pelaaminen on hyvä tapa kokeilla maaston kuvausta ennen kuin sen
+tekee näkyväksi muille Sprint-O-Maticin käyttäjille.
+
+### Tee karttasi näkyväksi Sprint-O-Maticin käyttäjille
+
+Lisää kartta Sprint-O-Maticin karttaluetteloon, niin kaikki voivat pelata
+sen kanssa. Karttaa koskevat perustiedot on lähetettävä osoitteeseen
+sprint.o.matic miukumauku gmail.com linkityksen toteuttamiseksi:
+
+- kartan nimi, tarpeeksi lyhyt, jotta se sopii aloitusnäyttöön painikkeen alle
+- url-linkki karttakuvaan (png-muoto on suositeltavaa)
+- lisenssitiedot karttaan liittyen
+- tietoa kartan omistajasta/tekijästä
+- URL-osoite maaston kuvaukseen (samankokoinen png-kuva kuin kartta)
+- lisenssitiedot maaston kuvaukseen liittyen
+- tietoa maaston kuvauksen omistajasta/tekijästä
+- metriä/pikseli -kerroin
+- kartan koon skaalauskerroin
+
+Tässä on esimerkki yhden kartan tiedoista [sprint-o-maticin tämänhetkisessä ulkoisten karttojen luettelossa](https://github.com/LemesoftNostalgic/sprint-o-matic-external-map-links):
+
+   ```json
+    {
+        "name": "Fantasy",
+        "map-url": "https://raw.githubusercontent.com/LemesoftNostalgic/sprint-o-matic-map-image-example/main/FantasySprintMap.png?raw=true",
+        "map-license": "CC BY-SA 4.0 Deed",
+         "map-credits": "Jyrki Leskelä, 2024",
+         "lookup-png-url": "https://raw.githubusercontent.com/LemesoftNostalgic/sprint-o-matic-map-image-example/main/fantasylookup.png?raw=true",
+         "lookup-png-license": "CC BY-SA 4.0 Deed",
+         "lookup-png-credits": "Jyrki Leskela, 2024",
+         "meters-per-pixel": 0.5
+         "default-zoom": 1.0
+    }
+   ```
+
+**Vihje:** Jos et tiedä kuinka julkaista tiedostoja verkossa saadaksesi
+kartan URL-osoitteen: helppo tapa tehdä se on [avaa ilmainen tili ja
+kansio GitHub:ssa](https://github.com/signup) ja raahaa tiedostot sinne.
+Sprint.o.Matic miukumauku gmail.com ymmärtää github-osoitteet, joten sinun ei ole
+välttämätöntä kertoa tarkkaa URL-osoitetta github-osoitteiden kanssa.
+
+Kaksi muuta asiaa, joihin on kiinnitettävä huomiota, ovat a) kartan lisenssi
+ja b) maaston kuvauksen piirtäminen.
+
+a) Lisenssiin liittyen: julkiselle listalle on mahdollista
+sisällyttää vain suhteellisen sallivalla lisenssillä julkaistuja karttakuvia.
+Käytännössä karttakuva näkyy kaikille Sprint-O-Matic-käyttäjille, kun se otetaan mukaan.
+Paras tapa olisi että ehdokaskartta olisi julkaistu jollakin Creative Commons
+-lisenssityypeistä. Tämä todennäköisesti rajoittaa valinnan vanhoihin karttoihin,
+joilla ei ole enää kilpasuunnistuksellista käyttöä. Toisaalta näin voi saada
+vanhentuneita mutta muuten hyviä karttoja vielä uusiokäyttöön.
+
+b) Maaston kuvauksen luomisessa on jonkin verran käsityötä.
+Seuraava kappale kertoo miten se tehdään.
+
+### Maaston kuvauksen luominen
+
+Periaatteessa sinun on luotava samankokoinen kuva kuin karttakuva.
+Yksi helppo tapa on tehdä kopio alkuperäisestä karttakuvasta ja maalata kuvan päälle
+kukin maastotyyppi sille kuuluvalla värikoodilla ja tallentaa lopputulos png-muodossa.
+
+Värikoodit ovat seuraavat:
+
+![Jyrki Leskelän Sprint-O-Matic-hakuvärit](/doc/lookupcolors.png)
+
+Käytä kuvaeditoria, jossa voit valita värit tarkasti.
+Olen käyttänyt [GIMP-editoria](https://www.gimp.org), koska se on minulle tuttu.
+Maastomerkintöjen on vastattava täsmälleen kuvassa esitettyjä värikoodeja.
+Lopussa on hyvä tarkistaa editoinnin tulos silmämääräisesti. Kiinnitä huomiota erityisesti
+sprinttikartan mustalla värillä oleviin symboleihin: pääasiassa mustalla värillä
+merkitään sprinttikartoissa kohdat, joiden läpi ei voi juosta,
+mutta jotkut mustat merkinnät, kuten polut ja aitojen vinoviivat, ovat itse asiassa
+läpijuostavia. Varo ettet maalaa niitäkin kielletyiksi omassa maastokuvauksessasi.
+
+Katso [esimerkkikansiota](https://github.com/LemesoftNostalgic/sprint-o-matic-map-image-example)
+jossa on pelattavia esimerkkejä karttakuvasta ja sitä vastaavasta
+maastokuvauksesta. Nähtävillä on myös [YouTube-video, joka näyttää
+kuinka tehdä maaston kuvaus GIMP:llä](https://youtu.be/_n0IRG1GfLI).
+Sopivin resoluutio karttakuville ja maastokuvauksille on
+välillä 1024-2048 pikseliä (leveys). Sprint-O-Matic on suunniteltu
+toimimaan parhaiten sprinttikartoilla joiden mittakaava on noin
+1:3000 - 1:5000.
+
+Jos sinulla on erinomainen kartta, ja haluat olla mukana,
+mutta sinulla ei ole aikaa tai
+taitoa luoda maastokuvausta, ehdota sitä sprint-o-matic
+sprint.o.matic miukumauku gmail.com:n kautta silti. Voin auttaa esimerkiksi muutaman maastokuvauksen
+luonnissa jotta saadaan uusia karttoja mukaan. Hyvä kartta Sprint-O-Matic:ille
+on sellainen, jossa on tarpeeksi aitoja ja muita esteitä, eli haastava sprinttikartta.
+Myös hidas vihreä maasto on hyvä, mutta ei välttämätön.
+
 
 ## Tietoja tästä ohjelmistosta ja sen lisenssistä
 
@@ -196,24 +282,29 @@ ole parhaiden kaupallisten ohjelmistojen tasolla.
 Ohjelmisto on lisensoitu Apache-2.0-lisenssillä. Voit siis vapaasti
 perustaa oman kehityshaaran sen parantelua tai lisäkehitystä varten.
 Voit myös ehdottaa korjauksia "git pull request" mekanismilla.
-
+Harrastusprojektimaisesta luonteesta johtuen kaikki apu on tietysti tervetullutta.
 Tämänhetkinen idealista on seuraava:
 
 Helpot jutut:
 
-* lisää ulkoisia karttoja linkitettynä karttaluetteloon [ohje](/README-MAPS-FINNISH.md)
+* lisää ulkoisia karttoja linkitettynä karttaluetteloon (katso yllä)
+* Salli kuhunkin karttaan liittyvien käsinsuunniteltujen ratojen julkaiseminen
 * Tiettyyn suuntaan hidastava maastokuvaus, parantaisi portaikkojen ja kukkuloiden
 mallinnusta
 * Rastien numerointi, rastimääritteet, jne.
 * grafiikan parantelu
 * Score-O -tyyppinen (n.s. rogaining, kerää pisteet missä tahansa järjestyksessä, aikaraja)
-* Salli kuhunkin karttaan liittyvien käsinsuunniteltujen ratojen julkaiseminen
 * tapahtumien/moninpelin tuki (joutuisi olemaan maksullinen toiminto kattaakseen palvelinkulut)
 
 Hieman enemmän työtä vaatisi:
 
-* automaattinen maastokuvausten luominen.
-* 3d tila
+* automaattinen maastokuvausten luominen. Sprintin suunnistuskartoilla,
+musta väri on ongelma. Sitä käytetään symboleille, joiden läpi voit juosta,
+ja symboleille, joiden läpi et voi juosta. On jopa vaihtelua kartasta
+ja kartoittajasta johtuen, mikä tekee tietokoneohjelmalle vaikeaksi ymmärtää
+käytännön karttamerkintöjä, varsinkin vanhemmista kartoista.
+* 3d (ihmissilmä on herkempi laadulle, kun sisältö on 3d,
+siksi kunnollinen 3d-peli vaatii huomattavasti enemmän työtä kuin 2d-peli)
 
 ## Muut aiheet
 
