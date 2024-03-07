@@ -42,7 +42,7 @@ def pruneDistanceWeighter(testPt, lookup, semilookup, verylookup):
 def pruneWeightedDistance(ptA, ptB, lookup, semilookup, verylookup):
     if ptA == ptB:
         return 0.0
-    steps = int(max(abs(ptA[0]- ptB[0]), abs(ptA[1] - ptB[1])))
+    steps = max(abs(ptA[0]- ptB[0]), abs(ptA[1] - ptB[1]))
     start = (float(ptA[0]), float(ptA[1]))
     testPt = start
     newScore = 0.0
@@ -51,7 +51,7 @@ def pruneWeightedDistance(ptA, ptB, lookup, semilookup, verylookup):
         incr = (float(ptB[0] - ptA[0]) / float(steps), float(ptB[1] - ptA[1]) / float(steps))
         incrDist = distanceBetweenPoints((0.0, 0.0), incr)
 
-        for ind in range(steps):
+        for ind in range(int(steps)):
             testPt = (start[0] + ind * incr[0], start[1] + ind * incr[1])
             newScore = newScore + incrDist * pruneDistanceWeighter(testPt, lookup, semilookup, verylookup)
 
@@ -73,16 +73,17 @@ def pruneEnsureLineOfSight(ptA, ptB, lookup):
     testPtList = []
     if ptA == ptB:
         return testPtList
-    steps = max(abs(ptA[0]- ptB[0]), abs(ptA[1] - ptB[1]))
-    incr = (float(ptB[0] - ptA[0]) / float(steps), float(ptB[1] - ptA[1]) / float(steps))
-    incrDist = distanceBetweenPoints((0.0, 0.0), incr)
-    start = (float(ptA[0]), float(ptA[1]))
+    steps = int(max(abs(ptA[0]- ptB[0]), abs(ptA[1] - ptB[1])))
+    if steps:
+        incr = (float(ptB[0] - ptA[0]) / float(steps), float(ptB[1] - ptA[1]) / float(steps))
+        incrDist = distanceBetweenPoints((0.0, 0.0), incr)
+        start = (float(ptA[0]), float(ptA[1]))
 
-    for ind in range(steps):
-        testPt = (int(start[0] + ind * incr[0]), int(start[1] + ind * incr[1]))
-        testPtList.append(testPt)
-        if lookup and testPt in lookup:
-            return None
+        for ind in range(steps):
+            testPt = (int(start[0] + ind * incr[0]), int(start[1] + ind * incr[1]))
+            testPtList.append(testPt)
+            if lookup and testPt in lookup:
+                return None
     return testPtList
 
 
@@ -107,20 +108,21 @@ def pruneEnsureGoodShortcut(ptA, ptB, lookup1, lookup2, lookup3):
     if ptA == ptB:
         return testPtList
     steps = max(abs(ptA[0]- ptB[0]), abs(ptA[1] - ptB[1]))
-    incr = (float(ptB[0] - ptA[0]) / float(steps), float(ptB[1] - ptA[1]) / float(steps))
-    incrDist = distanceBetweenPoints((0.0, 0.0), incr)
-    start = (float(ptA[0]), float(ptA[1]))
+    if steps:
+        incr = (float(ptB[0] - ptA[0]) / float(steps), float(ptB[1] - ptA[1]) / float(steps))
+        incrDist = distanceBetweenPoints((0.0, 0.0), incr)
+        start = (float(ptA[0]), float(ptA[1]))
 
-    for ind in range(steps):
-        testPt = (int(start[0] + ind * incr[0]), int(start[1] + ind * incr[1]))
-        testPtList.append(testPt)
-        if lookup1 and testPt in lookup1:
-            return None
-        elif ind % 4 == 0:
-            if lookup2 and testPt in lookup2:
+        for ind in range(steps):
+            testPt = (int(start[0] + ind * incr[0]), int(start[1] + ind * incr[1]))
+            testPtList.append(testPt)
+            if lookup1 and testPt in lookup1:
                 return None
-            if lookup3 and testPt in lookup3:
-                return None
+            elif ind % 4 == 0:
+                if lookup2 and testPt in lookup2:
+                    return None
+                if lookup3 and testPt in lookup3:
+                    return None
 
     return testPtList
 
@@ -137,44 +139,47 @@ def pruneCheckLineOfSight(ptA, ptB, ptMid, forbiddenLookup, slowLookup, semiSlow
 
 
 # Straighten the rudimentary angular route that was found intially
-def pruneShortestRouteRes(route, forbiddenLookup, slowLookup, semiSlowLookup, verySlowLookup, res):
+def pruneShortestRouteRes(route, forbiddenLookup, slowLookup, semiSlowLookup, verySlowLookup, thisStep, maxIt):
     prunedRoute = route.copy()
 
-    while len(prunedRoute) > res * 3:
-        nextRoute = []
+    index = 0
+    for dummy in range(maxIt):
+        if index:
+            index = 0
+        else:
+            index = 1
 
-        maxDelta = 0
-        maxDeltaInd = 0
+        found = False
 
-        thisStep = res
-        for index in range(len(prunedRoute) - res * 2):
+        while True:
+            if index >= len(prunedRoute) - thisStep * 2:
+                break
             pt1 = prunedRoute[index]
             ptMid = prunedRoute[index + thisStep]
             pt2 = prunedRoute[index + thisStep * 2]
+            index = index + 1
 
             shortcutFound, delta = pruneCheckLineOfSight(pt1, pt2, ptMid, forbiddenLookup, slowLookup, semiSlowLookup, verySlowLookup)
             if shortcutFound:
-                if delta > maxDelta:
-                    maxDelta = delta
-                    maxDeltaInd = index + thisStep
+                found = True
+                for step in range(0, thisStep * 2 - 1):
+                    prunedRoute.pop(index)
+                prunedRoute.insert(index, ((pt1[0]+pt2[0])/2, (pt1[1]+pt2[1])/2))
+                index = index + 1
 
-        if maxDeltaInd == 0:
+        if not found:
             break
-
-        toBeRemovedInd = maxDeltaInd + 1 - thisStep
-        for step in range(toBeRemovedInd, toBeRemovedInd + (thisStep * 2 - 1)):
-            prunedRoute.pop(toBeRemovedInd)
 
     return prunedRoute
 
 
+# aloitetaan 1:stä toisella kertaa
 def pruneShortestRoute(route, forbiddenLookup, slowLookup, semiSlowLookup, verySlowLookup):
+    iters = { 7: 1, 3: 1, 1: 256 }
     res = pruneDefaultRes
-    for res in [13, 5, 1]:
-        route = pruneShortestRouteRes(route, forbiddenLookup, slowLookup, semiSlowLookup, verySlowLookup, res)
-        route.reverse()
-        route = pruneShortestRouteRes(route, forbiddenLookup, slowLookup, semiSlowLookup, verySlowLookup, 14 - res)
-        route.reverse()
+    route = pruneShortestRouteRes(route, forbiddenLookup, slowLookup, semiSlowLookup, verySlowLookup, 1, 16)
+    for res in [7, 3, 1]:
+        route = pruneShortestRouteRes(route, forbiddenLookup, slowLookup, semiSlowLookup, verySlowLookup, res, iters[res])
 
     return route
 
@@ -197,44 +202,47 @@ def pruneShortestRouteExt(route, forbiddenAreaLookup, slowAreaLookup, semiSlowAr
 
 
 # Straighten the rudimentary angular route that was found intially
-async def pruneShortestRouteResAsync(route, forbiddenLookup, slowLookup, semiSlowLookup, verySlowLookup, res):
+async def pruneShortestRouteResAsync(route, forbiddenLookup, slowLookup, semiSlowLookup, verySlowLookup, thisStep, maxIt):
     prunedRoute = route.copy()
 
-    while len(prunedRoute) > res * 3:
-        nextRoute = []
+    index = 0
+    for dummy in range(maxIt):
+        if index:
+            index = 0
+        else:
+            index = 1
 
-        maxDelta = 0
-        maxDeltaInd = 0
+        found = False
 
-        thisStep = res
-        for index in range(len(prunedRoute) - res * 2):
+        while True:
+            if index >= len(prunedRoute) - thisStep * 2:
+                break
             pt1 = prunedRoute[index]
             ptMid = prunedRoute[index + thisStep]
             pt2 = prunedRoute[index + thisStep * 2]
+            index = index + 1
 
             shortcutFound, delta = pruneCheckLineOfSight(pt1, pt2, ptMid, forbiddenLookup, slowLookup, semiSlowLookup, verySlowLookup)
             if shortcutFound:
-                if delta > maxDelta:
-                    maxDelta = delta
-                    maxDeltaInd = index + thisStep
-            await asyncio.sleep(0)
+                found = True
+                for step in range(0, thisStep * 2 - 1):
+                    prunedRoute.pop(index)
+                prunedRoute.insert(index, ((pt1[0]+pt2[0])/2, (pt1[1]+pt2[1])/2))
+                index = index + 1
 
-        if maxDeltaInd == 0:
+        await asyncio.sleep(0)
+
+        if not found:
             break
-
-        toBeRemovedInd = maxDeltaInd + 1 - thisStep
-        for step in range(toBeRemovedInd, toBeRemovedInd + (thisStep * 2 - 1)):
-            prunedRoute.pop(toBeRemovedInd)
 
     return prunedRoute
 
 
 async def pruneShortestRouteAsync(route, forbiddenLookup, slowLookup, semiSlowLookup, verySlowLookup):
+    iters = { 7: 1, 3: 2, 1: 256 }
     res = pruneDefaultRes
-    for res in [13, 5, 1]:
-        route = await pruneShortestRouteResAsync(route, forbiddenLookup, slowLookup, semiSlowLookup, verySlowLookup, res)
-        route.reverse()
-        route = await pruneShortestRouteResAsync(route, forbiddenLookup, slowLookup, semiSlowLookup, verySlowLookup, 14 - res)
-        route.reverse()
+    route = await pruneShortestRouteResAsync(route, forbiddenLookup, slowLookup, semiSlowLookup, verySlowLookup, 1, 16)
+    for res in [7, 3, 1]:
+        route = await pruneShortestRouteResAsync(route, forbiddenLookup, slowLookup, semiSlowLookup, verySlowLookup, res, iters[res])
 
     return route

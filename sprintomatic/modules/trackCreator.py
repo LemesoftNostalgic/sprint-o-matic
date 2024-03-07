@@ -223,11 +223,13 @@ async def createAmazeControls(cfg, distribution, metersPerPixel, faLookups, saLo
         if time.time() - start_tot_time > totMaxTimeAmaze:
             return [], [], [], [], 0.0
 
-        beautifiedLeft = pruneShortestRouteExt(preComputedLeft, faLookups, saLookups, ssaLookups, vsaLookups, 2)
+        beautifiedLeft = preComputedLeft
+        beautifiedRight = preComputedRight
+        beautifiedLeft = pruneShortestRouteExt(preComputedLeft, faLookups, saLookups, ssaLookups, vsaLookups, 0)
         if time.time() - start_tot_time > totMaxTimeAmaze:
             return [], [], [], [], 0.0
 
-        beautifiedRight = pruneShortestRouteExt(preComputedRight, faLookups, saLookups, ssaLookups, vsaLookups, 2)
+        beautifiedRight = pruneShortestRouteExt(preComputedRight, faLookups, saLookups, ssaLookups, vsaLookups, 0)
         if time.time() - start_tot_time > totMaxTimeAmaze:
             return [], [], [], [], 0.0
 

@@ -98,13 +98,11 @@ thinFence = [
     ]
 
 houseArray = [
-    [ "building", ["storage_tank","greenhouse","sports_centre","barn","commercial","kindergarten","semidetached_house","generator","toilets","cabin","cowshed","garages","hotel","kiosk","hangar","industrial","power","minor","carport","detached","fire_station","stable","supermarket","chapel","grandstand","transportation","garage","ship","yes","school","civic","dormitory","retail","silo","service","construction","office","tower","residential","sports_hall","bank","no","church","warehouse","observatory","public","parking","apartments","roof","train_station","hospital","farm_auxiliary","bungalow","government","house","manufacture"] ],
-      [ "power", [ "generator","substation","plant" ] ],
-      ["amenity", ["library","theatre","school","pub","restaurant","cafe","bank","fast_food","fuel","cinema","social_facility","ice_cream"] ]
+    [ "building", ["storage_tank","sports_centre","commercial","kindergarten","semidetached_house","generator","toilets","cabin","garages","hotel","kiosk","hangar","industrial","power","minor","carport","detached","fire_station","stable","supermarket","chapel","grandstand","transportation","garage","ship","yes","school","civic","dormitory","retail","silo","service","construction","office","tower","residential","sports_hall","bank","no","church","warehouse","observatory","public","apartments","train_station","hospital","bungalow","government","house","manufacture","parking"] ]
     ]
 
 shelterArray = [
-    ["building", ["hut","ruins","garbage_shed","terrace","grandstand","shelter","shed", "canopy"]],
+    ["building", ["hut","ruins","garbage_shed","terrace","grandstand","shelter","shed", "canopy", "greenhouse", "barn", "cowshed", "roof","farm_auxiliary"]],
     ["highway", ["corridor","bridleway", "steps"]]
 ]
 
@@ -157,7 +155,10 @@ oliveArea = [
     ["shop", [""]],
     ["sport", [""]],
     ["telecom", [""]],
-    ["tourism", [""]]
+    ["tourism", [""]],
+
+    [ "power", [ "generator","substation","plant" ] ],
+    ["amenity", ["library","theatre","school","pub","restaurant","cafe","bank","fast_food","fuel","cinema","social_facility","ice_cream"] ]
     ]
 
 asphaltArea = [

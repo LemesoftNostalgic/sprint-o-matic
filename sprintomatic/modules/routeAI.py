@@ -512,19 +512,13 @@ def calculateShortestRoute(setupList):
 
     if len(shortestRoute) < 2:
         return []
-
-    shortestRoute2, dummy_jumps = calculateCoarseRoute(ptB, ptA, forbiddenLookup, left, right, 0)
     shortestRoute.reverse()
+
+    shortestRoute = [(x[0] * tf, x[1] * tf) for x in shortestRoute.copy()]
 
     # Straighten the route into a beautiful one
     if pacemakerInd != 2:
-        shortestRoute = pruneShortestRoute(shortestRoute, forbiddenLookup, slowLookup, semiSlowLookup, verySlowLookup)
-        if len(shortestRoute2) > 1:
-            shortestRoute2 = pruneShortestRoute(shortestRoute2, forbiddenLookup, slowLookup, semiSlowLookup, verySlowLookup)
-            if len(shortestRoute2) > 1 and calculatePathDistance(shortestRoute2) < calculatePathDistance(shortestRoute):
-                shortestRoute = shortestRoute2
-
-    shortestRoute = [(x[0] * tf, x[1] * tf) for x in shortestRoute.copy()]
+        shortestRoute = pruneShortestRoute(shortestRoute, forbiddenAreaLookup[1], slowAreaLookup[1], semiSlowAreaLookup[1], verySlowAreaLookup[1])
 
     if len(shortestRoute) < 2:
         return []
@@ -583,7 +577,6 @@ async def slowAccurateCalculateShortestRouteAsync(setupList):
             pointsInBetween = []
             backPoints = []
             for point in backRouteLookup.copy():
-                await asyncio.sleep(0)
                 directions = getDirections(point)
                 for direction in directions:
                     newPoint = direction[0]
@@ -598,9 +591,9 @@ async def slowAccurateCalculateShortestRouteAsync(setupList):
                     if (newPoint not in backRouteLookup or backRouteLookup[point] + newScore < backRouteLookup[newPoint]) and newPoint not in forbiddenLookup:
                         backRouteLookup[newPoint] = backRouteLookup[point] + newScore
                         backPoints.append(newPoint)
+            await asyncio.sleep(0)
 
             for point in routeLookup.copy():
-                await asyncio.sleep(0)
                 directions = getDirections(point)
                 for direction in directions:
                     newPoint = direction[0]
@@ -631,6 +624,7 @@ async def slowAccurateCalculateShortestRouteAsync(setupList):
                                 break
                     if stop:
                         break
+            await asyncio.sleep(0)
             if time.time() - start_time > getAiPoolMaxTimeLimit(tf):
                 break
         # this is also intentional!
@@ -642,7 +636,6 @@ async def slowAccurateCalculateShortestRouteAsync(setupList):
         point = intersectionPointBack
         score = backRouteLookup[point]
         while score > startScore:
-            await asyncio.sleep(0)
             directions = getDirections(point)
             minScore = minScoreInit
             minPoint = None
@@ -659,12 +652,12 @@ async def slowAccurateCalculateShortestRouteAsync(setupList):
 
         if pointsInBetween != None:
             shortestRoute = shortestRoute + pointsInBetween
+        await asyncio.sleep(0)
 
         point = intersectionPointFront
         shortestRoute.append(point)
         score = routeLookup[point]
         while score > startScore:
-            await asyncio.sleep(0)
             directions = getDirections(point)
             minScore = minScoreInit
             minPoint = None
@@ -678,13 +671,15 @@ async def slowAccurateCalculateShortestRouteAsync(setupList):
                 return []
             point = minPoint
             shortestRoute.append(point)
+        await asyncio.sleep(0)
 
-        # Straighten the route into a beautiful one
-        if pacemakerInd != 2:
-            shortestRoute = await pruneShortestRouteAsync(shortestRoute, forbiddenLookup, slowLookup, semiSlowLookup, verySlowLookup)
         scaledShortestRoute = []
         for point in shortestRoute:
             scaledShortestRoute.append((point[0] * tf, point[1] * tf))
+
+        # Straighten the route into a beautiful one
+        if pacemakerInd != 2:
+            scaledShortestRoute = await pruneShortestRouteAsync(scaledShortestRoute, forbiddenAreaLookup[1], slowAreaLookup[1], semiSlowAreaLookup[1], verySlowAreaLookup[1])
         return scaledShortestRoute
     return []
 

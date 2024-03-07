@@ -471,7 +471,14 @@ async def main():
                                 controls = await setTheStageForNewRound(config)
 
                         elif gameSettings.amaze and datetime.now() - startTime > timedelta(seconds=amazeMidTimeThreshold):
-                            playerRoutes = [ beautifiedLeft + beautifiedRight ]
+                            beautifiedLeftDistance = calculatePathDistance(beautifiedLeft)
+                            beautifiedRightDistance = calculatePathDistance(beautifiedRight)
+                            if beautifiedLeftDistance > 2 * beautifiedRightDistance:
+                                playerRoutes = [ beautifiedRight ]
+                            elif beautifiedRightDistance > 2 * beautifiedLeftDistance:
+                                playerRoutes = [ beautifiedLeft ]
+                            else:
+                                playerRoutes = [ beautifiedLeft + beautifiedRight ]
 
                         # 1.999 separate pre-ending for "amaze"
                         elif gameSettings.amaze and datetime.now() - startTime > timedelta(seconds=amazeTimeThreshold):
@@ -488,6 +495,9 @@ async def main():
                                 angleDiff = angleDifference(angle, wantedAngle)
                                 if angleDiff < amazeAcceptedAngleDifference:
                                     finishTexts[1] = "I AGREE!"
+                                    shoutEffect()
+                                elif angleDiff < amazeAcceptedAngleDifference * 2:
+                                    finishTexts[1] = "ALMOST RIGHT..."
                                     shoutEffect()
                                 else:
                                     finishTexts[1] = "REALLY?"
