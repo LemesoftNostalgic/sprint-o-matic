@@ -676,6 +676,7 @@ async def slowAccurateCalculateShortestRouteAsync(setupList):
         scaledShortestRoute = []
         for point in shortestRoute:
             scaledShortestRoute.append((point[0] * tf, point[1] * tf))
+        scaledShortestRoute.reverse()
 
         # Straighten the route into a beautiful one
         if pacemakerInd != 2:
