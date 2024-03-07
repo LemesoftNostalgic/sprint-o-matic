@@ -110,9 +110,8 @@ async def setTheStageForNewRound(cfg):
         if gameSettings.accurate:
             initializeAINextTrack(ctrls, faLookup, saLookup, ssaLookup, vsaLookup, gameSettings.pacemaker)
             shortestRoutesArray = getReadyShortestRoutes()
-        elif not gameSettings.offline:
-            await initializeAINextTrackAsync(ctrls, faLookup, saLookup, ssaLookup, vsaLookup, gameSettings.pacemaker)
-            shortestRoutesArrayAsync = await getReadyShortestRoutesAsync(reachedControl)
+        await initializeAINextTrackAsync(ctrls, faLookup, saLookup, ssaLookup, vsaLookup, gameSettings.pacemaker)
+        shortestRoutesArrayAsync = await getReadyShortestRoutesAsync(reachedControl)
         shortestRoutes = []
         futureShortestRoutes = []
         startTime = datetime.now()
@@ -190,11 +189,10 @@ async def updateRoutesAndDistances(amaze):
     playerDistance = playerDistance + calculatePathDistance(playerRoutes[0])
     if gameSettings.accurate:
         shortestRoutesArray = getReadyShortestRoutes()
-    elif not gameSettings.offline:
-        shortestRoutesArrayAsync = await getReadyShortestRoutesAsync(reachedControl)
+    shortestRoutesArrayAsync = await getReadyShortestRoutesAsync(reachedControl)
     shortestRoutes = shortestRoutesArray[reachedControl - 1] if reachedControl > 0 else []
     futureShortestRoutes = shortestRoutesArray[reachedControl] if reachedControl > 0 and reachedControl < len(shortestRoutesArray) else []
-    if not gameSettings.accurate and not gameSettings.offline and reachedControl > 0:
+    if not gameSettings.accurate and reachedControl > 0:
         if shortestRoutesArrayAsync[reachedControl - 1]:
             shortestRoutesArray[reachedControl - 1] = [shortestRoutesArrayAsync[reachedControl - 1]]
             shortestRoutes = [shortestRoutesArrayAsync[reachedControl - 1]]
@@ -514,7 +512,7 @@ async def main():
                             finishEffect()
                             await updateRoutesAndDistances(gameSettings.amaze)
                             shortestRoutes = shortestRoutesArray[reachedControl - 1]
-                            if not gameSettings.accurate and not gameSettings.offline:
+                            if not gameSettings.accurate:
                                 if shortestRoutesArrayAsync[reachedControl - 1]:
                                     shortestRoutes = [shortestRoutesArrayAsync[reachedControl - 1]]
                             futureShortestRoutes = []
@@ -527,7 +525,7 @@ async def main():
                             finishTexts = generateFinishTexts(totalTime, shortestDistance, shortestWeightedDistance, playerWeightedDistance)
                             if gameSettings.analysis:
                                 mergedArray = shortestRoutesArray.copy()
-                                if not gameSettings.accurate and not gameSettings.offline:
+                                if not gameSettings.accurate:
                                     shortestRoutesArrayAsync = await getReadyShortestRoutesAsync(len(mergedArray)-1)
                                     for ind in range(len(mergedArray)):
                                         if ind < len(shortestRoutesArrayAsync) and shortestRoutesArrayAsync[ind]:
