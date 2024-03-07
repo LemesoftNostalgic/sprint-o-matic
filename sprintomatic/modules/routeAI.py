@@ -302,7 +302,6 @@ def moveToWallSide(currentPt, lookup):
     return None
 
     
-# Ensure there is no forbidden areas between point A and B
 def getTestPointList(ptA, ptB, lookup):
     testPtList = []
     testScoreList = []
@@ -368,7 +367,7 @@ def calculateCoarseRoute(ptA, ptB, forbiddenLookup, left, right, maxdist):
             return [], 0
 
         if not ptList:
-            return [], 0
+            break
 
         if state == 0:
             # currentscore test not madatory?
@@ -470,11 +469,12 @@ def calculateCoarseRouteExt(pointA, pointB, forbiddenAreaLookup, tfNum, left, ri
     forbiddenLookup = forbiddenAreaLookup[tf]
     ptA = (pointA[0] // tf, pointA[1] // tf)
     ptB = (pointB[0] // tf, pointB[1] // tf)
-    tmpShortestRoute, jumps = calculateCoarseRoute(ptA, ptB, forbiddenLookup, left, right, maxdist)
+    tmpShortestRoute, jumps = calculateCoarseRoute(ptA, ptB, forbiddenLookup, left, right, maxdist // tf)
     shortestRoute = []
     for item in tmpShortestRoute:
         shortestRoute.append((item[0]*tf, item[1]*tf))
     return shortestRoute, jumps
+
 
 
 # fastest one so far
@@ -504,21 +504,23 @@ def calculateShortestRoute(setupList):
 
     ptA = (pointA[0] // tf, pointA[1] // tf)
     ptB = (pointB[0] // tf, pointB[1] // tf)
+    preComputedScaled = []
+    for item in preComputed:
+        preComputedScaled.append((item[0] // tf, item[1] // tf))
 
-    if preComputed:
-        shortestRoute = preComputed
+    if preComputedScaled:
+        shortestRoute = preComputedScaled
     else:
         shortestRoute, dummy_jumps = calculateCoarseRoute(ptA, ptB, forbiddenLookup, left, right, 0)
 
     if len(shortestRoute) < 2:
         return []
-    shortestRoute.reverse()
-
-    shortestRoute = [(x[0] * tf, x[1] * tf) for x in shortestRoute.copy()]
 
     # Straighten the route into a beautiful one
     if pacemakerInd != 2:
-        shortestRoute = pruneShortestRoute(shortestRoute, forbiddenAreaLookup[1], slowAreaLookup[1], semiSlowAreaLookup[1], verySlowAreaLookup[1])
+        shortestRoute = pruneShortestRoute(shortestRoute, forbiddenLookup, slowLookup, semiSlowLookup, verySlowLookup)
+
+    shortestRoute = [(x[0] * tf, x[1] * tf) for x in shortestRoute.copy()]
 
     if len(shortestRoute) < 2:
         return []
@@ -676,7 +678,6 @@ async def slowAccurateCalculateShortestRouteAsync(setupList):
         scaledShortestRoute = []
         for point in shortestRoute:
             scaledShortestRoute.append((point[0] * tf, point[1] * tf))
-        scaledShortestRoute.reverse()
 
         # Straighten the route into a beautiful one
         if pacemakerInd != 2:

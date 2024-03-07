@@ -159,7 +159,6 @@ def getPacemakerThreshold(inputPath, pacemakerInd):
 def getPacemakerPos(saLookup, ssaLookup, vsaLookup, tunnelLookup, inputPath, steps, speed, metersPerPixel, pacemakerInd):
     index = 0
     path = inputPath.copy()
-    path.reverse()
     pos = path[index]
     dist = distanceBetweenPoints(path[index], path[index + 1])
     angle = angleOfLine([path[index], path[index + 1]])

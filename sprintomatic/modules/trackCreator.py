@@ -31,7 +31,7 @@ firstControlMinDistance = 100
 maxDifficultAttempts = 3
 pickDistMaxTime = 1.0
 pickMaxTime = pickDistMaxTime / maxDifficultAttempts
-totMaxTime = 20.0
+totMaxTime = 15.0
 totMaxTimeAmaze = 40.0
 
 def pickLegLen(distribution, metersPerPixel):
@@ -148,6 +148,7 @@ def pickDistAutoControl(cfg, ctrls, distribution, metersPerPixel, faLookups):
 
 async def createAutoControls(cfg, trackLength, distribution, metersPerPixel, faLookups, saLookups, ssaLookups, vsaLookups, pacemakerInd):
     totdist = 0
+    precision = 0 #two is too big
     ctrls = []
     shortests = []
     start_tot_time = time.time()
@@ -159,9 +160,9 @@ async def createAutoControls(cfg, trackLength, distribution, metersPerPixel, faL
         if isDifficultControl:
             numDifficultControls = numDifficultControls + 1
         if ctrl is None:
-            return [], 0, []
+            return [], []
 
-        preComputed, dummy_jumps = calculateCoarseRouteExt(ctrls[-1], ctrl, faLookups, 1, True, True, 0)
+        preComputed, dummy_jumps = calculateCoarseRouteExt(ctrls[-1], ctrl, faLookups, precision, True, True, 0)
         if len(preComputed) > 1:
             ctrls.append(ctrl)
             totdist = totdist + dist
@@ -176,8 +177,9 @@ async def createAutoControls(cfg, trackLength, distribution, metersPerPixel, faL
         await asyncio.sleep(0)
 
     # only complete the work afterwards
+    start_tot_time = time.time()
     for ind in range(len(shortests)):
-        shortests[ind] = [calculateShortestRoute([ctrls[ind], ctrls[ind + 1], faLookups, saLookups, ssaLookups, vsaLookups, 0, pacemakerInd, shortests[ind][0].copy()])]
+        shortests[ind] = [calculateShortestRoute([ctrls[ind], ctrls[ind + 1], faLookups, saLookups, ssaLookups, vsaLookups, precision, pacemakerInd, shortests[ind][0].copy()])]
         if time.time() - start_tot_time > totMaxTime:
             break
 
