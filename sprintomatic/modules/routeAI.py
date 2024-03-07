@@ -34,6 +34,7 @@ tfs = [1, 2, 4, 8, 16]
 
 quickCheckDefaultTf = 4
 bddTimeThreshold = 1.5
+sleepTimeThreshold = 0.05
 
 start_time = None
 refreshCtr = 5000
@@ -578,6 +579,8 @@ async def slowAccurateCalculateShortestRouteAsync(setupList):
         while not stop:
             pointsInBetween = []
             backPoints = []
+
+            sleep_time = time.time()
             for point in backRouteLookup.copy():
                 directions = getDirections(point)
                 for direction in directions:
@@ -593,8 +596,11 @@ async def slowAccurateCalculateShortestRouteAsync(setupList):
                     if (newPoint not in backRouteLookup or backRouteLookup[point] + newScore < backRouteLookup[newPoint]) and newPoint not in forbiddenLookup:
                         backRouteLookup[newPoint] = backRouteLookup[point] + newScore
                         backPoints.append(newPoint)
-            await asyncio.sleep(0)
+                if time.time() - sleep_time > sleepTimeThreshold:
+                    await asyncio.sleep(0)
+                    sleep_time = time.time()
 
+            sleep_time = time.time()
             for point in routeLookup.copy():
                 directions = getDirections(point)
                 for direction in directions:
@@ -626,7 +632,9 @@ async def slowAccurateCalculateShortestRouteAsync(setupList):
                                 break
                     if stop:
                         break
-            await asyncio.sleep(0)
+                if time.time() - sleep_time > sleepTimeThreshold:
+                    await asyncio.sleep(0)
+                    sleep_time = time.time()
             if time.time() - start_time > getAiPoolMaxTimeLimit(tf):
                 break
         # this is also intentional!
