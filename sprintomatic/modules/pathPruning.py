@@ -175,7 +175,7 @@ def pruneShortestRouteRes(route, forbiddenLookup, slowLookup, semiSlowLookup, ve
 
 # aloitetaan 1:stä toisella kertaa
 def pruneShortestRoute(route, forbiddenLookup, slowLookup, semiSlowLookup, verySlowLookup):
-    iters = { 7: 1, 3: 1, 1: 256 }
+    iters = { 7: 1, 3: 2, 1: 256 }
     res = pruneDefaultRes
     route = pruneShortestRouteRes(route, forbiddenLookup, slowLookup, semiSlowLookup, verySlowLookup, 1, 16)
     for res in [7, 3, 1]:
