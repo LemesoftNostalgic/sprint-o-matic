@@ -23,6 +23,7 @@ It provides you an infinite number of sprint orienteering route selection challe
 form of an entertaining 2D game. See the following YouTube videos to get an
 idea:
 
+* [Sprint-O-Matic 4.0: new "AMaze" feature to practice the first-control problem](https://youtu.be/nepM0oAiFn8)
 * [Sprint-O-Matic 3.0: faster, webapp, hundreds of sprint orienteering maps all around the world](https://youtu.be/lmbBzbUQUbc)
 * [Sprint-O-Matic early prototype, generated map, pacemaker mode, treadmill stunt](https://youtu.be/VikFxwu9e0Q).
 * [Trying out Sprint-O-Matic route analysis mode with a fantasy map](https://youtu.be/rI9zinYGOmc)
