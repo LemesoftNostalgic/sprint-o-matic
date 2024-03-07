@@ -511,7 +511,7 @@ async def main():
                             pacemakerRunning = False
                             stopMelody()
                             finishEffect()
-                            await updateRoutesAndDistances()
+                            await updateRoutesAndDistances(gameSettings.amaze)
                             shortestRoutes = shortestRoutesArray[reachedControl - 1]
                             if not gameSettings.accurate and not gameSettings.offline:
                                 if shortestRoutesArrayAsync[reachedControl - 1]:
