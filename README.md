@@ -138,7 +138,7 @@ for the best direction.
 
 There are three different categories of maps in Sprint-O-Matic.
 
-**Infinite Oulu** is an automatically generated city-block-map, different map every time. The Infinite Oulu is also an internal system of the Sprint-O-Matic application. See the previous image for an example.
+**Infinite Oulu** is an automatically generated city-block-map, different map every time. The Infinite Oulu is also an internal system of the Sprint-O-Matic application.
 
 ![Sprint-O-Matic gameplay with a Barcelona map by Jyrki Leskelä](/doc/Barcelona.png)
 

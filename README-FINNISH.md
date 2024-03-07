@@ -148,7 +148,6 @@ Sprint-O-Maticissa on kolme erilaista karttatyyppiä.
 
 **Infinite Oulu** on automaattisesti luotu kaupunkikorttelikartta, joka kerta erilainen.
 Infinite Oulu on Sprint-O-Matic-sovelluksen sisäinen järjestelmä.
-Katso esimerkki edellisestä kuvasta.
 
 ![Sprint-O-Matic kartta Barcelonan alueelta, kirjoittanut Jyrki Leskelä](/doc/Barcelona.png)
 
