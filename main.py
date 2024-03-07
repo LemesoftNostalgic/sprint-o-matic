@@ -196,7 +196,7 @@ async def updateRoutesAndDistances(amaze):
     futureShortestRoutes = shortestRoutesArray[reachedControl] if reachedControl > 0 and reachedControl < len(shortestRoutesArray) else []
     if not gameSettings.accurate and not gameSettings.offline and reachedControl > 0:
         if shortestRoutesArrayAsync[reachedControl - 1]:
-            shortestRoutesArray[reachedControl - 1] = shortestRoutesArrayAsync[reachedControl - 1]
+            shortestRoutesArray[reachedControl - 1] = [shortestRoutesArrayAsync[reachedControl - 1]]
             shortestRoutes = [shortestRoutesArrayAsync[reachedControl - 1]]
 
     await uiFlushEvents()
