@@ -125,10 +125,9 @@ Graafisen analyysin tulos näyttää tältä:
 
 ![Sprint-O-Matic gameplay in a maze mode by Jyrki Leskelä](/doc/AMaze.png)
 
-A Maze -tilassa harjoittelet ensimmäiselle rastille lähtöä. Saat näkyviisi viisi karttaa yksi kerrallaan. Tehtäväsi on kääntää kartta kymmenessä sekunnissa
-optimaaliseen lähtösuuntaan.
+A Maze -tilassa harjoittelet ensimmäiselle rastille lähtöä. Saat näkyviisi viisi satunnaista ensimmäistä rastiväliä yksi kerrallaan. Tehtäväsi on kääntää kartta kymmenessä sekunnissa optimaaliseen lähtösuuntaan.
 
-Kymmenen sekunnin päästä saat tuloksen, sekä Sprint-O-Maticin ehdotuksen
+Kymmenen sekunnin päästä saat tuloksen, sekä vertailuksi Sprint-O-Maticin ehdotuksen
 parhaasta lähtösuunnasta.
 
 ### Jänistila

@@ -128,8 +128,7 @@ and competes against/with you in between the controls.
 
 ![Sprint-O-Matic gameplay in a maze mode by Jyrki Leskelä](/doc/AMaze.png)
 
-In the A Maze -mode, you exercise the 1st control challenge. You get five maps with only the first control shown. You have 10 seconds to turn the map in
-the best running direction.
+In the A Maze -mode, you exercise the 1st control. You get five random first-leg challenges with only the start and the first control shown. You have 10 seconds to turn the map in the best running direction.
 
 After 10 seconds, you get the verdict, and the Sprint-O-Matic proposal
 for the best direction.
