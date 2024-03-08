@@ -23,6 +23,7 @@ import math
 
 from .gameUIUtils import getApplicationTitle, getMasterFont, getStopKey, getUpKey, getLeftKey, getRightKey, getDownKey, getEnterKey, getSpaceKey, getBackKey, getPlayerColor, getPacemakerColor, getTrackColor, getCreditColor, getGreyColor, convertXCoordinate, convertYCoordinate, getBigScreen, getTimerStep, uiDrawTriangle, checkAutoTestKey, uiFlip, uiSubmitSlide, uiFlushEvents, uiFadeVisibleSlide
 
+from .infiniteWorld import getInfiniteWorldPlace
 from .mathUtils import distanceBetweenPoints
 from .infoBox import showInfoBoxTxt, updateInfoTxtByEvent
 from .gameSounds import stepEffect, finishEffect
@@ -426,21 +427,28 @@ async def initScreen(imagePath, gameSettings, externalImageData, externalWorldCi
         gameSettings.infiniteOulu = True
         gameSettings.infiniteWorld = False
         gameSettings.externalExample = ""
+        uiSubmitSlide(str(randrange(1000000,9999999)) + "th District of Infinite Oulu!")
         uiRenderImmediate(loadingPosition, loadingText)
     elif retSettings[3] == "infinite-world":
         gameSettings.infiniteOulu = False
         gameSettings.infiniteWorld = True
         gameSettings.infiniteWorldCity = worldExampleText
+        gameSettings.place, placeName = getInfiniteWorldPlace(worldExampleText, externalWorldCityMap)
         gameSettings.externalExample = ""
+        if placeName:
+           uiSubmitSlide("Welcome to " + placeName + "...")
+        else:
+           uiSubmitSlide("Somewhere in " + worldExampleText + "...")
         uiRenderImmediate(loadingPosition, loadingText)
     elif retSettings[3] == "external-team" or retSettings[3] == "external-map":
         gameSettings.infiniteOulu = False
         gameSettings.infiniteWorld = False
         gameSettings.externalExample = externalExampleText
         gameSettings.externalExampleTeam = externalExampleTeamText
+        print("Yes")
+        uiSubmitSlide("Welcome to " + externalExampleText)
         uiRenderImmediate(loadingPosition, loadingText)
     pygame.time.set_timer(TIMER_EVENT, 0)
-    uiSubmitSlide("Starting game!")
     uiFlushEvents
     
     return quitting, gameSettings

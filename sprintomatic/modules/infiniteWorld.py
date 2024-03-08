@@ -924,7 +924,7 @@ async def getInfiniteWorld(latlonMapOrigo, xyPictureSize, metersPerPixel, imageP
     return world, worldMask
 
 
-async def getInfiniteWorldDefault(city, citymap, imagePath):
+def getInfiniteWorldPlace(city, citymap):
     currmap = []
     for tentative in citymap:
         if tentative[0] == city:
@@ -932,8 +932,18 @@ async def getInfiniteWorldDefault(city, citymap, imagePath):
             break
     if currmap:
         setup = currmap[randrange(len(currmap))]
-        latlonMapOrigo = tuple(setup[0])
-        metersPerPixel = setup[1] * (0.9 + 0.2 *random())
-        xyPictureSize = (1280, 720)
-        return await getInfiniteWorld(latlonMapOrigo, xyPictureSize, metersPerPixel, imagePath)
+        place = tuple(setup[0])
+        placeName = ""
+        if len(setup) > 2:
+            placeName = setup[2]
+        if placeName == 1.0:
+            placeName = ""
+        return place, placeName
     return None, None
+
+
+async def getInfiniteWorldDefault(place, imagePath):
+    latlonMapOrigo = tuple(place)
+    metersPerPixel = (0.9 + 0.2 *random())
+    xyPictureSize = (1280, 720)
+    return await getInfiniteWorld(latlonMapOrigo, xyPictureSize, metersPerPixel, imagePath)
