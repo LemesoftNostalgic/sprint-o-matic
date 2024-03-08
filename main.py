@@ -490,7 +490,7 @@ async def main():
                                 sRoutes = shortestRoutes[0].copy()
                                 sRoutes.reverse()
                                 uiStartControlEffect(reachedControl)
-                                wantedAngle = angleOfPath(sRoutes, 5)
+                                wantedAngle = angleOfPath(sRoutes, 15)
                                 angleDiff = angleDifference(angle, wantedAngle)
                                 if angleDiff < amazeAcceptedAngleDifference:
                                     finishTexts[1] = "I AGREE!"
