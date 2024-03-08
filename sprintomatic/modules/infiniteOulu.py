@@ -17,7 +17,7 @@
 # under the License.
 #
 
-from random import randrange
+from random import randrange, uniform
 import pygame
 import asyncio
 import math
@@ -78,6 +78,11 @@ fenceDeltaGap = 3
 holeDeltaMax = 4
 rotateOneOutOf = 2
 minMarkedLineSegment = 12
+
+countoursMinOutOf = 3
+countoursMaxOutOf = 4
+countoursMinKernelWidth = 4
+countoursMaxKernelWidth = 5
 
 terrains = ["shortLeg", "mediumLeg", "longLeg"]
 
@@ -169,6 +174,9 @@ backyardkind = [OLIVEGREEN, OPENAREA, ASPHALT]
 yardkind = [OPENAREA, ASPHALT, ASPHALT]
 specialareakind = [OPENAREA, ASPHALT, SHELTERINTERNAL]
 specialareaportkind = [FOREST, NARROWBLACK]
+
+# this one as color too, due to contours
+contouroverlapkindcol = [colors[FOREST], colors[DEEPFOREST], colors[VERYDEEPFOREST], colors[OPENAREA], colors[OLIVEGREEN], colors[ASPHALT]]
 
 # multiple houseforms, each containing a rectlist-pointlist pair
 houseforms = [
@@ -471,6 +479,74 @@ def addTwoHoleFence(area, png, mask, outer, fenceStyle1, fenceStyle2, fenceStyle
     modified, pngModified, maskModified = addSolidFenceSegment(modified, pngModified, maskModified, outer, fenceStyle3, fenceHole2stop, xMax)
     markControlSpot(maskModified, 1 + controlBend, 1 + controlBend)
     return modified, pngModified, maskModified
+
+
+def addContours(kernelWidth, contourArr, keepOneOf):
+    width = contourArr.get_size()[0]
+    height = contourArr.get_size()[1]
+    maxDim = max(width, height) + kernelWidth
+    iZoom = maxDim // kernelWidth
+
+    # constants
+    softeningZoom = 2
+    theMax = 256
+
+    sumArr = pygame.Surface((kernelWidth*iZoom*softeningZoom, kernelWidth*iZoom*softeningZoom))
+    sumArr.fill((0,0,0))
+    thresholdArr = pygame.Surface((width, height))
+    thresholdArr.fill((0,0,0))
+
+    initArrs = []
+    for ind in [1, 2, 4]:
+        initialSize = kernelWidth * ind
+        zoom = iZoom // ind
+
+        arr = pygame.Surface((initialSize,initialSize))
+        for x in range(arr.get_size()[0]):
+            for y in range(arr.get_size()[1]):
+                height = int(uniform(0, (theMax/2)/ind))
+                arr.set_at((x, y), (height, height, height))
+
+        tmpArr = pygame.transform.smoothscale_by(arr, zoom*softeningZoom)
+        sumArr.blit(tmpArr, (0,0, softeningZoom*width, softeningZoom*height), special_flags=pygame.BLEND_ADD)
+
+    sumArr2 = pygame.transform.smoothscale_by(sumArr, 1/softeningZoom)
+
+    origThresholds = [240, 230, 220, 210, 200, 190, 180, 170, 160, 150, 140, 130, 120, 110, 100, 90, 80, 70, 60, 50, 40, 30, 20, 10]
+    thresholds = []
+    thresholdShift = 10
+    for item in origThresholds:
+        if randrange(keepOneOf) == 0:
+            thresholds.append(item)
+
+    yvals = []
+    for y in range(sumArr2.get_size()[1]):
+        yvals.append(sumArr2.get_at((0, y))[0])
+
+    for x in range(1, thresholdArr.get_size()[0] - 1):
+        val = sumArr2.get_at((x, 0))[0]
+        for y in range(1,thresholdArr.get_size()[1] - 1):
+            newVal = sumArr2.get_at((x, y))[0]
+            yvals[y] = (10 * yvals[y] + newVal) / 11
+            val = (10 * val + newVal) / 11
+            val = (val + yvals[y]) / 2
+            for threshold in thresholds:
+                if val > threshold:
+                    col = threshold - thresholdShift
+                    thresholdArr.set_at((x, y), (col, col, col))
+                    break
+
+    for x in range(1, contourArr.get_size()[0] - 1):
+        for y in range(1, contourArr.get_size()[1] - 1):
+            mid = thresholdArr.get_at((x, y))[0]
+            left = thresholdArr.get_at((x -1, y))[0]
+            right = thresholdArr.get_at((x +1, y))[0]
+            up = thresholdArr.get_at((x, y-1))[0]
+            down = thresholdArr.get_at((x, y+ 1))[0]
+            if left + right + up + down < 4 * mid:
+                if contourArr.get_at((x, y)) in contouroverlapkindcol:
+                    contourArr.set_at((x, y), colors[BROWNX])
+    return sumArr2, contourArr
 
 
 def addFence(area, png, mask, outer):
@@ -943,9 +1019,6 @@ def interleaveArea(area, miniarea, png, mask, miniPng, miniMask):
     return modified, pngModified, maskModified
 
 
-def addContours(area, png, mask):
-    pass
-
 def addWeirdArea(area, png, mask, radius, areaType):
     modified, pngModified, maskModified = copyArea(area, png, mask)
 
@@ -1261,6 +1334,7 @@ async def getInfiniteOulu(blockSize, gridSize, boundary):
             await asyncio.sleep(0)
             oulu, ouluMask = installOuluBlock(oulu, png, ouluMask, mask, (x, y), blockSize, boundary)
             await asyncio.sleep(0)
+    dummy_heightmap, oulu = addContours(randrange(countoursMinKernelWidth, countoursMaxKernelWidth), oulu, randrange(countoursMinOutOf, countoursMaxOutOf))
     return oulu, ouluMask
 
 

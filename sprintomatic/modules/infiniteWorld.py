@@ -3,13 +3,17 @@ import asyncio
 import os
 import json
 from math import cos, radians
-from random import randrange, random
+from random import randrange, random, uniform
 
 from .utils import getSlowAreaMask, getSemiSlowAreaMask, getVerySlowAreaMask, getForbiddenAreaMask, getControlMask, getNoMask, getPackagePath
 from .mathUtils import calculatePathDistance
 
 offlineMapDataFolder = os.path.join("data", "offline-map-data", "")
 spotnessFactor = 4
+countoursMinOutOf = 1
+countoursMaxOutOf = 4
+countoursMinKernelWidth = 4
+countoursMaxKernelWidth = 7
 
 # types
 FOREST = '.'
@@ -418,6 +422,74 @@ def drawPolygonWithBounds(png, mask, pointlist, polyInternalColor, polyBoundaryC
         for point in pointlist:
             markControlSpot(mask, point[0], point[1])
 
+
+def drawContours(kernelWidth, contourArr, keepOneOf):
+    width = contourArr.get_size()[0]
+    height = contourArr.get_size()[1]
+    maxDim = max(width, height) + kernelWidth
+    iZoom = maxDim // kernelWidth
+
+    # constants
+    softeningZoom = 2
+    theMax = 256
+
+    sumArr = pygame.Surface((kernelWidth*iZoom*softeningZoom, kernelWidth*iZoom*softeningZoom))
+    sumArr.fill((0,0,0))
+    thresholdArr = pygame.Surface((width, height))
+    thresholdArr.fill((0,0,0))
+
+    initArrs = []
+    for ind in [1, 2, 4]:
+        initialSize = kernelWidth * ind
+        zoom = iZoom // ind
+
+        arr = pygame.Surface((initialSize,initialSize))
+        for x in range(arr.get_size()[0]):
+            for y in range(arr.get_size()[1]):
+                height = int(uniform(0, (theMax/2)/ind))
+                arr.set_at((x, y), (height, height, height))
+
+        tmpArr = pygame.transform.smoothscale_by(arr, zoom*softeningZoom)
+        sumArr.blit(tmpArr, (0,0, softeningZoom*width, softeningZoom*height), special_flags=pygame.BLEND_ADD)
+
+    sumArr2 = pygame.transform.smoothscale_by(sumArr, 1/softeningZoom)
+
+    origThresholds = [240, 230, 220, 210, 200, 190, 180, 170, 160, 150, 140, 130, 120, 110, 100, 90, 80, 70, 60, 50, 40, 30, 20, 10]
+    thresholds = []
+    thresholdShift = 10
+    for item in origThresholds:
+        if randrange(keepOneOf) == 0:
+            thresholds.append(item)
+
+    yvals = []
+    for y in range(sumArr2.get_size()[1]):
+        yvals.append(sumArr2.get_at((0, y))[0])
+
+    for x in range(1, thresholdArr.get_size()[0] - 1):
+        val = sumArr2.get_at((x, 0))[0]
+        for y in range(1,thresholdArr.get_size()[1] - 1):
+            newVal = sumArr2.get_at((x, y))[0]
+            yvals[y] = (10 * yvals[y] + newVal) / 11
+            val = (10 * val + newVal) / 11
+            val = (val + yvals[y]) / 2
+            for threshold in thresholds:
+                if val > threshold:
+                    col = threshold - thresholdShift
+                    thresholdArr.set_at((x, y), (col, col, col))
+                    break
+
+    for x in range(1, contourArr.get_size()[0] - 1):
+        for y in range(1, contourArr.get_size()[1] - 1):
+            mid = thresholdArr.get_at((x, y))[0]
+            left = thresholdArr.get_at((x -1, y))[0]
+            right = thresholdArr.get_at((x +1, y))[0]
+            up = thresholdArr.get_at((x, y-1))[0]
+            down = thresholdArr.get_at((x, y+ 1))[0]
+            if left + right + up + down < 4 * mid:
+                contourArr.set_at((x, y), colors[BROWNX])
+    return sumArr2, contourArr
+
+
 def drawSpot(png, mask, pointlist, filltype):
     radius = 3
     crossradius = 2
@@ -784,6 +856,8 @@ async def getInfiniteWorld(latlonMapOrigo, xyPictureSize, metersPerPixel, imageP
     world, worldMask = drawOliveArea(world, worldMask, db)
     await asyncio.sleep(0)
     world, worldMask = drawSolidGreenArea(world, worldMask, db)
+    await asyncio.sleep(0)
+    dummy_heightmap, world = drawContours(randrange(countoursMinKernelWidth, countoursMaxKernelWidth), world, randrange(countoursMinOutOf, countoursMaxOutOf))
     await asyncio.sleep(0)
     world, worldMask = drawWater(world, worldMask, db)
     await asyncio.sleep(0)
