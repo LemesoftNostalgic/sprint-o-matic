@@ -324,6 +324,7 @@ async def main():
     nextControl = None
     reachedControl = None
     quitting = False
+    firstTime = True
 
     # This is the main loop
     while not quitting:
@@ -372,6 +373,7 @@ async def main():
 
                 # initializations specific to a particular track
                 controls = await setTheStageForNewRound(config)
+                firstTime = True
 
                 # Flush events again
                 await uiFlushEvents()
@@ -598,7 +600,8 @@ async def main():
                                             externalMapInfoTexts = [stripMapName(subitem["map-url"]), subitem["map-license"], subitem["map-credits"], stripMapName(subitem["lookup-png-url"]), subitem["lookup-png-license"], subitem["lookup-png-credits"]]
                                             break
                         if gameSettings.noUiTest != "yes":
-                            uiCompleteRender(finishTexts, externalMapInfoTexts, gameSettings.pacemaker, pacemakerTextNeeded, aiTextNeeded, gameSettings.amaze, normalizedDifference)
+                            uiCompleteRender(finishTexts, externalMapInfoTexts, gameSettings.pacemaker, pacemakerTextNeeded, aiTextNeeded, gameSettings.amaze, normalizedDifference, firstTime)
+                            firstTime = False
             await asyncio.sleep(0)
 
     # Final freeing of resources

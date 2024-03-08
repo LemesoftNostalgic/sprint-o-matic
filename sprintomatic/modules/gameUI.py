@@ -24,7 +24,7 @@ import asyncio
 from datetime import datetime
 from random import randrange
 
-from .gameUIUtils import getMasterFont, getStopKey, getLeftKey, getRightKey, getPlayerColor, getTrackColor, getCreditColor, getPacemakerColor, getPlayerRouteColor, getFinishTextColor, getWhiteColor, convertXCoordinate, convertXCoordinateSpecificSurface, convertYCoordinate, getBigScreen, getTimerStepSeconds, getAnalysisResultsFileBase
+from .gameUIUtils import getMasterFont, getStopKey, getLeftKey, getRightKey, getPlayerColor, getTrackColor, getCreditColor, getPacemakerColor, getPlayerRouteColor, getFinishTextColor, getWhiteColor, convertXCoordinate, convertXCoordinateSpecificSurface, convertYCoordinate, getBigScreen, getTimerStepSeconds, getAnalysisResultsFileBase, uiFlip, uiUnSubmitSlide
 from .mathUtils import rotatePoint, fromRadiansToDegrees, distanceBetweenPoints, triangleCreator
 from .infoBox import showInfoBoxTxt, updateInfoTxtByEvent
 
@@ -243,7 +243,7 @@ def uiAnimatePacemaker(pos, angle, scale, pacemakerInd, inTunnel, background):
     feetPlusPacemaker = uiAnimateCharacter(oMapCopy, pos, math.pi - angle, getPacemakerColor(pacemakerInd), 0.6 * scale / metersPerPixel, feetPlusPacemaker, inTunnel, background, False)
 
 
-def uiCompleteRender(finishTexts, mapInfoTextList, pacemakerInd, pacemakerTextNeeded, aiTextNeeded, amaze, amazeNumber):
+def uiCompleteRender(finishTexts, mapInfoTextList, pacemakerInd, pacemakerTextNeeded, aiTextNeeded, amaze, amazeNumber, firstTime):
     xShift = (getBigScreen().get_size()[0] - screen.get_size()[0]) / 2
     yShift = (getBigScreen().get_size()[1] - screen.get_size()[1]) / 2
     getBigScreen().blit(screen, (xShift, yShift))
@@ -258,7 +258,10 @@ def uiCompleteRender(finishTexts, mapInfoTextList, pacemakerInd, pacemakerTextNe
     if mapInfoTextList:
         uiRenderExternalMapInfo(mapInfoTextList)
     showInfoBoxTxt(getBigScreen())
-    pygame.display.flip()
+    if firstTime:
+        uiUnSubmitSlide()
+    else:
+        uiFlip()
 
 
 previousTime = time.time()

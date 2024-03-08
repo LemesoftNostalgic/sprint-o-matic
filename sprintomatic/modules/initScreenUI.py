@@ -21,7 +21,7 @@ import asyncio
 import pygame
 import math
 
-from .gameUIUtils import getApplicationTitle, getMasterFont, getStopKey, getUpKey, getLeftKey, getRightKey, getDownKey, getEnterKey, getSpaceKey, getBackKey, getPlayerColor, getPacemakerColor, getTrackColor, getCreditColor, getGreyColor, convertXCoordinate, convertYCoordinate, getBigScreen, getTimerStep, uiDrawTriangle, checkAutoTestKey
+from .gameUIUtils import getApplicationTitle, getMasterFont, getStopKey, getUpKey, getLeftKey, getRightKey, getDownKey, getEnterKey, getSpaceKey, getBackKey, getPlayerColor, getPacemakerColor, getTrackColor, getCreditColor, getGreyColor, convertXCoordinate, convertYCoordinate, getBigScreen, getTimerStep, uiDrawTriangle, checkAutoTestKey, uiFlip, uiSubmitSlide
 
 from .mathUtils import distanceBetweenPoints
 from .infoBox import showInfoBoxTxt, updateInfoTxtByEvent
@@ -70,7 +70,7 @@ def showInitArrow(surf, spot, inScale):
 
 def uiRenderImmediate(pos, textStr):
     showTextShadowed(pos, 32, textStr, getTrackColor(), 2)
-    pygame.display.flip()
+    uiFlip()
 
 
 def showInitSelections(surf, positions, selections, inScale, texts, titleTexts, titleTextPositions, creditTexts, creditTextPositions, externalOverallText, externalOverallPos, externalTeamText, externalTeamPosition, externalText, externalPosition, ouluText, ouluPosition, news, newsPosition, worldText, worldPosition):
@@ -384,7 +384,7 @@ async def initScreen(imagePath, gameSettings, externalImageData, externalWorldCi
         showInitArrow(getBigScreen(), positions[initScreenPos], arrowScale)
         if gameSettings.infoBox:
             showInfoBoxTxt(getBigScreen())
-        pygame.display.flip()
+        uiFlip()
         await asyncio.sleep(0)
 
     retSettings = []
@@ -435,4 +435,5 @@ async def initScreen(imagePath, gameSettings, externalImageData, externalWorldCi
         gameSettings.externalExampleTeam = externalExampleTeamText
         uiRenderImmediate(loadingPosition, loadingText)
     pygame.time.set_timer(TIMER_EVENT, 0)
+    uiSubmitSlide("Starting game!")
     return quitting, gameSettings
