@@ -1208,33 +1208,69 @@ def filterProblematicControls(area, png, mask):
     return modified, pngModified, maskModified
 
 
-def addBlock(dim, bigBlock):
+async def addBlock(dim, bigBlock):
     area, png, mask = createArea(dim)
     if randrange(0, forestBlockOneOutOf) != 0:
         area, png, mask = addOpens(area, png, mask)
+        if await uiFlushEvents():
+            return None, None, None
         area, png, mask = addHouses(area, png, mask)
+        if await uiFlushEvents():
+            return None, None, None
         if dim[0] > 100 and randrange(0, miniBlockOneOutOf) == 0:
-            miniarea, minipng, minimask = addBlock((dim[0]//2, dim[1]//2), False)
+            miniarea, minipng, minimask = await addBlock((dim[0]//2, dim[1]//2), False)
             area, png, mask = interleaveArea(area, miniarea, png, mask, minipng, minimask)
+        if await uiFlushEvents():
+            return None, None, None
         area, png, mask = addFences(area, png, mask, bigBlock)
+        if await uiFlushEvents():
+            return None, None, None
         area, png, mask = addSpecialties(area, png, mask)
+        if await uiFlushEvents():
+            return None, None, None
         area, png, mask = addHuts(area, png, mask)
+        if await uiFlushEvents():
+            return None, None, None
         area, png, mask = recolorForbiddenPlaces(area, png, mask, "big")
+        if await uiFlushEvents():
+            return None, None, None
         area, png, mask = recolorForbiddenPlaces(area, png, mask, "topLeft")
+        if await uiFlushEvents():
+            return None, None, None
         area, png, mask = recolorForbiddenPlaces(area, png, mask, "topRight")
+        if await uiFlushEvents():
+            return None, None, None
         area, png, mask = recolorForbiddenPlaces(area, png, mask, "bottomLeft")
+        if await uiFlushEvents():
+            return None, None, None
         area, png, mask = recolorForbiddenPlaces(area, png, mask, "bottomRight")
+        if await uiFlushEvents():
+            return None, None, None
         area, png, mask = filterProblematicControls(area, png, mask)
         if dim[0] > 100:
             area, png, mask = addSpots(area, png, mask, False)
     else:
         area, png, mask = addDifficultForest(area, png, mask)
+        if await uiFlushEvents():
+            return None, None, None
         area, png, mask = addHole(area, png, mask)
+        if await uiFlushEvents():
+            return None, None, None
         area, png, mask = addPathsAndStreams(area, png, mask)
+        if await uiFlushEvents():
+            return None, None, None
         area, png, mask = addLake(area, png, mask)
+        if await uiFlushEvents():
+            return None, None, None
         area, png, mask = addSpecialties(area, png, mask)
+        if await uiFlushEvents():
+            return None, None, None
         area, png, mask = addCottages(area, png, mask)
+        if await uiFlushEvents():
+            return None, None, None
         area, png, mask = filterProblematicControls(area, png, mask)
+        if await uiFlushEvents():
+            return None, None, None
         if dim[0] > 100:
             area, png, mask = addSpots(area, png, mask, True)
     return area, png, mask
@@ -1333,8 +1369,10 @@ async def getInfiniteOulu(blockSize, gridSize, boundary):
         for y in range(gridSize[1]):
             if await uiFlushEvents():
                 return None, None
-            yard, png, mask = addBlock(blockSize, True)
+            yard, png, mask = await addBlock(blockSize, True)
             await asyncio.sleep(0)
+            if yard == None:
+                return None, None
             oulu, ouluMask = installOuluBlock(oulu, png, ouluMask, mask, (x, y), blockSize, boundary)
             await asyncio.sleep(0)
     dummy_heightmap, oulu = addContours(randrange(countoursMinKernelWidth, countoursMaxKernelWidth), oulu, randrange(countoursMinOutOf, countoursMaxOutOf))

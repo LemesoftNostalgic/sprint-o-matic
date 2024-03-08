@@ -151,7 +151,9 @@ def uiDrawTriangle(surf, radius, angle, pos, wd):
     pygame.draw.line(surf, getTrackColor(), triangle[2], triangle[0], width = wd)
 
 
-slideCtrStart = 8
+slideCtrStart = 12
+slideCtrStartUp = 12
+slideCtrStartDown = 12
 slideCtr = 0
 bigScreenCopy = None
 bigScreenNew = None
@@ -160,11 +162,11 @@ def uiSubmitSlide(textStr):
     global slideCtr
     global bigScreenCopy
     global bigScreenNew
-    global bigScreenMul
-    slideCtr = slideCtrStart
+    global slideCtrStart
+    slideCtr = slideCtrStartUp
+    sideCtrStart = slideCtrStartUp
     bigScreenCopy = bigScreen.copy()
     bigScreenNew = bigScreen.copy()
-    bigScreenMul = bigScreen.copy()
     bigScreenNew.fill(getBlackColor())
     middle = tuple(ti/2.0 for ti in bigScreenNew.get_size())
     slideText = pygame.font.Font(getMasterFont(), convertXCoordinate(48)).render(textStr, True, getCreditColor())
@@ -173,11 +175,26 @@ def uiSubmitSlide(textStr):
     bigScreenNew.blit(slideText, slideTextRect)
 
 
+def uiFadeVisibleSlide():
+    global slideCtr
+    global bigScreenCopy
+    global bigScreenNew
+    global slideCtrStart
+    slideCtr = slideCtrStartDown
+    slideCtrStart = slideCtrStartDown
+    if bigScreenCopy == None:
+        bigScreenCopy = bigScreen.copy()
+    bigScreenCopy.fill(getBlackColor())
+    bigScreenNew = bigScreen.copy()
+
+
 def uiUnSubmitSlide():
     global slideCtr
     global bigScreenCopy
     global bigScreenNew
-    slideCtr = slideCtrStart
+    global slideCtrStart
+    slideCtr = slideCtrStartDown
+    slideCtrStart = slideCtrStartDown
     bigScreenCopy = bigScreenNew
     bigScreenNew = bigScreen.copy()
 
@@ -185,6 +202,7 @@ def uiUnSubmitSlide():
 def uiFlip():
     global slideCtr
     global slideCtrStart
+    global bigScreenMul
     if slideCtr:
         slideCtr = slideCtr - 1
         step = slideCtr * (255 // slideCtrStart)
@@ -192,11 +210,14 @@ def uiFlip():
         stepCol = (step, step, step)
         stepBackCol = (stepBack, stepBack, stepBack)
         bigScreen.fill(stepCol)
+        if bigScreenMul == None:
+            bigScreenMul = bigScreen.copy()        
         bigScreenMul.fill(stepBackCol)
         bigScreen.blit(bigScreenCopy, (0,0), special_flags=pygame.BLEND_MULT)
         bigScreenMul.blit(bigScreenNew, (0,0), special_flags=pygame.BLEND_MULT)
         bigScreen.blit(bigScreenMul, (0,0), special_flags=pygame.BLEND_ADD)
     pygame.display.flip()
+
 
 def uiLateQuit():
     getBigScreen().fill(getWhiteColor())
@@ -204,10 +225,10 @@ def uiLateQuit():
     pygame.quit()
 
 
-uiFlipFreq = 0.1
-prev_flush_time = time.time()
+uiFlipFreq = 0.05
 async def uiFlushEvents():
     global prev_flush_time
+    global slideCtr
     retval = False
     for event in pygame.event.get():
         if event.type == pygame.KEYDOWN:
@@ -219,8 +240,9 @@ async def uiFlushEvents():
         elif event.type == pygame.QUIT:
             retval = True
 
-    if time.time() - prev_flush_time > uiFlipFreq:
-        prev_flush_time = time.time()
+    # attach a slideware starter here
+    if slideCtr:
         uiFlip()
+        await asyncio.sleep(uiFlipFreq)
 
     return retval

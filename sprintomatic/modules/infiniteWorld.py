@@ -370,11 +370,15 @@ async def constructWayDb(latlonMapOrigo, xyPictureSize, metersPerPixel):
 
             if waytype not in waydb:
                 waydb[waytype] = {}
+            if await uiFlushEvents():
+                return None
 
             for way in result.ways:
                 subway = way.tags.get(waytype, "n/a")
                 if subway not in waydb[waytype]:
                     waydb[waytype][subway] = []
+                if await uiFlushEvents():
+                    return None
                 poslistToAppend = []
                 for node in way.nodes:
                     xyPos = toPictureCoordinates(latlonMapOrigo, (float(node.lat), float(node.lon)), xyPictureSize, metersPerPixel)
@@ -831,12 +835,14 @@ def drawArtificialSpots(png, mask):
     return png, mask
 
 
-def initWorldCreator(size, imagePath):
+async def initWorldCreator(size, imagePath):
     png = pygame.Surface(size)
     mask = pygame.Surface(size)
     pattern = pygame.image.load(imagePath + "lemesoftnostalgic/OpenPattern.png")
     psize = pattern.get_size()
     for x in range(size[0]//psize[0]):
+        if await uiFlushEvents():
+            return None, None
         for y in range(size[1]//psize[1]):
             png.blit(pattern, (x * psize[0], y * psize[1]))
     mask.fill(getSlowAreaMask())
@@ -844,14 +850,16 @@ def initWorldCreator(size, imagePath):
 
 
 async def getInfiniteWorld(latlonMapOrigo, xyPictureSize, metersPerPixel, imagePath):
+    world, worldMask = await initWorldCreator(xyPictureSize, imagePath)
+    if world == None:
+        return None, None
+    await asyncio.sleep(0)
     db = await constructWayDb(latlonMapOrigo, xyPictureSize, metersPerPixel)
     if db == None:
         return None, None
     await asyncio.sleep(0)
     if await uiFlushEvents():
         return None, None
-    world, worldMask = initWorldCreator(xyPictureSize, imagePath)
-    await asyncio.sleep(0)
     if await uiFlushEvents():
         return None, None
     world, worldMask = drawForestArea(world, worldMask, db)

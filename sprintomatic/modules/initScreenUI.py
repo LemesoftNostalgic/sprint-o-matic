@@ -21,7 +21,7 @@ import asyncio
 import pygame
 import math
 
-from .gameUIUtils import getApplicationTitle, getMasterFont, getStopKey, getUpKey, getLeftKey, getRightKey, getDownKey, getEnterKey, getSpaceKey, getBackKey, getPlayerColor, getPacemakerColor, getTrackColor, getCreditColor, getGreyColor, convertXCoordinate, convertYCoordinate, getBigScreen, getTimerStep, uiDrawTriangle, checkAutoTestKey, uiFlip, uiSubmitSlide
+from .gameUIUtils import getApplicationTitle, getMasterFont, getStopKey, getUpKey, getLeftKey, getRightKey, getDownKey, getEnterKey, getSpaceKey, getBackKey, getPlayerColor, getPacemakerColor, getTrackColor, getCreditColor, getGreyColor, convertXCoordinate, convertYCoordinate, getBigScreen, getTimerStep, uiDrawTriangle, checkAutoTestKey, uiFlip, uiSubmitSlide, uiFlushEvents, uiFadeVisibleSlide
 
 from .mathUtils import distanceBetweenPoints
 from .infoBox import showInfoBoxTxt, updateInfoTxtByEvent
@@ -145,6 +145,8 @@ async def initScreen(imagePath, gameSettings, externalImageData, externalWorldCi
     global externalExampleCtr
     global worldExampleCtr
     global initScreenPos
+
+    firstTime = True
 
     # scale for the current display
     xStep = convertXCoordinate(xStepOrig)
@@ -384,6 +386,9 @@ async def initScreen(imagePath, gameSettings, externalImageData, externalWorldCi
         showInitArrow(getBigScreen(), positions[initScreenPos], arrowScale)
         if gameSettings.infoBox:
             showInfoBoxTxt(getBigScreen())
+        if firstTime:
+                uiFadeVisibleSlide()
+                firstTime = False
         uiFlip()
         await asyncio.sleep(0)
 
@@ -436,4 +441,6 @@ async def initScreen(imagePath, gameSettings, externalImageData, externalWorldCi
         uiRenderImmediate(loadingPosition, loadingText)
     pygame.time.set_timer(TIMER_EVENT, 0)
     uiSubmitSlide("Starting game!")
+    uiFlushEvents
+    
     return quitting, gameSettings
