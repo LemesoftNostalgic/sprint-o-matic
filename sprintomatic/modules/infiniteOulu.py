@@ -25,6 +25,7 @@ import math
 from .mathUtils import rotateVector, rotatePoint, getBoundingBox, polygonCreate, polygonContainsWithLookup
 from .lookupPngReader import getTfs
 from .utils import getSlowAreaMask, getSemiSlowAreaMask, getVerySlowAreaMask, getForbiddenAreaMask, getControlMask, getNoMask, getAiPoolMaxTimeLimit, getTunnelMask
+from .gameUIUtils  import uiFlushEvents
 
 # types
 FOREST = '.'
@@ -1330,6 +1331,8 @@ async def getInfiniteOulu(blockSize, gridSize, boundary):
     oulu, ouluMask = initOuluCreator(blockSize, gridSize, boundary)
     for x in range(gridSize[0]):
         for y in range(gridSize[1]):
+            if await uiFlushEvents():
+                return None, None
             yard, png, mask = addBlock(blockSize, True)
             await asyncio.sleep(0)
             oulu, ouluMask = installOuluBlock(oulu, png, ouluMask, mask, (x, y), blockSize, boundary)

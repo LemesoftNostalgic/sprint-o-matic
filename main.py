@@ -330,10 +330,11 @@ async def main():
         running = True
         if showInitScreen:
             startBirds()
-            await uiFlushEvents()
             if gameSettings.autoTest:
                 (quitting, gameSettings) = fakeInitScreen(gameSettings.imageRoot, gameSettings, externalImageData)
             else:
+                time.sleep(1)
+                await uiFlushEvents()
                 (quitting, gameSettings) = await initScreen(gameSettings.imageRoot, gameSettings, externalImageData, externalWorldCityMap, news)
             running = True
             if quitting:
@@ -404,7 +405,6 @@ async def main():
                     running = False
                     if gameSettings.autoTest:
                         fakeResetAgain()
-                    time.sleep(1)
                     stopMelody()
                     stopEffects()
                     if not showInitScreen:

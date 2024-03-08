@@ -7,6 +7,7 @@ from random import randrange, random, uniform
 
 from .utils import getSlowAreaMask, getSemiSlowAreaMask, getVerySlowAreaMask, getForbiddenAreaMask, getControlMask, getNoMask, getPackagePath
 from .mathUtils import calculatePathDistance
+from .gameUIUtils import uiFlushEvents
 
 offlineMapDataFolder = os.path.join("data", "offline-map-data", "")
 spotnessFactor = 4
@@ -359,6 +360,8 @@ async def constructWayDb(latlonMapOrigo, xyPictureSize, metersPerPixel):
 
     
         for waytype in waytypes:
+            if await uiFlushEvents():
+                return None
             result = api.query("""
                 way("""+str(latlonMapOrigo[0])+""","""+str(latlonMapOrigo[1])+""","""+str(latlonMapOppositeCorner[0])+""","""+str(latlonMapOppositeCorner[1])+""") [\"""" + waytype + """\"];
                 (._;>;);
@@ -842,37 +845,71 @@ def initWorldCreator(size, imagePath):
 
 async def getInfiniteWorld(latlonMapOrigo, xyPictureSize, metersPerPixel, imagePath):
     db = await constructWayDb(latlonMapOrigo, xyPictureSize, metersPerPixel)
+    if db == None:
+        return None, None
     await asyncio.sleep(0)
+    if await uiFlushEvents():
+        return None, None
     world, worldMask = initWorldCreator(xyPictureSize, imagePath)
     await asyncio.sleep(0)
+    if await uiFlushEvents():
+        return None, None
     world, worldMask = drawForestArea(world, worldMask, db)
     await asyncio.sleep(0)
+    if await uiFlushEvents():
+        return None, None
     world, worldMask = drawOpenArea(world, worldMask, db)
     await asyncio.sleep(0)
+    if await uiFlushEvents():
+        return None, None
     world, worldMask = drawBrownArea(world, worldMask, db)
     await asyncio.sleep(0)
+    if await uiFlushEvents():
+        return None, None
     world, worldMask = drawAsphaltArea(world, worldMask, db)
     await asyncio.sleep(0)
+    if await uiFlushEvents():
+        return None, None
     world, worldMask = drawOliveArea(world, worldMask, db)
     await asyncio.sleep(0)
+    if await uiFlushEvents():
+        return None, None
     world, worldMask = drawSolidGreenArea(world, worldMask, db)
     await asyncio.sleep(0)
+    if await uiFlushEvents():
+        return None, None
     dummy_heightmap, world = drawContours(randrange(countoursMinKernelWidth, countoursMaxKernelWidth), world, randrange(countoursMinOutOf, countoursMaxOutOf))
     await asyncio.sleep(0)
+    if await uiFlushEvents():
+        return None, None
     world, worldMask = drawWater(world, worldMask, db)
     await asyncio.sleep(0)
+    if await uiFlushEvents():
+        return None, None
     world, worldMask = drawCliff(world, worldMask, db)
     await asyncio.sleep(0)
+    if await uiFlushEvents():
+        return None, None
     world, worldMask = drawRailway(world, worldMask, db, metersPerPixel)
     await asyncio.sleep(0)
+    if await uiFlushEvents():
+        return None, None
     world, worldMask = drawArtificialSpots(world, worldMask)
     await asyncio.sleep(0)
+    if await uiFlushEvents():
+        return None, None
     world, worldMask = drawRoads(world, worldMask, db, metersPerPixel)
     await asyncio.sleep(0)
+    if await uiFlushEvents():
+        return None, None
     world, worldMask = drawFences(world, worldMask, db)
     await asyncio.sleep(0)
+    if await uiFlushEvents():
+        return None, None
     world, worldMask = drawHouses(world, worldMask, db)
     await asyncio.sleep(0)
+    if await uiFlushEvents():
+        return None, None
     world, worldMask = drawSpots(world, worldMask, db)
     x, y = worldMask.get_size()
     pygame.draw.rect(worldMask, getForbiddenAreaMask(), [(2,2), ((x-2, y-2))], width=2)

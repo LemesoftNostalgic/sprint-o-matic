@@ -23,6 +23,7 @@ import time
 import asyncio
 
 from .mathUtils import angleBetweenLineSegments, distanceBetweenPoints, calculatePathDistance
+from .gameUIUtils import uiFlushEvents
 from .pathPruning import pruneEnsureLineOfSightExt, pruneShortestRouteExt
 from .routeAI import calculateCoarseRouteExt, calculateShortestRoute, slowAccurateCalculateShortestRouteAsync
 
@@ -159,7 +160,7 @@ async def createAutoControls(cfg, trackLength, distribution, metersPerPixel, faL
         ctrl, dist, isDifficultControl = pickDistAutoControl(cfg, ctrls, distribution, metersPerPixel, faLookups)
         if isDifficultControl:
             numDifficultControls = numDifficultControls + 1
-        if ctrl is None:
+        if ctrl is None or await uiFlushEvents():
             return [], []
 
         preComputed, dummy_jumps = calculateCoarseRouteExt(ctrls[-1], ctrl, faLookups, precision, True, True, 0)
@@ -199,7 +200,7 @@ async def createAmazeControls(cfg, distribution, metersPerPixel, faLookups, saLo
     secondBestCtrl = (0,0)
     
     while True:
-        if time.time() - start_tot_time > totMaxTimeAmaze:
+        if time.time() - start_tot_time > totMaxTimeAmaze or await uiFlushEvents():
             return [], [], [], [], 0.0
         ctrls = []
         ctrl, dummy_dist = pickAutoControl(cfg, ctrls, 0, 1000000)

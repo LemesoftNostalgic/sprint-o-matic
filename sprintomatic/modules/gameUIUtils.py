@@ -144,8 +144,18 @@ def uiEarlyInit(fullScreen):
 
 
 async def uiFlushEvents():
+    retval = False
     for event in pygame.event.get():
-        pass
+        if event.type == pygame.KEYDOWN:
+            if event.scancode == getStopKey():
+                retval = True
+        elif event.type == pygame.MOUSEBUTTONDOWN:
+            if pygame.mouse.get_pressed()[1]:
+                retval = True
+        elif event.type == pygame.QUIT:
+            retval = True
+    return retval
+
 
 def uiDrawTriangle(surf, radius, angle, pos, wd):
     triangle = triangleCreator(radius, angle, pos)
