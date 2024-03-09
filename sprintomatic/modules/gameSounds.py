@@ -65,8 +65,9 @@ melodyPaths = [
     os.path.join("nomiqbomi", "579059__nomiqbomi__transist-4.ogg"),
     os.path.join("seth", "680840__seth_makes_sounds__homemade.ogg"),
     os.path.join("szymalix", "588569__szymalix__risemix.ogg"),
-    os.path.join("the_loner", "705439__the_loner__weird_loop02.ogg")
-    ]
+    os.path.join("the_loner", "705439__the_loner__weird_loop02.ogg"),
+    os.path.join("badoink", "538501__badoink__slow-and-easy.ogg")
+]
 
 melodySounds = []
 melodyCtr = None
@@ -194,6 +195,9 @@ def startMelody():
     if melodyCtr >= len(melodySounds):
         melodyCtr = 0
     melodyChannel.play(melodySounds[melodyCtr], loops=-1, fade_ms=20000)
+
+def startElevatorMelody():
+    melodyChannel.play(melodySounds[-1], loops=-1, fade_ms=120000)
 
 def stopMelody():
     melodyChannel.stop()

@@ -21,8 +21,9 @@ import asyncio
 import pygame
 import os
 import time
+import math
 
-from .mathUtils import triangleCreator
+from .mathUtils import triangleCreator, rotateVector, angleOfLine
 from .utils import getPackagePath
 
 xReference = 1920
@@ -143,12 +144,37 @@ def uiEarlyInit(fullScreen):
     pygame.mouse.set_visible(False)
     xCurrent, yCurrent = bigScreen.get_size()
 
+    
+def uiDrawLine(surf, color, start, end, width):
+    angle = angleOfLine([start, end])
+
+    for ind in range(1, width):
+        for dir in [-1, 1]:
+            inc = rotateVector(angle + dir * math.pi / 2, 0.5)
+            st = (start[0] + ind * inc[0], start[1] + ind * inc[1])
+            ed = (end[0] + ind * inc[0], end[1] + ind * inc[1])
+            pygame.draw.aalines(surf, color, False, [st, ed])
+
+    pygame.draw.aalines(surf, color, False, [start, end])
+
+
+def uiDrawCircle(surf, color, center, radius, width):
+    numSteps = int(radius) * 4
+    angleStep = (2 * math.pi) / numSteps
+    for ind in range(numSteps):
+        startV = rotateVector(ind * angleStep, radius)
+        endV = rotateVector((ind + 1) * angleStep, radius)
+        start = (center[0]+startV[0], center[1]+startV[1])
+        end = (center[0]+endV[0], center[1]+endV[1])
+        uiDrawLine(surf, color, start, end, width)
+    
 
 def uiDrawTriangle(surf, radius, angle, pos, wd):
     triangle = triangleCreator(radius, angle, pos)
-    pygame.draw.line(surf, getTrackColor(), triangle[0], triangle[1], width = wd)
-    pygame.draw.line(surf, getTrackColor(), triangle[1], triangle[2], width = wd)
-    pygame.draw.line(surf, getTrackColor(), triangle[2], triangle[0], width = wd)
+    uiDrawLine(surf, getTrackColor(), triangle[0], triangle[1], wd)
+    uiDrawLine(surf, getTrackColor(), triangle[1], triangle[2], wd)
+    uiDrawLine(surf, getTrackColor(), triangle[2], triangle[0], wd)
+
 
 
 slideCtrStart = 12
@@ -199,23 +225,40 @@ def uiUnSubmitSlide():
     bigScreenNew = bigScreen.copy()
 
 
-def uiFlip():
+def uiSubFlip():
     global slideCtr
     global slideCtrStart
     global bigScreenMul
-    if slideCtr:
-        slideCtr = slideCtr - 1
-        step = slideCtr * (255 // slideCtrStart)
-        stepBack = 255 - step
-        stepCol = (step, step, step)
-        stepBackCol = (stepBack, stepBack, stepBack)
-        bigScreen.fill(stepCol)
-        if bigScreenMul == None:
-            bigScreenMul = bigScreen.copy()        
-        bigScreenMul.fill(stepBackCol)
-        bigScreen.blit(bigScreenCopy, (0,0), special_flags=pygame.BLEND_MULT)
-        bigScreenMul.blit(bigScreenNew, (0,0), special_flags=pygame.BLEND_MULT)
-        bigScreen.blit(bigScreenMul, (0,0), special_flags=pygame.BLEND_ADD)
+    step = slideCtr * (255 // slideCtrStart)
+    stepBack = 255 - step
+    stepCol = (step, step, step)
+    stepBackCol = (stepBack, stepBack, stepBack)
+    bigScreen.fill(stepCol)
+    if bigScreenMul == None:
+        bigScreenMul = bigScreen.copy()        
+    bigScreenMul.fill(stepBackCol)
+    bigScreen.blit(bigScreenCopy, (0,0), special_flags=pygame.BLEND_MULT)
+    bigScreenMul.blit(bigScreenNew, (0,0), special_flags=pygame.BLEND_MULT)
+    bigScreen.blit(bigScreenMul, (0,0), special_flags=pygame.BLEND_ADD)
+
+
+uiFlipFreq = 0.05
+async def uiFlip(fast):
+    global slideCtr
+    if not fast:
+        if slideCtr > 0:
+            while slideCtr > 0:
+                slideCtr = slideCtr - 1
+                uiSubFlip()
+                if slideCtr > 0:
+                    pygame.display.flip()
+                    await asyncio.sleep(uiFlipFreq)
+    else:
+        if slideCtr > 0:
+            slideCtr = slideCtr - 1
+            uiSubFlip()
+
+    # and then the final flip
     pygame.display.flip()
 
 
@@ -225,10 +268,7 @@ def uiLateQuit():
     pygame.quit()
 
 
-uiFlipFreq = 0.05
 async def uiFlushEvents():
-    global prev_flush_time
-    global slideCtr
     retval = False
     for event in pygame.event.get():
         if event.type == pygame.KEYDOWN:
@@ -241,8 +281,6 @@ async def uiFlushEvents():
             retval = True
 
     # attach a slideware starter here
-    if slideCtr:
-        uiFlip()
-        await asyncio.sleep(uiFlipFreq)
+    await uiFlip(True)
 
     return retval

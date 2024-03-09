@@ -33,7 +33,7 @@ from sprintomatic.modules.initScreenUI import initScreen
 from sprintomatic.modules.gameUI import uiInit, uiInitStartTriangle, uiStartControlEffect, uiControlEffectEnded, uiCenterTurnZoomTheMap, uiAnimatePlayer, uiAnimatePacemaker, uiRenderRoutes, uiRenderControls, uiCompleteRender, uiEvent, uiClearCanvas, raiseControlApproachZoom, lowerControlApproachZoom, uiRenderPacemakerText, uiRenderAIText, uiControlEffectRestart, uiRenderExternalMapInfo, uiStoreAnalysis
 from sprintomatic.modules.gameEngine import startOverPlayerRoute, playerRoute, calculateNextStep, closeToControl, quiteCloseToControl, longLapEveryOther, generateAngleStep, normalizeAngleStep, defaultAngle, getPlayerRoute, getPacemakerThreshold, getPacemakerPos
 from sprintomatic.modules.pathPruning import calculatePathWeightedDistance
-from sprintomatic.modules.gameSounds import initSounds, stopSounds, maintainRunningStepEffect, startMelody, stopMelody, startBirds, stopBirds, shoutEffect, pacemakerShoutEffect, finishEffect, startEffect, stopEffects
+from sprintomatic.modules.gameSounds import initSounds, stopSounds, maintainRunningStepEffect, startMelody, startElevatorMelody, stopMelody, startBirds, stopBirds, shoutEffect, pacemakerShoutEffect, finishEffect, startEffect, stopEffects
 from sprintomatic.modules.imageDownloader import downloadExternalImageData, downloadExternalWorldCityMap, downloadNews
 
 from sprintomatic.modules.autoTest import fakeInitScreen, fakeCalculateNextStep, fakeUiEvent, fakeResetAgain
@@ -341,6 +341,7 @@ async def main():
             if quitting:
                 running = False
             stopBirds()
+            startElevatorMelody()
         if not quitting:
             config, controls, faLookup, saLookup, ssaLookup, vsaLookup, tunnelLookup, generatedOrDownloadedMap, tmpMetersPerPixel, externalZoom = await returnConfig(gameSettings, externalImageData, externalWorldCityMap)
 
@@ -377,6 +378,9 @@ async def main():
 
                 # Flush events again
                 await uiFlushEvents()
+
+            # Stop the elevator music
+            stopMelody()
 
         # main loop of the gameplay itself:
         while running and controls and not quitting:
@@ -600,7 +604,7 @@ async def main():
                                             externalMapInfoTexts = [stripMapName(subitem["map-url"]), subitem["map-license"], subitem["map-credits"], stripMapName(subitem["lookup-png-url"]), subitem["lookup-png-license"], subitem["lookup-png-credits"]]
                                             break
                         if gameSettings.noUiTest != "yes":
-                            uiCompleteRender(finishTexts, externalMapInfoTexts, gameSettings.pacemaker, pacemakerTextNeeded, aiTextNeeded, gameSettings.amaze, normalizedDifference, firstTime)
+                            await uiCompleteRender(finishTexts, externalMapInfoTexts, gameSettings.pacemaker, pacemakerTextNeeded, aiTextNeeded, gameSettings.amaze, normalizedDifference, firstTime)
                             firstTime = False
             await asyncio.sleep(0)
 

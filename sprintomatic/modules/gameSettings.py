@@ -171,7 +171,7 @@ async def returnConfig(gameSettings, externalImageData, infiniteWorldCityMap):
         faLookup, saLookup, ssaLookup, vsaLookup, tunnelLookup, config = extractPngLookups(pngMask)
 
     elif gameSettings.infiniteWorld:
-        png, pngMask = await getInfiniteWorldDefault(gameSettings.place, gameSettings.imageRoot)
+        png, pngMask = await getInfiniteWorldDefault(gameSettings.place, gameSettings.imageRoot, gameSettings.offline)
         faLookup, saLookup, ssaLookup, vsaLookup, tunnelLookup, config = extractPngLookups(pngMask)
 
     elif not gameSettings.lookupPngName and (gameSettings.externalExampleTeam and gameSettings.externalExample):

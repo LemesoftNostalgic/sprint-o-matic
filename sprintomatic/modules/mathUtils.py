@@ -97,6 +97,17 @@ def distanceBetweenPoints(point1, point2):
     return math.sqrt((point1[0]-point2[0])**2 + (point1[1]-point2[1])**2)
 
 
+def distanceBetweenPointAndLine(point, line, steps):
+    minDistance = distanceBetweenPoints(point, line[0])
+    vect = ((line[1][0] - line[0][0])/steps, (line[1][1] - line[0][1])/steps)
+    for ind in range(int(steps)):
+        pt = (line[0][0] + ind * vect[0], line[0][1] + ind * vect[1])
+        ptDist = distanceBetweenPoints(point, pt)
+        if ptDist < minDistance:
+            minDistance = ptDist
+    return minDistance
+
+
 def angleOfPath(path, maxdist):
     if len(path) < 2:
         return 0.0

@@ -7,7 +7,7 @@ from random import randrange, random, uniform
 
 from .utils import getSlowAreaMask, getSemiSlowAreaMask, getVerySlowAreaMask, getForbiddenAreaMask, getControlMask, getNoMask, getPackagePath
 from .mathUtils import calculatePathDistance
-from .gameUIUtils import uiFlushEvents
+from .gameUIUtils import uiFlushEvents, uiDrawLine
 
 offlineMapDataFolder = os.path.join("data", "offline-map-data", "")
 spotnessFactor = 4
@@ -360,8 +360,6 @@ async def constructWayDb(latlonMapOrigo, xyPictureSize, metersPerPixel):
 
     
         for waytype in waytypes:
-            if await uiFlushEvents():
-                return None
             result = api.query("""
                 way("""+str(latlonMapOrigo[0])+""","""+str(latlonMapOrigo[1])+""","""+str(latlonMapOppositeCorner[0])+""","""+str(latlonMapOppositeCorner[1])+""") [\"""" + waytype + """\"];
                 (._;>;);
@@ -411,21 +409,28 @@ def markControlSpot(mask, x, y):
                mask.fill(getControlMask(), ((int(x + shift[0]), int(y + shift[1])), (1, 1)))
 
 
-def drawPolylineWithWidth(png, mask, pointlist, polylineColor, polylineMaskColor,polylineWidth):
+def uiDrawLines(surf, color, pointlist, width):
+    for ind in range(len(pointlist) - 1):
+        uiDrawLine(surf, color, pointlist[ind], pointlist[ind+1], width)
+
+
+def drawPolylineWithWidth(png, mask, pointlist, polylineColor, polylineMaskColor,polylineWidth, accurate):
     if len(pointlist) > 1:
-        pygame.draw.lines(png, polylineColor, False, pointlist, width=int(polylineWidth))
+        if accurate:
+            uiDrawLines(png, polylineColor, pointlist, int(polylineWidth))
+        else:
+            pygame.draw.lines(png, polylineColor, False, pointlist, width=int(polylineWidth))
         pygame.draw.lines(mask, polylineMaskColor, False, pointlist, width=int(polylineWidth))
         if pointlist:
             markControlSpot(mask, pointlist[0][0], pointlist[0][1])
             markControlSpot(mask, pointlist[-1][0], pointlist[-1][1])
-        
 
 
 def drawPolygonWithBounds(png, mask, pointlist, polyInternalColor, polyBoundaryColor, polyMaskColor):
     if len(pointlist) > 2:
         pygame.draw.polygon(mask, polyMaskColor, pointlist)
         pygame.draw.polygon(png, polyInternalColor, pointlist)
-        pygame.draw.polygon(png, polyBoundaryColor, pointlist, width = 1)
+        uiDrawLines(png, polyBoundaryColor, pointlist + [pointlist[0]], 1)
         for point in pointlist:
             markControlSpot(mask, point[0], point[1])
 
@@ -467,7 +472,6 @@ def drawContours(kernelWidth, contourArr, keepOneOf):
     for item in origThresholds:
         if randrange(keepOneOf) == 0:
             thresholds.append(item)
-
     yvals = []
     for y in range(sumArr2.get_size()[1]):
         yvals.append(sumArr2.get_at((0, y))[0])
@@ -557,7 +561,7 @@ def drawCliff(png, mask, waydb):
                 subwayarray = waydb[waytype][subway]
                 waydb[waytype].pop(subway)
                 for way in subwayarray:
-                    drawPolylineWithWidth(png, mask, way, colors[SOLIDBLACK], getForbiddenAreaMask(), 4)
+                    drawPolylineWithWidth(png, mask, way, colors[SOLIDBLACK], getForbiddenAreaMask(), 4, True)
     return png, mask
 
 
@@ -583,7 +587,7 @@ def drawWater(png, mask, waydb):
                     polygonWay = coastlineToPolygon(way, png.get_size())
                     if polygonWay:
                         drawPolygonWithBounds(png, mask, polygonWay, colors[WATER], colors[WATER], getForbiddenAreaMask())
-                    drawPolylineWithWidth(png, mask, way, colors[SOLIDBLACK], getForbiddenAreaMask(), 2)
+                    drawPolylineWithWidth(png, mask, way, colors[SOLIDBLACK], getForbiddenAreaMask(), 2, True)
     for waytypelist in waterLine:
         waytype = waytypelist[0]
         subwaylist = waytypelist[1]
@@ -592,7 +596,7 @@ def drawWater(png, mask, waydb):
                 subwayarray = waydb[waytype][subway]
                 waydb[waytype].pop(subway)
                 for way in subwayarray:
-                    drawPolylineWithWidth(png, mask, way, colors[WATER], getForbiddenAreaMask(), 2)
+                    drawPolylineWithWidth(png, mask, way, colors[WATER], getForbiddenAreaMask(), 2, True)
     return png, mask
 
 
@@ -605,7 +609,7 @@ def drawFences(png, mask, waydb):
                 subwayarray = waydb[waytype][subway]
                 waydb[waytype].pop(subway)
                 for way in subwayarray:
-                    drawPolylineWithWidth(png, mask, way, colors[SOLIDBLACK], getForbiddenAreaMask(), 2)
+                    drawPolylineWithWidth(png, mask, way, colors[SOLIDBLACK], getForbiddenAreaMask(), 2, True)
     for waytypelist in solidGreenFence:
         waytype = waytypelist[0]
         subwaylist = waytypelist[1]
@@ -614,7 +618,7 @@ def drawFences(png, mask, waydb):
                 subwayarray = waydb[waytype][subway]
                 waydb[waytype].pop(subway)
                 for way in subwayarray:
-                    drawPolylineWithWidth(png, mask, way, colors[SOLIDGREEN], getForbiddenAreaMask(), 2)
+                    drawPolylineWithWidth(png, mask, way, colors[SOLIDGREEN], getForbiddenAreaMask(), 2, True)
     for waytypelist in thinFence:
         waytype = waytypelist[0]
         subwaylist = waytypelist[1]
@@ -623,7 +627,7 @@ def drawFences(png, mask, waydb):
                 subwayarray = waydb[waytype][subway]
                 waydb[waytype].pop(subway)
                 for way in subwayarray:
-                    drawPolylineWithWidth(png, mask, way, colors[SOLIDBLACK], getVerySlowAreaMask(), 1)
+                    drawPolylineWithWidth(png, mask, way, colors[SOLIDBLACK], getVerySlowAreaMask(), 1, True)
     return png, mask
 
 
@@ -750,7 +754,7 @@ def drawRailway(png, mask, waydb, metersPerPixel):
                 subwayarray = waydb[waytype][subway]
                 waydb[waytype].pop(subway)
                 for way in subwayarray:
-                    drawPolylineWithWidth(png, mask, way, colors[OLIVEGREEN], getForbiddenAreaMask(), railWayWidthMeters / metersPerPixel)
+                    drawPolylineWithWidth(png, mask, way, colors[OLIVEGREEN], getForbiddenAreaMask(), railWayWidthMeters / metersPerPixel, False)
     return png, mask
 
 
@@ -763,7 +767,7 @@ def drawRoads(png, mask, waydb, metersPerPixel):
                 subwayarray = waydb[waytype][subway]
                 waydb[waytype].pop(subway)
                 for way in subwayarray:
-                    drawPolylineWithWidth(png, mask, way, colors[TMPASPHALT], getNoMask(), wideWayWidthMeters / metersPerPixel)
+                    drawPolylineWithWidth(png, mask, way, colors[TMPASPHALT], getNoMask(), wideWayWidthMeters / metersPerPixel, False)
     for waytypelist in midWay:
         waytype = waytypelist[0]
         subwaylist = waytypelist[1]
@@ -772,7 +776,7 @@ def drawRoads(png, mask, waydb, metersPerPixel):
                 subwayarray = waydb[waytype][subway]
                 waydb[waytype].pop(subway)
                 for way in subwayarray:
-                    drawPolylineWithWidth(png, mask, way, colors[TMPASPHALT], getNoMask(), midWayWidthMeters / metersPerPixel)
+                    drawPolylineWithWidth(png, mask, way, colors[TMPASPHALT], getNoMask(), midWayWidthMeters / metersPerPixel, False)
     for waytypelist in unclassifiedWay:
         waytype = waytypelist[0]
         subwaylist = waytypelist[1]
@@ -781,7 +785,7 @@ def drawRoads(png, mask, waydb, metersPerPixel):
                 subwayarray = waydb[waytype][subway]
                 waydb[waytype].pop(subway)
                 for way in subwayarray:
-                    drawPolylineWithWidth(png, mask, way, colors[TMPASPHALT], getNoMask(), unclassifiedWayWidthMeters / metersPerPixel)
+                    drawPolylineWithWidth(png, mask, way, colors[TMPASPHALT], getNoMask(), unclassifiedWayWidthMeters / metersPerPixel, False)
     for waytypelist in smallWay:
         waytype = waytypelist[0]
         subwaylist = waytypelist[1]
@@ -790,7 +794,7 @@ def drawRoads(png, mask, waydb, metersPerPixel):
                 subwayarray = waydb[waytype][subway]
                 waydb[waytype].pop(subway)
                 for way in subwayarray:
-                    drawPolylineWithWidth(png, mask, way, colors[TMPASPHALT], getNoMask(), smallWayWidthMeters / metersPerPixel)
+                    drawPolylineWithWidth(png, mask, way, colors[TMPASPHALT], getNoMask(), smallWayWidthMeters / metersPerPixel, False)
     png = boundarize(png,  colors[TMPASPHALT], colors[ASPHALT], colors[SOLIDBLACK])
     return png, mask
 
@@ -841,86 +845,98 @@ async def initWorldCreator(size, imagePath):
     pattern = pygame.image.load(imagePath + "lemesoftnostalgic/OpenPattern.png")
     psize = pattern.get_size()
     for x in range(size[0]//psize[0]):
-        if await uiFlushEvents():
-            return None, None
         for y in range(size[1]//psize[1]):
             png.blit(pattern, (x * psize[0], y * psize[1]))
     mask.fill(getSlowAreaMask())
     return png, mask
 
 
-async def getInfiniteWorld(latlonMapOrigo, xyPictureSize, metersPerPixel, imagePath):
+async def getInfiniteWorld(latlonMapOrigo, xyPictureSize, metersPerPixel, imagePath, offline):
     world, worldMask = await initWorldCreator(xyPictureSize, imagePath)
     if world == None:
         return None, None
+
     await asyncio.sleep(0)
     db = await constructWayDb(latlonMapOrigo, xyPictureSize, metersPerPixel)
+
     if db == None:
         return None, None
+
     await asyncio.sleep(0)
-    if await uiFlushEvents():
-        return None, None
     if await uiFlushEvents():
         return None, None
     world, worldMask = drawForestArea(world, worldMask, db)
+
     await asyncio.sleep(0)
     if await uiFlushEvents():
         return None, None
     world, worldMask = drawOpenArea(world, worldMask, db)
+
     await asyncio.sleep(0)
     if await uiFlushEvents():
         return None, None
     world, worldMask = drawBrownArea(world, worldMask, db)
+
     await asyncio.sleep(0)
     if await uiFlushEvents():
         return None, None
     world, worldMask = drawAsphaltArea(world, worldMask, db)
+
     await asyncio.sleep(0)
     if await uiFlushEvents():
         return None, None
     world, worldMask = drawOliveArea(world, worldMask, db)
+
     await asyncio.sleep(0)
     if await uiFlushEvents():
         return None, None
     world, worldMask = drawSolidGreenArea(world, worldMask, db)
-    await asyncio.sleep(0)
-    if await uiFlushEvents():
-        return None, None
-    dummy_heightmap, world = drawContours(randrange(countoursMinKernelWidth, countoursMaxKernelWidth), world, randrange(countoursMinOutOf, countoursMaxOutOf))
+
+    if not offline:
+        dummy_heightmap, world = drawContours(randrange(countoursMinKernelWidth, countoursMaxKernelWidth), world, randrange(countoursMinOutOf, countoursMaxOutOf))
+
     await asyncio.sleep(0)
     if await uiFlushEvents():
         return None, None
     world, worldMask = drawWater(world, worldMask, db)
+
     await asyncio.sleep(0)
     if await uiFlushEvents():
         return None, None
     world, worldMask = drawCliff(world, worldMask, db)
+
     await asyncio.sleep(0)
     if await uiFlushEvents():
         return None, None
     world, worldMask = drawRailway(world, worldMask, db, metersPerPixel)
+
     await asyncio.sleep(0)
     if await uiFlushEvents():
         return None, None
     world, worldMask = drawArtificialSpots(world, worldMask)
+
     await asyncio.sleep(0)
     if await uiFlushEvents():
         return None, None
     world, worldMask = drawRoads(world, worldMask, db, metersPerPixel)
+
     await asyncio.sleep(0)
     if await uiFlushEvents():
         return None, None
     world, worldMask = drawFences(world, worldMask, db)
+
     await asyncio.sleep(0)
     if await uiFlushEvents():
         return None, None
     world, worldMask = drawHouses(world, worldMask, db)
+
     await asyncio.sleep(0)
     if await uiFlushEvents():
         return None, None
     world, worldMask = drawSpots(world, worldMask, db)
     x, y = worldMask.get_size()
     pygame.draw.rect(worldMask, getForbiddenAreaMask(), [(2,2), ((x-2, y-2))], width=2)
+
     return world, worldMask
 
 
@@ -942,8 +958,8 @@ def getInfiniteWorldPlace(city, citymap):
     return None, None
 
 
-async def getInfiniteWorldDefault(place, imagePath):
+async def getInfiniteWorldDefault(place, imagePath, offline):
     latlonMapOrigo = tuple(place)
     metersPerPixel = (0.9 + 0.2 *random())
-    xyPictureSize = (1280, 720)
-    return await getInfiniteWorld(latlonMapOrigo, xyPictureSize, metersPerPixel, imagePath)
+    xyPictureSize = (1024, 720)
+    return await getInfiniteWorld(latlonMapOrigo, xyPictureSize, metersPerPixel, imagePath, offline)

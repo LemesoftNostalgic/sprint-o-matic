@@ -26,10 +26,10 @@ import pygame
 from .pathPruning import pruneWeightedDistance
 from .utils import getForbiddenAreaMask, getSlowAreaMask, getSemiSlowAreaMask, getVerySlowAreaMask, getControlMask, getTunnelMask
 
+boundaryThreshold = 10
 
 def getTfs():
     return [1, 2, 4, 8, 16]
-
 
 
 def extractPngLookups(oMapMask):
@@ -70,7 +70,8 @@ def extractPngLookups(oMapMask):
                 for tf in getTfs():
                     faLookup[tf][(int(x/tf), int(y/tf))] = True
             elif col == getControlMask():
-                controls.append((x, y))
+                if x > boundaryThreshold and x < size[0] - boundaryThreshold and y > boundaryThreshold and y < size[1] - boundaryThreshold:
+                    controls.append((x, y))
 
     return faLookup, saLookup, ssaLookup, vsaLookup, tunnelLookup, controls
 

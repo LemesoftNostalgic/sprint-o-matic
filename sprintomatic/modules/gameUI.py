@@ -24,7 +24,7 @@ import asyncio
 from datetime import datetime
 from random import randrange
 
-from .gameUIUtils import getMasterFont, getStopKey, getLeftKey, getRightKey, getPlayerColor, getTrackColor, getCreditColor, getPacemakerColor, getPlayerRouteColor, getFinishTextColor, getWhiteColor, convertXCoordinate, convertXCoordinateSpecificSurface, convertYCoordinate, getBigScreen, getTimerStepSeconds, getAnalysisResultsFileBase, uiFlip, uiUnSubmitSlide
+from .gameUIUtils import getMasterFont, getStopKey, getLeftKey, getRightKey, getPlayerColor, getTrackColor, getCreditColor, getPacemakerColor, getPlayerRouteColor, getFinishTextColor, getWhiteColor, convertXCoordinate, convertXCoordinateSpecificSurface, convertYCoordinate, getBigScreen, getTimerStepSeconds, getAnalysisResultsFileBase, uiFlip, uiUnSubmitSlide, uiDrawLine, uiDrawCircle
 from .mathUtils import rotatePoint, fromRadiansToDegrees, distanceBetweenPoints, triangleCreator
 from .infoBox import showInfoBoxTxt, updateInfoTxtByEvent
 
@@ -214,16 +214,16 @@ def uiAnimateCharacter(where, origin, angle, color, scale, feetPlus, inTunnel, b
         leftHand = (origin[0] - 5 * scale, origin[1] + scale * (-feetPlusStart/2 + abs(feetPlus)))
         rightHand = rotatePoint(origin, (origin[0] + 5 * scale, origin[1] + scale * (-feetPlusStart/2 + (feetPlusStart - abs(feetPlus)))), angle)
 
-        pygame.draw.line(where, color, leftFootStart, leftFootEnd, width=int(3 * scale))
-        pygame.draw.line(where, color, rightFootStart, rightFootEnd, width=int(3 * scale))
-        pygame.draw.line(where, color, leftHand, rightHand, width=int(3 * scale))
+        uiDrawLine(where, color, leftFootStart, leftFootEnd, int(3 * scale))
+        uiDrawLine(where, color, rightFootStart, rightFootEnd, int(3 * scale))
+        uiDrawLine(where, color, leftHand, rightHand, int(3 * scale))
 
     pygame.draw.circle(where, color, origin, int(3 * scale))
 
     if amaze:
-        pygame.draw.line(where, color, (origin[0], origin[1]  - 7 * scale), (origin[0], origin[1]  - 17 * scale), width=int(3 * scale))
-        pygame.draw.line(where, color, (origin[0] - 3 * scale, origin[1]  - 12 * scale), (origin[0], origin[1]  - 17 * scale), width=int(3 * scale))
-        pygame.draw.line(where, color, (origin[0] + 3 * scale, origin[1]  - 12 * scale), (origin[0], origin[1]  - 17 * scale), width=int(3 * scale))
+        uiDrawLine(where, color, (origin[0], origin[1]  - 7 * scale), (origin[0], origin[1]  - 17 * scale), width=int(3 * scale))
+        uiDrawLine(where, color, (origin[0] - 3 * scale, origin[1]  - 12 * scale), (origin[0], origin[1]  - 17 * scale), width=int(3 * scale))
+        uiDrawLine(where, color, (origin[0] + 3 * scale, origin[1]  - 12 * scale), (origin[0], origin[1]  - 17 * scale), width=int(3 * scale))
 
     return feetPlus
 
@@ -243,7 +243,7 @@ def uiAnimatePacemaker(pos, angle, scale, pacemakerInd, inTunnel, background):
     feetPlusPacemaker = uiAnimateCharacter(oMapCopy, pos, math.pi - angle, getPacemakerColor(pacemakerInd), 0.6 * scale / metersPerPixel, feetPlusPacemaker, inTunnel, background, False)
 
 
-def uiCompleteRender(finishTexts, mapInfoTextList, pacemakerInd, pacemakerTextNeeded, aiTextNeeded, amaze, amazeNumber, firstTime):
+async def uiCompleteRender(finishTexts, mapInfoTextList, pacemakerInd, pacemakerTextNeeded, aiTextNeeded, amaze, amazeNumber, firstTime):
     xShift = (getBigScreen().get_size()[0] - screen.get_size()[0]) / 2
     yShift = (getBigScreen().get_size()[1] - screen.get_size()[1]) / 2
     getBigScreen().blit(screen, (xShift, yShift))
@@ -261,7 +261,7 @@ def uiCompleteRender(finishTexts, mapInfoTextList, pacemakerInd, pacemakerTextNe
     if firstTime:
         uiUnSubmitSlide()
     else:
-        uiFlip()
+        await uiFlip(True)
 
 
 previousTime = time.time()
@@ -358,15 +358,16 @@ def uiRenderControls(controls, usePacemaker, amaze):
             tmpEffectStep = effectStep
 
         if control == controls[0]:
-            pygame.draw.line(oMapCopy, getTrackColor(), triangle[0], triangle[1], width = max(2, int(2/metersPerPixel)))
-            pygame.draw.line(oMapCopy, getTrackColor(), triangle[1], triangle[2], width = max(2, int( 2/metersPerPixel)))
-            pygame.draw.line(oMapCopy, getTrackColor(), triangle[2], triangle[0], width = max(2, int(2/metersPerPixel)))
+            uiDrawLine(oMapCopy, getTrackColor(), triangle[0], triangle[1], max(2, int(2/metersPerPixel)))
+            uiDrawLine(oMapCopy, getTrackColor(), triangle[1], triangle[2], max(2, int( 2/metersPerPixel)))
+            uiDrawLine(oMapCopy, getTrackColor(), triangle[2], triangle[0], max(2, int(2/metersPerPixel)))
         else:
             if controlApproachZoomUsed:
                 pygame.draw.circle(oMapCopy, getTrackColor(), control, int(2/metersPerPixel))
-            pygame.draw.circle(oMapCopy, (255, tmpEffectStep * 3, tmpEffectStep * 2), control, circleRadius/metersPerPixel, width = max(2, int(2/metersPerPixel)))
+
+            uiDrawCircle(oMapCopy, (255, tmpEffectStep * 3, tmpEffectStep * 2), control, circleRadius/metersPerPixel, max(2, int(2/metersPerPixel)))
             if control == controls[-1] and not amaze:
-                pygame.draw.circle(oMapCopy, (255, tmpEffectStep * 3, tmpEffectStep * 2), control, (circleRadius - circleSpacing)/metersPerPixel, width = max(2, int(2/metersPerPixel)))
+                uiDrawCircle(oMapCopy, (255, tmpEffectStep * 3, tmpEffectStep * 2), control, (circleRadius - circleSpacing)/metersPerPixel, max(2, int(2/metersPerPixel)))
         if previousControl:
             fraction = (circleRadiusMargin/metersPerPixel) / distanceBetweenPoints(control, previousControl)
             lineItself = (control[0]-previousControl[0], control[1]-previousControl[1])
@@ -375,7 +376,7 @@ def uiRenderControls(controls, usePacemaker, amaze):
                 previousControlShrinked = (previousControl[0]+lineDelta[0], previousControl[1]+lineDelta[1])
                 controlShrinked = (control[0]-lineDelta[0], control[1]-lineDelta[1])
                 if not tmpEffectStep or usePacemaker:
-                    pygame.draw.line(oMapCopy, getTrackColor(), previousControlShrinked, controlShrinked, width=max(2, int(2/metersPerPixel)))
+                    uiDrawLine(oMapCopy, getTrackColor(), previousControlShrinked, controlShrinked, max(2, int(2/metersPerPixel)))
         previousControl = control
 
 
@@ -390,7 +391,7 @@ def uiRenderRoute(whichmap, shortestRoute, color):
     for i in range(len(shortestRoute) - 1):
         pointA = shortestRoute[i]
         pointB = shortestRoute[i + 1]
-        pygame.draw.line(whichmap, color, pointA, pointB, width = max(2, int(2/metersPerPixel)))
+        uiDrawLine(whichmap, color, pointA, pointB, max(2, int(2/metersPerPixel)))
 
 
 def uiRenderRoutes(shortestRoutes, whoami):
@@ -403,13 +404,13 @@ def uiRenderRoutes(shortestRoutes, whoami):
 def uiDrawControlCircles(theMap, controls):
     for control in controls:
         if control == controls[0]:
-            pygame.draw.line(theMap, getTrackColor(), triangle[0], triangle[1], width = max(2, int(2/metersPerPixel)))
-            pygame.draw.line(theMap, getTrackColor(), triangle[1], triangle[2], width = max(2, int( 2/metersPerPixel)))
-            pygame.draw.line(theMap, getTrackColor(), triangle[2], triangle[0], width = max(2, int(2/metersPerPixel)))
+            uiDrawLine(theMap, getTrackColor(), triangle[0], triangle[1], max(2, int(2/metersPerPixel)))
+            uiDrawLine(theMap, getTrackColor(), triangle[1], triangle[2], max(2, int( 2/metersPerPixel)))
+            uiDrawLine(theMap, getTrackColor(), triangle[2], triangle[0], max(2, int(2/metersPerPixel)))
         else:
-            pygame.draw.circle(theMap, getTrackColor(), control, circleRadius/metersPerPixel, width = max(2, int(2/metersPerPixel)))
+            uiDrawCircle(theMap, getTrackColor(), control, circleRadius/metersPerPixel, max(2, int(2/metersPerPixel)))
             if control == controls[-1]:
-                pygame.draw.circle(theMap, getTrackColor(), control, (circleRadius - circleSpacing)/metersPerPixel, width = max(2, int(2/metersPerPixel)))
+                uiDrawCircle(theMap, getTrackColor(), control, (circleRadius - circleSpacing)/metersPerPixel, max(2, int(2/metersPerPixel)))
     
             
 def uiStoreAnalysis(shortestRoutesArray, playerRoutesArray, controls, finishTexts):

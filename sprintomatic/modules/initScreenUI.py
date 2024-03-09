@@ -21,12 +21,12 @@ import asyncio
 import pygame
 import math
 
-from .gameUIUtils import getApplicationTitle, getMasterFont, getStopKey, getUpKey, getLeftKey, getRightKey, getDownKey, getEnterKey, getSpaceKey, getBackKey, getPlayerColor, getPacemakerColor, getTrackColor, getCreditColor, getGreyColor, convertXCoordinate, convertYCoordinate, getBigScreen, getTimerStep, uiDrawTriangle, checkAutoTestKey, uiFlip, uiSubmitSlide, uiFlushEvents, uiFadeVisibleSlide
+from .gameUIUtils import getApplicationTitle, getMasterFont, getStopKey, getUpKey, getLeftKey, getRightKey, getDownKey, getEnterKey, getSpaceKey, getBackKey, getPlayerColor, getPacemakerColor, getTrackColor, getCreditColor, getGreyColor, convertXCoordinate, convertYCoordinate, getBigScreen, getTimerStep, uiDrawTriangle, checkAutoTestKey, uiFlip, uiSubmitSlide, uiFlushEvents, uiFadeVisibleSlide, uiDrawLine, uiDrawCircle
 
 from .infiniteWorld import getInfiniteWorldPlace
 from .mathUtils import distanceBetweenPoints
 from .infoBox import showInfoBoxTxt, updateInfoTxtByEvent
-from .gameSounds import stepEffect, finishEffect
+from .gameSounds import stepEffect
 from random import randrange
 
 
@@ -64,14 +64,14 @@ def showInitArrow(surf, spot, inScale):
     arrow2 = tuple(map(lambda i, j: i + j, spot, (0, 10 * scale)))
     arrow3 = tuple(map(lambda i, j: i + j, spot, (4 * scale, 5 * scale)))
     arrow4 = tuple(map(lambda i, j: i + j, spot, (-4 * scale, 5 * scale)))
-    pygame.draw.line(surf, getPlayerColor(), arrow1, arrow2, width=scale)
-    pygame.draw.line(surf, getPlayerColor(), arrow1, arrow3, width=scale)
-    pygame.draw.line(surf, getPlayerColor(), arrow1, arrow4, width=scale)
+    uiDrawLine(surf, getPlayerColor(), arrow1, arrow2, scale)
+    uiDrawLine(surf, getPlayerColor(), arrow1, arrow3, scale)
+    uiDrawLine(surf, getPlayerColor(), arrow1, arrow4, scale)
 
 
-def uiRenderImmediate(pos, textStr):
+async def uiRenderImmediate(pos, textStr, fast):
     showTextShadowed(pos, 32, textStr, getTrackColor(), 2)
-    uiFlip()
+    await uiFlip(fast)
 
 
 def showInitSelections(surf, positions, selections, inScale, texts, titleTexts, titleTextPositions, creditTexts, creditTextPositions, externalOverallText, externalOverallPos, externalTeamText, externalTeamPosition, externalText, externalPosition, ouluText, ouluPosition, news, newsPosition, worldText, worldPosition):
@@ -89,7 +89,7 @@ def showInitSelections(surf, positions, selections, inScale, texts, titleTexts, 
         pos = (positions[ind][0], positions[ind][1])
         selectedColor = titleColorRandom if selections[ind] else getGreyColor()
         pygame.draw.circle(surf, selectedColor, pos, scale)
-        pygame.draw.circle(surf, getTrackColor(), pos, (scale * 1.6), width = int(scale / 5))
+        uiDrawCircle(surf, getTrackColor(), pos, (scale * 1.6), int(scale / 5))
         theTextCenter = (pos[0], pos[1] - scale * 2.0)
         showTextShadowed(theTextCenter, 32, texts[ind], getTrackColor(), 2)
         lineItself = (pos[0] - positions[ind + 1][0], pos[1] - positions[ind + 1][1])
@@ -97,8 +97,8 @@ def showInitSelections(surf, positions, selections, inScale, texts, titleTexts, 
         lineDelta = (lineItself[0]*fraction, lineItself[1]*fraction)
         previousControlShrinked = (pos[0]-lineDelta[0], pos[1]-lineDelta[1])
         controlShrinked = (positions[ind + 1][0]+lineDelta[0], positions[ind + 1][1]+lineDelta[1])
-        pygame.draw.line(surf, getTrackColor(), previousControlShrinked, controlShrinked, width=int(scale / 5))
-    pygame.draw.line(surf, getTrackColor(), (positions[0][0] - xStep + 3 * scale, positions[0][1]), (positions[0][0] - 2 * scale, positions[0][1]), width=int(scale / 5))
+        uiDrawLine(surf, getTrackColor(), previousControlShrinked, controlShrinked, int(scale / 5))
+    uiDrawLine(surf, getTrackColor(), (positions[0][0] - xStep + 3 * scale, positions[0][1]), (positions[0][0] - 2 * scale, positions[0][1]), int(scale / 5))
     uiDrawTriangle(surf, 2 * scale, math.pi/2, (positions[0][0] - xStep * 0.8, positions[0][1]), int(scale / 5))
     pos = (positions[len(positions) - 1][0], positions[len(positions) - 1][1])
     pygame.draw.circle(surf, getTrackColor(), pos, scale, width = int(scale / 5))
@@ -278,8 +278,6 @@ async def initScreen(imagePath, gameSettings, externalImageData, externalWorldCi
                 elif event.scancode == getEnterKey() or event.scancode == getSpaceKey():
                     if initScreenPos == len(positions) - 1:
                         running = False
-                        if not gameSettings.offline:
-                            finishEffect()
                     else:
                         stepEffect()
                         if not (initScreenPos == len(selections) - 1 and len(externalImageData) == 0):
@@ -390,7 +388,7 @@ async def initScreen(imagePath, gameSettings, externalImageData, externalWorldCi
         if firstTime:
                 uiFadeVisibleSlide()
                 firstTime = False
-        uiFlip()
+        await uiFlip(True)
         await asyncio.sleep(0)
 
     retSettings = []
@@ -428,7 +426,7 @@ async def initScreen(imagePath, gameSettings, externalImageData, externalWorldCi
         gameSettings.infiniteWorld = False
         gameSettings.externalExample = ""
         uiSubmitSlide(str(randrange(1000000,9999999)) + "th District of Infinite Oulu!")
-        uiRenderImmediate(loadingPosition, loadingText)
+        await uiRenderImmediate(loadingPosition, loadingText, True)
     elif retSettings[3] == "infinite-world":
         gameSettings.infiniteOulu = False
         gameSettings.infiniteWorld = True
@@ -439,16 +437,13 @@ async def initScreen(imagePath, gameSettings, externalImageData, externalWorldCi
            uiSubmitSlide("Welcome to " + placeName + "...")
         else:
            uiSubmitSlide("Somewhere in " + worldExampleText + "...")
-        uiRenderImmediate(loadingPosition, loadingText)
+        await uiRenderImmediate(loadingPosition, loadingText, True)
     elif retSettings[3] == "external-team" or retSettings[3] == "external-map":
         gameSettings.infiniteOulu = False
         gameSettings.infiniteWorld = False
         gameSettings.externalExample = externalExampleText
         gameSettings.externalExampleTeam = externalExampleTeamText
-        print("Yes")
         uiSubmitSlide("Welcome to " + externalExampleText)
-        uiRenderImmediate(loadingPosition, loadingText)
+        await uiRenderImmediate(loadingPosition, loadingText, False)
     pygame.time.set_timer(TIMER_EVENT, 0)
-    uiFlushEvents
-    
     return quitting, gameSettings
