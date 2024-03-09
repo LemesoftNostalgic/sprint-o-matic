@@ -29,7 +29,7 @@ from .routeAI import calculateCoarseRouteExt, calculateShortestRoute, slowAccura
 
 
 firstControlMinDistance = 100
-maxDifficultAttempts = 10
+maxDifficultAttempts = 4
 pickDistMaxTime = 1.0
 pickMaxTime = pickDistMaxTime / maxDifficultAttempts
 totMaxTime = 15.0
@@ -78,7 +78,6 @@ def pickAutoControl(cfg, ctrls, minlen, maxlen):
         smallestOvershoot = 10000
         smallestAngleOvershoot = 10000
         biggestAvgNearness = 0
-        biggestAvgLineNearness = 0
 
         if type(cfg[index]) is not tuple:
             if time.time() - start_time > pickMaxTime:
@@ -92,16 +91,14 @@ def pickAutoControl(cfg, ctrls, minlen, maxlen):
 
         elif ctrls:
 
+            # leg overshoot
             dist = distanceBetweenPoints(cfg[index], ctrls[-1])
-            if dist < minlen:
-                if time.time() - start_time > pickMaxTime:
-                    return None, None
-                continue
-            elif dist > maxlen:
+            if dist > maxlen:
                 if dist < smallestOvershoot:
                     smallestOvershoot = dist
                 toContinue = True
 
+            # leg angle overshoot
             if len(ctrls) > 1:
                 anglebtw = angleBetweenLineSegments([ctrls[-2], ctrls[-1]], [ctrls[-1], cfg[index]])
                 while anglebtw < 0:
@@ -115,8 +112,8 @@ def pickAutoControl(cfg, ctrls, minlen, maxlen):
                         smallestAngleOvershoot = anglebtw
                     toContinue = True
 
+            # nearness to previous controls
             totNearness = 0
-            totLineNearness = 0
             for ctrl in ctrls[:-1]:
                 nearness = distanceBetweenPoints(cfg[index], ctrl)
                 if nearness < minlen / 2:
@@ -124,17 +121,13 @@ def pickAutoControl(cfg, ctrls, minlen, maxlen):
                         return None, None
                     continue
                 totNearness = totNearness + nearness
-                lineNearness = distanceBetweenPointAndLine(cfg[index], [ctrl, ctrls[-1]], nearness/2)
-                totLineNearness = totLineNearness + lineNearness
 
             if len(ctrls) > 1:
                 if totNearness / (len(ctrls) - 1) > biggestAvgNearness:
                     biggestAvgNearness = totNearness / (len(ctrls) - 1)
-                if totLineNearness / (len(ctrls) - 1) > biggestAvgLineNearness:
-                    biggestAvgLineNearness = totLineNearness / (len(ctrls) - 1)
 
         if toContinue:
-            score = (smallestOvershoot - maxlen) / maxlen + 2 * (smallestAngleOvershoot - 0.65 * math.pi ) / (0.65 * math.pi) + 6 * biggestAvgNearness + 2 * biggestAvgLineNearness
+            score = (smallestOvershoot - maxlen) / maxlen + 2 * (smallestAngleOvershoot - 0.55 * math.pi ) / (0.55 * math.pi) + 4 * biggestAvgNearness
             if score < secondBestScore:
                 secondBestIndex = index
                 secondBestScore = score
@@ -196,24 +189,25 @@ async def createAutoControls(cfg, trackLength, distribution, metersPerPixel, faL
         ctrl, dist, isDifficultControl = pickDistAutoControl(cfgCopy, ctrls, distribution, metersPerPixel, faLookups)
         if isDifficultControl:
             numDifficultControls = numDifficultControls + 1
-        if ctrl is None or await uiFlushEvents():
+        if await uiFlushEvents():
             return [], []
 
-        preComputed, dummy_jumps = calculateCoarseRouteExt(ctrls[-1], ctrl, faLookups, precision, True, True, 0)
-        if len(preComputed) > 1:
-            ctrls.append(ctrl)
-            cfgCopy.pop(cfgCopy.index(ctrl))
-            totdist = totdist + dist
-            shortests.append([preComputed])
-        elif len(ctrls) < 2: # also change first one in this case
-            ctrls = []
-            cfgCopy = cfg.copy()
-            ctrl, dummy_dist = pickAutoControl(cfgCopy, ctrls, 0, 1000000)
-            ctrls.append(ctrl)
-            cfgCopy.pop(cfgCopy.index(ctrl))
+        if ctrl is not None:
+            preComputed, dummy_jumps = calculateCoarseRouteExt(ctrls[-1], ctrl, faLookups, precision, True, True, 0)
+            if len(preComputed) > 1:
+                ctrls.append(ctrl)
+                cfgCopy.pop(cfgCopy.index(ctrl))
+                totdist = totdist + dist
+                shortests.append([preComputed])
+            elif len(ctrls) < 2: # also change first one in this case
+                ctrls = []
+                cfgCopy = cfg.copy()
+                ctrl, dummy_dist = pickAutoControl(cfgCopy, ctrls, 0, 1000000)
+                ctrls.append(ctrl)
+                cfgCopy.pop(cfgCopy.index(ctrl))
+
         if time.time() - start_tot_time > totMaxTime:
             break
-
         await asyncio.sleep(0)
 
     # only complete the work afterwards
