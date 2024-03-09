@@ -21,7 +21,8 @@ Se sisältää äärettömän määrän sprinttisuunnistuksen reitinvalintahaast
 hauskan 2D-pelin muodossa. Katso seuraavat esittelyvideot saadaksesi
 alustavan kuvan siitä miten peli toimii:
 
-* [Sprint-O-Matic 4.0: new "AMaze" feature to practice the first-control problem](https://youtu.be/nepM0oAiFn8)
+* [Sprint-O-Matic 5.0: parempi grafiikka ja enemmän karttoja](https://youtu.be/86cpFzc_-78)
+* [Sprint-O-Matic 4.0: uusi "AMaze"-toiminto ensimmäisen rastivälin harjoitteluun](https://youtu.be/nepM0oAiFn8)
 * [Sprint-O-Matic 3.0: nopeampi, satoja sprinttisuunnistukseen soveltuvia karttoja ympäri maailmaa, sisältää myös web-sovelluksen](https://youtu.be/lmbBzbUQUbc)
 * [Sprint-O-Matic varhainen prototyyppi, automaattisesti luotu kartta, jänismoodi, juoksumatto](https://youtu.be/VikFxwu9e0Q).
 * [Sprint-O-Matic reittianalyysitila, kartta kuvitteellisesta keskiaikaisesta kaupungista](https://youtu.be/rI9zinYGOmc)
