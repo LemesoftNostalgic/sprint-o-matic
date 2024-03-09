@@ -193,9 +193,11 @@ async def updateRoutesAndDistances(amaze):
     shortestRoutes = shortestRoutesArray[reachedControl - 1] if reachedControl > 0 else []
     futureShortestRoutes = shortestRoutesArray[reachedControl] if reachedControl > 0 and reachedControl < len(shortestRoutesArray) else []
     if not gameSettings.accurate and reachedControl > 0:
-        if shortestRoutesArrayAsync[reachedControl - 1]:
-            shortestRoutesArray[reachedControl - 1] = [shortestRoutesArrayAsync[reachedControl - 1]]
-            shortestRoutes = [shortestRoutesArrayAsync[reachedControl - 1]]
+        shortestRoutesProposal = shortestRoutesArrayAsync[reachedControl - 1]
+        if shortestRoutesProposal:
+            if calculatePathWeightedDistance(shortestRoutesProposal, saLookup, ssaLookup, vsaLookup) < calculatePathWeightedDistance(shortestRoutes[0], saLookup, ssaLookup, vsaLookup):
+                shortestRoutes = [shortestRoutesProposal]
+                shortestRoutesArray[reachedControl - 1] = shortestRoutes
 
     await uiFlushEvents()
     if shortestRoutes:
@@ -519,8 +521,11 @@ async def main():
                             await updateRoutesAndDistances(gameSettings.amaze)
                             shortestRoutes = shortestRoutesArray[reachedControl - 1]
                             if not gameSettings.accurate:
-                                if shortestRoutesArrayAsync[reachedControl - 1]:
-                                    shortestRoutes = [shortestRoutesArrayAsync[reachedControl - 1]]
+                                shortestRoutesProposal = shortestRoutesArrayAsync[reachedControl - 1]
+                                if shortestRoutesProposal:
+                                    if calculatePathWeightedDistance(shortestRoutesProposal, saLookup, ssaLookup, vsaLookup) < calculatePathWeightedDistance(shortestRoutes[0], saLookup, ssaLookup, vsaLookup):
+                                        shortestRoutes = [shortestRoutesProposal]
+                                        shortestRoutesArray[reachedControl - 1] = shortestRoutes
                             futureShortestRoutes = []
                             uiStartControlEffect(reachedControl)
                             # calculate statistics at finish
