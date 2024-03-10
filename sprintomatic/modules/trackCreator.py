@@ -34,6 +34,7 @@ pickDistMaxTime = 1.0
 pickMaxTime = pickDistMaxTime / maxDifficultAttempts
 totMaxTime = 15.0
 totMaxTimeAmaze = 40.0
+minOldNearness = 20
 
 def pickLegLen(distribution, metersPerPixel):
     a = random.random()
@@ -52,11 +53,17 @@ def fastGetDecentControl(cfg, ctrls, minlen, maxlen):
     if not ctrls:
         return startingPoint
     length = len(cfg)
-    for ind in range(length):
-        realInd = int((startingPoint + ind) % length)
+    for ind in range(0, length, 4):
+        realInd = int((startingPoint - length + ind) % length)
         dist = distanceBetweenPoints(cfg[realInd], ctrls[-1])
         if dist > minlen and dist < maxlen * 3:
-            return realInd
+            badFound = False
+            for ctrl in ctrls[:-1]:
+                if distanceBetweenPoints(cfg[realInd], ctrl) < minOldNearness:
+                    badFound = True
+                    break
+            if not badFound:
+                return realInd
     return None
 
 
@@ -116,10 +123,6 @@ def pickAutoControl(cfg, ctrls, minlen, maxlen):
             totNearness = 0
             for ctrl in ctrls[:-1]:
                 nearness = distanceBetweenPoints(cfg[index], ctrl)
-                if nearness < minlen / 2:
-                    if time.time() - start_time > pickMaxTime:
-                        return None, None
-                    continue
                 totNearness = totNearness + nearness
 
             if len(ctrls) > 1:
@@ -185,7 +188,7 @@ async def createAutoControls(cfg, trackLength, distribution, metersPerPixel, faL
     ctrls.append(ctrl)
     cfgCopy.pop(cfgCopy.index(ctrl))
     numDifficultControls = 0
-    while (len(ctrls) < 25 and totdist < trackLength) or len(ctrls) < 3:
+    while (len(ctrls) < 25 and totdist < trackLength) or len(ctrls) < 5:
         ctrl, dist, isDifficultControl = pickDistAutoControl(cfgCopy, ctrls, distribution, metersPerPixel, faLookups)
         if isDifficultControl:
             numDifficultControls = numDifficultControls + 1
@@ -310,4 +313,4 @@ def createPairedList(trivialList):
     for index in range(len(trivialList) - 1):
         pairedList.append([trivialList[index], trivialList[index + 1]])
     return pairedList
-        
+

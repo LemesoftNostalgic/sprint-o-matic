@@ -27,6 +27,7 @@ from .pathPruning import pruneWeightedDistance
 from .utils import getForbiddenAreaMask, getSlowAreaMask, getSemiSlowAreaMask, getVerySlowAreaMask, getControlMask, getTunnelMask
 
 boundaryThreshold = 10
+spacingBetweenControls = 16
 
 def getTfs():
     return [1, 2, 4, 8, 16]
@@ -51,27 +52,35 @@ def extractPngLookups(oMapMask):
         vsaLookup[tf] = {}
         tunnelLookup[tf] = {}
 
-    for y in range(0, size[1]):
-        for x in range(0, size[0]):
-            col = oMapMask.get_at((x, y))
-            if col == getSlowAreaMask():
-                for tf in getTfs():
-                    saLookup[tf][(int(x/tf), int(y/tf))] = True
-            elif col == getTunnelMask():
-                for tf in getTfs():
-                    tunnelLookup[tf][(int(x/tf), int(y/tf))] = True
-            elif col == getSemiSlowAreaMask():
-                for tf in getTfs():
-                    ssaLookup[tf][(int(x/tf), int(y/tf))] = True
-            elif col == getVerySlowAreaMask():
-                for tf in getTfs():
-                    vsaLookup[tf][(int(x/tf), int(y/tf))] = True
-            elif col == getForbiddenAreaMask():
-                for tf in getTfs():
-                    faLookup[tf][(int(x/tf), int(y/tf))] = True
-            elif col == getControlMask():
-                if x > boundaryThreshold and x < size[0] - boundaryThreshold and y > boundaryThreshold and y < size[1] - boundaryThreshold:
-                    controls.append((x, y))
+    for yBig in range(0, size[1]//spacingBetweenControls + 1):
+        for xBig in range(0, size[0]//spacingBetweenControls + 1):
+            controlToAdd = None
+            for ySmall in range(0, spacingBetweenControls):
+                for xSmall in range(0, spacingBetweenControls):
+                    x = xBig * spacingBetweenControls + xSmall
+                    y = yBig * spacingBetweenControls + ySmall
+                    if y < size[1] and x < size[0]:
+                        col = oMapMask.get_at((x, y))
+                        if col == getSlowAreaMask():
+                            for tf in getTfs():
+                                saLookup[tf][(int(x/tf), int(y/tf))] = True
+                        elif col == getTunnelMask():
+                            for tf in getTfs():
+                                tunnelLookup[tf][(int(x/tf), int(y/tf))] = True
+                        elif col == getSemiSlowAreaMask():
+                            for tf in getTfs():
+                                ssaLookup[tf][(int(x/tf), int(y/tf))] = True
+                        elif col == getVerySlowAreaMask():
+                            for tf in getTfs():
+                                vsaLookup[tf][(int(x/tf), int(y/tf))] = True
+                        elif col == getForbiddenAreaMask():
+                            for tf in getTfs():
+                                faLookup[tf][(int(x/tf), int(y/tf))] = True
+                        elif col == getControlMask():
+                            if x > boundaryThreshold and x < size[0] - boundaryThreshold and y > boundaryThreshold and y < size[1] - boundaryThreshold:
+                              controlToAdd = (x, y)
+            if controlToAdd is not None:
+                controls.append(controlToAdd)
 
     return faLookup, saLookup, ssaLookup, vsaLookup, tunnelLookup, controls
 

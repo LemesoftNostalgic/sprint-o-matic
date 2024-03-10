@@ -492,9 +492,9 @@ def addContours(kernelWidth, contourArr, keepOneOf):
     softeningZoom = 2
     theMax = 256
 
-    sumArr = pygame.Surface((kernelWidth*iZoom*softeningZoom, kernelWidth*iZoom*softeningZoom))
+    sumArr = pygame.Surface((kernelWidth*iZoom, kernelWidth*iZoom))
     sumArr.fill((0,0,0))
-    thresholdArr = pygame.Surface((width, height))
+    thresholdArr = pygame.Surface((width//softeningZoom, height//softeningZoom))
     thresholdArr.fill((0,0,0))
 
     initArrs = []
@@ -508,10 +508,8 @@ def addContours(kernelWidth, contourArr, keepOneOf):
                 height = int(uniform(0, (theMax/2)/ind))
                 arr.set_at((x, y), (height, height, height))
 
-        tmpArr = pygame.transform.smoothscale_by(arr, zoom*softeningZoom)
-        sumArr.blit(tmpArr, (0,0, softeningZoom*width, softeningZoom*height), special_flags=pygame.BLEND_ADD)
-
-    sumArr2 = pygame.transform.smoothscale_by(sumArr, 1/softeningZoom)
+        tmpArr = pygame.transform.smoothscale_by(arr, zoom)
+        sumArr.blit(tmpArr, (0,0, width, height), special_flags=pygame.BLEND_ADD)
 
     origThresholds = [240, 230, 220, 210, 200, 190, 180, 170, 160, 150, 140, 130, 120, 110, 100, 90, 80, 70, 60, 50, 40, 30, 20, 10]
     thresholds = []
@@ -521,13 +519,13 @@ def addContours(kernelWidth, contourArr, keepOneOf):
             thresholds.append(item)
 
     yvals = []
-    for y in range(sumArr2.get_size()[1]):
-        yvals.append(sumArr2.get_at((0, y))[0])
+    for y in range(sumArr.get_size()[1]):
+        yvals.append(sumArr.get_at((0, y))[0])
 
     for x in range(1, thresholdArr.get_size()[0] - 1):
-        val = sumArr2.get_at((x, 0))[0]
+        val = sumArr.get_at((x, 0))[0]
         for y in range(1,thresholdArr.get_size()[1] - 1):
-            newVal = sumArr2.get_at((x, y))[0]
+            newVal = sumArr.get_at((x, y))[0]
             yvals[y] = (10 * yvals[y] + newVal) / 11
             val = (10 * val + newVal) / 11
             val = (val + yvals[y]) / 2
@@ -537,17 +535,18 @@ def addContours(kernelWidth, contourArr, keepOneOf):
                     thresholdArr.set_at((x, y), (col, col, col))
                     break
 
-    for x in range(1, contourArr.get_size()[0] - 1):
-        for y in range(1, contourArr.get_size()[1] - 1):
+    contourLookup = {}
+    for x in range(1, thresholdArr.get_size()[0] - 1):
+        for y in range(1, thresholdArr.get_size()[1] - 1):
             mid = thresholdArr.get_at((x, y))[0]
             left = thresholdArr.get_at((x -1, y))[0]
             right = thresholdArr.get_at((x +1, y))[0]
             up = thresholdArr.get_at((x, y-1))[0]
             down = thresholdArr.get_at((x, y+ 1))[0]
             if left + right + up + down < 4 * mid:
-                if contourArr.get_at((x, y)) in contouroverlapkindcol:
-                    contourArr.set_at((x, y), colors[BROWNX])
-    return sumArr2, contourArr
+                if contourArr.get_at((x*2, y*2)) in contouroverlapkindcol:
+                    contourLookup[(x*2, y*2)] = True
+    return sumArr, contourArr
 
 
 def addFence(area, png, mask, outer):
