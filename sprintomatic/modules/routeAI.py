@@ -158,6 +158,7 @@ def calculateCoarseRoute(ptA, ptB, forbiddenLookup, left, right, maxdist):
     prevEasy = True
     jumps = 0
     ptList, scoreList = getTestPointList(ptA, ptB, forbiddenLookup)
+    ptListOld = []
 
     if not ptList:
         return [], 0
@@ -171,6 +172,7 @@ def calculateCoarseRoute(ptA, ptB, forbiddenLookup, left, right, maxdist):
     dist = 0
 
     currentPt = ptList.pop(0) # turn to pop() to give a bit more perf?
+    ptListOld.append(currentPt)
     currentScore=scoreList.pop(0)
     shortestRoute.append(currentPt)
 
@@ -187,6 +189,7 @@ def calculateCoarseRoute(ptA, ptB, forbiddenLookup, left, right, maxdist):
             # currentscore test not madatory?
             if scoreList[0] > currentScore and nearby(ptList[0], currentPt):
                 currentPt = ptList.pop(0)
+                ptListOld.append(currentPt)
                 currentPt2 = (-100, -100)
                 currentScore = scoreList.pop(0)
                 shortestRoute.append(currentPt)
@@ -194,6 +197,8 @@ def calculateCoarseRoute(ptA, ptB, forbiddenLookup, left, right, maxdist):
             else:
                 state = 1
                 prevEasy = True
+                stucked = False
+                stucked2 = False
         else:
             if prevEasy:
                 currentPt = moveToWallSide(currentPt, forbiddenLookup)
@@ -254,6 +259,7 @@ def calculateCoarseRoute(ptA, ptB, forbiddenLookup, left, right, maxdist):
                     ptList.pop(0)
                     scoreList.pop(0)
                 currentPt = ptList.pop(0)
+                ptListOld.append(currentPt)
                 currentScore = scoreList.pop(0)
                 shortestRoute = shortestRoute + leftGuyRoute
                 state = 0
@@ -263,9 +269,17 @@ def calculateCoarseRoute(ptA, ptB, forbiddenLookup, left, right, maxdist):
                     ptList.pop(0)
                     scoreList.pop(0)
                 currentPt = ptList.pop(0)
+                ptListOld.append(currentPt)
                 currentScore = scoreList.pop(0)
                 shortestRoute = shortestRoute + rightGuyRoute
                 state = 0
+            else:
+                if currentPt in ptListOld:
+                    stucked = True
+                if currentPt2 in ptListOld:
+                    stucked2 = True
+                if stucked and stucked2:
+                    return [], 0
 
     if state == 1:
         if distanceBetweenPoints(currentPt, ptB) <= 4.0:

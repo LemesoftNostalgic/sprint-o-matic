@@ -165,7 +165,6 @@ def pruneShortestRouteRes(route, forbiddenLookup, slowLookup, semiSlowLookup, ve
                 for step in range(0, thisStep * 2 - 1):
                     prunedRoute.pop(index)
                 prunedRoute.insert(index, ((pt1[0]+pt2[0])/2, (pt1[1]+pt2[1])/2))
-                index = index + 1
 
         if not found:
             break
