@@ -341,6 +341,10 @@ async def initScreen(imagePath, gameSettings, externalImageData, externalWorldCi
                                 externalExampleCtr = externalExampleCtr + 1
                                 if externalExampleCtr >= len(externalImageData[externalExampleTeamCtr]["sub-listing"]):
                                     externalExampleCtr = 0
+                            if initScreenPos == len(selections) - 4:
+                                worldExampleCtr = worldExampleCtr + 1
+                                if worldExampleCtr >= len(externalWorldCityMap):
+                                    worldExampleCtr = 0
 
             if event.type == pygame.QUIT:
                 quitting = True
@@ -365,6 +369,10 @@ async def initScreen(imagePath, gameSettings, externalImageData, externalWorldCi
                         externalExampleCtr = externalExampleCtr + 1
                         if externalExampleCtr >= len(externalImageData[externalExampleTeamCtr]["sub-listing"]):
                             externalExampleCtr = 0
+                    if initScreenPos == len(selections) - 4:
+                        worldExampleCtr = worldExampleCtr + 1
+                        if worldExampleCtr >= len(externalWorldCityMap):
+                            worldExampleCtr = 0
 
         # renderer
         externalExampleTeamText = ""
