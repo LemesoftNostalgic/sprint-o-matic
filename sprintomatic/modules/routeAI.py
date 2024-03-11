@@ -408,15 +408,15 @@ async def slowAccurateCalculateShortestRouteAsync(setupList):
                 directions = getDirections(point)
                 for direction in directions:
                     newPoint = direction[0]
-                    factor = 1.0
-                    if newPoint in slowLookup:
-                        factor = getSlowdownFactor()
-                    elif newPoint in semiSlowLookup:
-                        factor = getSemiSlowdownFactor()
-                    elif newPoint in verySlowLookup:
-                        factor = getVerySlowdownFactor()
-                    newScore = direction[1] * factor
                     if (newPoint not in backRouteLookup or backRouteLookup[point] + newScore < backRouteLookup[newPoint]) and newPoint not in forbiddenLookup:
+                        factor = 1.0
+                        if newPoint in slowLookup:
+                            factor = getSlowdownFactor()
+                        elif newPoint in semiSlowLookup:
+                            factor = getSemiSlowdownFactor()
+                        elif newPoint in verySlowLookup:
+                            factor = getVerySlowdownFactor()
+                        newScore = direction[1] * factor
                         backRouteLookup[newPoint] = backRouteLookup[point] + newScore
                         backPoints.append(newPoint)
             await asyncio.sleep(0)
@@ -425,15 +425,15 @@ async def slowAccurateCalculateShortestRouteAsync(setupList):
                 directions = getDirections(point)
                 for direction in directions:
                     newPoint = direction[0]
-                    factor = 1.0
-                    if newPoint in slowLookup:
-                        factor = getSlowdownFactor()
-                    elif newPoint in semiSlowLookup:
-                        factor = getSemiSlowdownFactor()
-                    elif newPoint in verySlowLookup:
-                        factor = getVerySlowdownFactor()
-                    newScore = direction[1] * factor
                     if (newPoint not in routeLookup or routeLookup[point] + newScore <= routeLookup[newPoint]) and newPoint not in forbiddenLookup:
+                        factor = 1.0
+                        if newPoint in slowLookup:
+                            factor = getSlowdownFactor()
+                        elif newPoint in semiSlowLookup:
+                            factor = getSemiSlowdownFactor()
+                        elif newPoint in verySlowLookup:
+                            factor = getVerySlowdownFactor()
+                        newScore = direction[1] * factor
                         routeLookup[newPoint] = routeLookup[point] + newScore
                         if newPoint in backRouteLookup:
                             stop = True

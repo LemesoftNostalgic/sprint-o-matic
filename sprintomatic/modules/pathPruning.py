@@ -42,7 +42,7 @@ def pruneDistanceWeighter(testPt, lookup, semilookup, verylookup):
 def pruneWeightedDistance(ptA, ptB, lookup, semilookup, verylookup):
     if ptA == ptB:
         return 0.0
-    steps = max(abs(ptA[0]- ptB[0]), abs(ptA[1] - ptB[1]))
+    steps = int(max(abs(ptA[0]- ptB[0]), abs(ptA[1] - ptB[1])))
     start = (float(ptA[0]), float(ptA[1]))
     testPt = start
     newScore = 0.0
@@ -51,7 +51,7 @@ def pruneWeightedDistance(ptA, ptB, lookup, semilookup, verylookup):
         incr = (float(ptB[0] - ptA[0]) / float(steps), float(ptB[1] - ptA[1]) / float(steps))
         incrDist = distanceBetweenPoints((0.0, 0.0), incr)
 
-        for ind in range(int(steps)):
+        for ind in range(steps):
             testPt = (start[0] + ind * incr[0], start[1] + ind * incr[1])
             newScore = newScore + incrDist * pruneDistanceWeighter(testPt, lookup, semilookup, verylookup)
 
@@ -73,7 +73,7 @@ def pruneEnsureLineOfSight(ptA, ptB, lookup):
     testPtList = []
     if ptA == ptB:
         return testPtList
-    steps = int(max(abs(ptA[0]- ptB[0]), abs(ptA[1] - ptB[1])))
+    steps = int(max(abs(ptA[0]- ptB[0]), abs(ptA[1] - ptB[1]))) * 2
     if steps:
         incr = (float(ptB[0] - ptA[0]) / float(steps), float(ptB[1] - ptA[1]) / float(steps))
         incrDist = distanceBetweenPoints((0.0, 0.0), incr)
@@ -129,7 +129,6 @@ def pruneEnsureGoodShortcut(ptA, ptB, lookup1, lookup2, lookup3):
 
 # check if a line crosses forbidden areas or not
 def pruneCheckLineOfSight(ptA, ptB, ptMid, forbiddenLookup, slowLookup, semiSlowLookup, verySlowLookup):
-    origScore = pruneWeightedDistance(ptA, ptMid, slowLookup, semiSlowLookup, verySlowLookup) + pruneWeightedDistance(ptMid, ptB, slowLookup, semiSlowLookup, verySlowLookup)
     if pruneEnsureLineOfSight(ptA, ptB, forbiddenLookup) != None:
         origScore = pruneWeightedDistance(ptA, ptMid, slowLookup, semiSlowLookup, verySlowLookup) + pruneWeightedDistance(ptMid, ptB, slowLookup, semiSlowLookup, verySlowLookup)
         newScore = pruneWeightedDistance(ptA, ptB, slowLookup, semiSlowLookup, verySlowLookup)
