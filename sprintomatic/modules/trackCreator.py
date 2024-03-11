@@ -180,7 +180,7 @@ def pickDistAutoControl(cfg, ctrls, distribution, metersPerPixel, faLookups):
 async def createAutoControls(cfg, trackLength, distribution, metersPerPixel, faLookups, saLookups, ssaLookups, vsaLookups, pacemakerInd):
     cfgCopy = cfg.copy()
     totdist = 0
-    precision = 0 #two is too big
+    precision = 0 # two is too big
     ctrls = []
     shortests = []
     start_tot_time = time.time()
@@ -244,31 +244,47 @@ async def createAmazeControls(cfg, distribution, metersPerPixel, faLookups, saLo
 
         ctrl, dist, isDifficultControl = pickDistAutoControl(cfg, ctrls, distribution, metersPerPixel, faLookups)
         if ctrl is None:
+            print("nonePickDist")
             continue
         if not isDifficultControl:
+            print("noIsDifficult")
             continue
         dist = distanceBetweenPoints(ctrls[-1], ctrl)
 
-        # check there is both right and left alternative
-        preComputedLeft, jumps = calculateCoarseRouteExt(ctrls[-1], ctrl, faLookups, 2, True, False, dist * 20)
-        if jumps < 1 or len(preComputedLeft) < 3 or calculatePathDistance(preComputedLeft) < dist + dist / deAmazeFactor:
+        preComputedMid, jumps = calculateCoarseRouteExt(ctrls[-1], ctrl, faLookups, 2, True, True, dist * 20)
+        if jumps < 1 or len(preComputedMid) < 3 or calculatePathDistance(preComputedMid) < dist + dist / deAmazeFactor:
+            print("noCoarsePathMid")
             continue
+
+        if time.time() - start_tot_time > totMaxTimeAmaze or await uiFlushEvents():
+            return [], [], [], [], 0.0
+
+        leftChanged = False
+        # check there either right or left alternative
+        preComputedLeft, jumps = calculateCoarseRouteExt(ctrls[-1], ctrl, faLookups, 2, True, False, dist * 20)
+        if len(preComputedLeft) < 3 or calculatePathDistance(preComputedLeft) < dist + dist / deAmazeFactor:
+            preComputedLeft = preComputedMid
+            leftChanged = True
         if time.time() - start_tot_time > totMaxTimeAmaze or await uiFlushEvents():
             return [], [], [], [], 0.0
 
         preComputedRight, jumps = calculateCoarseRouteExt(ctrls[-1], ctrl, faLookups, 2, False, True, dist * 20)
         if len(preComputedRight) < 3 or calculatePathDistance(preComputedRight) < dist + dist / deAmazeFactor:
-            continue
+            if not leftChanged:
+                preComputedRight = preComputedMid
+            else:
+                print("noCoarsePathRight")
+                continue
         if time.time() - start_tot_time > totMaxTimeAmaze or await uiFlushEvents():
             return [], [], [], [], 0.0
 
         beautifiedLeft = preComputedLeft
         beautifiedRight = preComputedRight
-        beautifiedLeft = pruneShortestRouteExt(preComputedLeft, faLookups, saLookups, ssaLookups, vsaLookups, 0)
+        beautifiedLeft = pruneShortestRouteExt(preComputedLeft, faLookups, saLookups, ssaLookups, vsaLookups, 2)
         if time.time() - start_tot_time > totMaxTimeAmaze or await uiFlushEvents():
             return [], [], [], [], 0.0
 
-        beautifiedRight = pruneShortestRouteExt(preComputedRight, faLookups, saLookups, ssaLookups, vsaLookups, 0)
+        beautifiedRight = pruneShortestRouteExt(preComputedRight, faLookups, saLookups, ssaLookups, vsaLookups, 2)
         if time.time() - start_tot_time > totMaxTimeAmaze or await uiFlushEvents():
             return [], [], [], [], 0.0
 
@@ -281,6 +297,7 @@ async def createAmazeControls(cfg, distribution, metersPerPixel, faLookups, saLo
                 secondBestNormalizedDifference = normalizedDifference
                 secondBestCtrls = ctrls.copy()
                 secondBestCtrl = ctrl
+                print("secondbest")
                 continue
             else:
                 beautifiedRight = secondBestBeautifiedRight
@@ -297,13 +314,11 @@ async def createAmazeControls(cfg, distribution, metersPerPixel, faLookups, saLo
 
     shortests = []
     for ind in range(len(ctrls) - 1):
-        shortests.append([await slowAccurateCalculateShortestRouteAsync([ctrls[ind], ctrls[ind + 1], faLookups, saLookups, ssaLookups, vsaLookups, 2, 0])])
+        shortests.append([await slowAccurateCalculateShortestRouteAsync([ctrls[ind], ctrls[ind + 1], faLookups, saLookups, ssaLookups, vsaLookups, 3, 0])])
         if await uiFlushEvents():
             return [], [], [], [], 0.0
         if not shortests[ind][0]:
-            shortests[ind] = [await slowAccurateCalculateShortestRouteAsync([ctrls[ind], ctrls[ind + 1], faLookups, saLookups, ssaLookups, vsaLookups, 3, 0])]
-            if not shortests[ind][0]:
-                return [], [], [], [], 0.0
+            return [], [], [], [], 0.0
 
     return ctrls, shortests, beautifiedLeft, beautifiedRight, normalizedDifference
 

@@ -78,7 +78,9 @@ def extractPngLookups(oMapMask):
                                 faLookup[tf][(int(x/tf), int(y/tf))] = True
                         elif col == getControlMask():
                             if x > boundaryThreshold and x < size[0] - boundaryThreshold and y > boundaryThreshold and y < size[1] - boundaryThreshold:
-                              controlToAdd = (x, y)
+                                if not ((x, y-1) in faLookup[1] and (x, y+1) in faLookup[1]) and not ((x-1, y) in faLookup[1] and (x+1, y) in faLookup[1]):
+                                    if not ((x//2, y//2-1) in faLookup[2] and (x//2, y//2+1) in faLookup[2]) and not ((x//2-1, y//2) in faLookup[2] and (x//2+1, y//2) in faLookup[2]):
+                                        controlToAdd = (x, y)
             if controlToAdd is not None:
                 controls.append(controlToAdd)
 
