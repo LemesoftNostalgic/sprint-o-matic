@@ -280,11 +280,11 @@ async def createAmazeControls(cfg, distribution, metersPerPixel, faLookups, saLo
 
         beautifiedLeft = preComputedLeft
         beautifiedRight = preComputedRight
-        beautifiedLeft = pruneShortestRouteExt(preComputedLeft, faLookups, saLookups, ssaLookups, vsaLookups, 2)
+        beautifiedLeft = pruneShortestRouteExt(preComputedLeft, faLookups, saLookups, ssaLookups, vsaLookups, 1)
         if time.time() - start_tot_time > totMaxTimeAmaze or await uiFlushEvents():
             return [], [], [], [], 0.0
 
-        beautifiedRight = pruneShortestRouteExt(preComputedRight, faLookups, saLookups, ssaLookups, vsaLookups, 2)
+        beautifiedRight = pruneShortestRouteExt(preComputedRight, faLookups, saLookups, ssaLookups, vsaLookups, 1)
         if time.time() - start_tot_time > totMaxTimeAmaze or await uiFlushEvents():
             return [], [], [], [], 0.0
 
