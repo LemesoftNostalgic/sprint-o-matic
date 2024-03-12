@@ -244,16 +244,13 @@ async def createAmazeControls(cfg, distribution, metersPerPixel, faLookups, saLo
 
         ctrl, dist, isDifficultControl = pickDistAutoControl(cfg, ctrls, distribution, metersPerPixel, faLookups)
         if ctrl is None:
-            print("nonePickDist")
             continue
         if not isDifficultControl:
-            print("noIsDifficult")
             continue
         dist = distanceBetweenPoints(ctrls[-1], ctrl)
 
         preComputedMid, jumps = calculateCoarseRouteExt(ctrls[-1], ctrl, faLookups, 2, True, True, dist * 20)
         if jumps < 1 or len(preComputedMid) < 3 or calculatePathDistance(preComputedMid) < dist + dist / deAmazeFactor:
-            print("noCoarsePathMid")
             continue
 
         if time.time() - start_tot_time > totMaxTimeAmaze or await uiFlushEvents():
@@ -273,7 +270,6 @@ async def createAmazeControls(cfg, distribution, metersPerPixel, faLookups, saLo
             if not leftChanged:
                 preComputedRight = preComputedMid
             else:
-                print("noCoarsePathRight")
                 continue
         if time.time() - start_tot_time > totMaxTimeAmaze or await uiFlushEvents():
             return [], [], [], [], 0.0
@@ -297,7 +293,6 @@ async def createAmazeControls(cfg, distribution, metersPerPixel, faLookups, saLo
                 secondBestNormalizedDifference = normalizedDifference
                 secondBestCtrls = ctrls.copy()
                 secondBestCtrl = ctrl
-                print("secondbest")
                 continue
             else:
                 beautifiedRight = secondBestBeautifiedRight

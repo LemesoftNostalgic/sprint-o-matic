@@ -247,8 +247,8 @@ async def pruneCutTheCornersAsync(route, forbiddenLookup, slowLookup, semiSlowLo
         ptMid1 = prunedRoute[index + 1]
         ptMid2 = prunedRoute[index + jump]
         pt2 = prunedRoute[index + jump + 1]
-        pt1 = ((pt1[0] * split + ptMid1[0] * (1 - split)), (pt1[1] * split + ptMid1[1] * (1 - split)))
-        pt2 = ((pt2[0] * split + ptMid2[0] * (1 - split)), (pt2[1] * split + ptMid2[1] * (1 - split)))
+        pt1 = ((pt1[0] * split[0] + ptMid1[0] * (1 - split[0])), (pt1[1] * split[0] + ptMid1[1] * (1 - split[0])))
+        pt2 = ((pt2[0] * split[1] + ptMid2[0] * (1 - split[1])), (pt2[1] * split[1] + ptMid2[1] * (1 - split[1])))
         index = index + 1
 
         shortcutFound, delta = pruneCheckLineOfSight(pt1, pt2, ptMid1, forbiddenLookup, slowLookup, semiSlowLookup, verySlowLookup)
@@ -270,7 +270,7 @@ async def pruneShortestRouteAsync(route, forbiddenLookup, slowLookup, semiSlowLo
     route = await pruneShortestRouteResAsync(route, forbiddenLookup, slowLookup, semiSlowLookup, verySlowLookup, 1, 16)
     for res in [13, 7, 3, 1]:
         route = await pruneShortestRouteResAsync(route, forbiddenLookup, slowLookup, semiSlowLookup, verySlowLookup, res, iters[res])
-    for split in [0.5, 0.3, 0.2]:
+    for split in [(0.8, 0.8), (0.7, 0.4), (0.4, 0.7), (0.5, 0.5), (0.3, 0.3), (0.2, 0.2)]:
         for jump in range(2, 0, -1):
             route = await pruneCutTheCornersAsync(route, forbiddenLookup, slowLookup, semiSlowLookup, verySlowLookup, split, jump)
 

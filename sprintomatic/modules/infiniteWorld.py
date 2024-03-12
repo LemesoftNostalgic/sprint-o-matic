@@ -359,30 +359,30 @@ async def constructWayDb(latlonMapOrigo, xyPictureSize, metersPerPixel):
 
         api = overpy.Overpass()
 
-    
+        queryStr = """[out:json];("""
         for waytype in waytypes:
-            result = api.query("""
+            queryStr = queryStr + """
                 way("""+str(latlonMapOrigo[0])+""","""+str(latlonMapOrigo[1])+""","""+str(latlonMapOppositeCorner[0])+""","""+str(latlonMapOppositeCorner[1])+""") [\"""" + waytype + """\"];
-                (._;>;);
-                out body;
-                """)
+                """
+        queryStr = queryStr + """); (._;>;); out body;"""
+        result = api.query(queryStr)
 
-            if waytype not in waydb:
-                waydb[waytype] = {}
+        for way in result.ways:
             if await uiFlushEvents():
                 return None
 
-            for way in result.ways:
-                subway = way.tags.get(waytype, "n/a")
-                if subway not in waydb[waytype]:
-                    waydb[waytype][subway] = []
-                if await uiFlushEvents():
-                    return None
-                poslistToAppend = []
-                for node in way.nodes:
-                    xyPos = toPictureCoordinates(latlonMapOrigo, (float(node.lat), float(node.lon)), xyPictureSize, metersPerPixel)
-                    poslistToAppend.append(xyPos)
-                waydb[waytype][subway].append(poslistToAppend)
+            for waytype in way.tags:
+                if waytype in waytypes:
+                    subway = way.tags[waytype]
+                    if waytype not in waydb:
+                        waydb[waytype] = {}
+                    if subway not in waydb[waytype]:
+                        waydb[waytype][subway] = []
+                    poslistToAppend = []
+                    for node in way.nodes:
+                        xyPos = toPictureCoordinates(latlonMapOrigo, (float(node.lat), float(node.lon)), xyPictureSize, metersPerPixel)
+                        poslistToAppend.append(xyPos)
+                    waydb[waytype][subway].append(poslistToAppend)
     except Exception as err:
         waydb = {}
 
@@ -400,6 +400,7 @@ def queryForbiddenSpot(mask, x, y):
     if currentMask == getForbiddenAreaMask():
         return True
     return False
+
 
 def markControlSpot(mask, x, y):
     if not queryForbiddenSpot(mask, x, y):
