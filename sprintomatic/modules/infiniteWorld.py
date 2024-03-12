@@ -339,14 +339,11 @@ def oppositeToLatLonCoordinates(latlonMapOrigo, xyPictureSize, metersPerPixel):
 
 def checkIfWaydbInLocalCache(latlonMapOrigo):
     waydb = {}
-    print("foo")
     offlineMapData = offlineMapDataFolder + str(round(latlonMapOrigo[0] ,5)) + "_" + str(round(latlonMapOrigo[1],5)) + ".json"
     fname = os.path.join(getPackagePath(), offlineMapData)
-    print(fname)
     if os.path.isfile(fname):
         with open(fname, 'rb') as f:
             waydb = json.load(f)
-            print(waydb)
     return waydb
 
 
@@ -386,7 +383,6 @@ async def constructWayDb(latlonMapOrigo, xyPictureSize, metersPerPixel):
                     poslistToAppend.append(xyPos)
                 waydb[waytype][subway].append(poslistToAppend)
 
-    print(json.dumps(waydb, indent=4))
     if not waydb:
         waydb = checkIfWaydbInLocalCache(latlonMapOrigo)
 

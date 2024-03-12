@@ -92,9 +92,7 @@ stepSound = None
 
 left = False
 
-offlineMode = False
-def initSounds(soundRoot, offline):
-    global offlineMode
+def initSounds(soundRoot):
     global stepsChannel
     global birdsChannel
     global effectChannel
@@ -110,15 +108,12 @@ def initSounds(soundRoot, offline):
     global stepSound
     global finishSound
 
-    offlineMode = offline
 
     pygame.mixer.init()
     pygame.mixer.set_num_channels(4)
 
     for leftStep in leftSteps:
         fact = 0.02
-        if offlineMode:
-            fact = 0.0
         
         leftSounds.append(pygame.mixer.Sound(os.path.join(soundRoot, soundPath, leftStep)))
         leftSounds[-1].set_volume(5*fact + fact * randrange(0, 3))
@@ -127,42 +122,21 @@ def initSounds(soundRoot, offline):
         rightSounds[-1].set_volume(5*fact + fact * randrange(0, 3))
     for melodyPath in melodyPaths:
         sound = pygame.mixer.Sound(os.path.join(soundRoot, melodyPath))
-        if offlineMode:
-            sound.set_volume(0.0)
-        else:
-            sound.set_volume(0.8)
+        sound.set_volume(0.8)
         melodySounds.append(sound)
     melodyCtr = len(melodySounds) - 1
     birdsSound = pygame.mixer.Sound(os.path.join(soundRoot,  birdsPath))
-    if offlineMode:
-        birdsSound.set_volume(0.0)
-    else:
-        birdsSound.set_volume(0.8)
+    birdsSound.set_volume(0.8)
     shoutSound = pygame.mixer.Sound(os.path.join(soundRoot, shoutPath))
-    if offlineMode:
-        shoutSound.set_volume(0.2)
-    else:
-        shoutSound.set_volume(0.3)
+    shoutSound.set_volume(0.3)
     pacemakerShoutSound = pygame.mixer.Sound(os.path.join(soundRoot, pacemakerShoutPath))
-    if offlineMode:
-        pacemakerShoutSound.set_volume(0.3)
-    else:
-        pacemakerShoutSound.set_volume(0.5)
+    pacemakerShoutSound.set_volume(0.5)
     finishSound = pygame.mixer.Sound(os.path.join(soundRoot, finishPath))
-    if offlineMode:
-        finishSound.set_volume(0.3)
-    else:
-        finishSound.set_volume(0.6)
+    finishSound.set_volume(0.6)
     startSound = pygame.mixer.Sound(os.path.join(soundRoot, startPath))
-    if offlineMode:
-        startSound.set_volume(0.3)
-    else:
-        startSound.set_volume(8.0)
+    startSound.set_volume(0.8)
     stepSound = pygame.mixer.Sound(os.path.join(soundRoot, stepPath))
-    if offlineMode:
-        stepSound.set_volume(0.3)
-    else:
-        stepSound.set_volume(0.8)
+    stepSound.set_volume(0.8)
 
     stepsChannel = pygame.mixer.Channel(stepsChannelNumber)
     birdsChannel = pygame.mixer.Channel(birdsChannelNumber)
