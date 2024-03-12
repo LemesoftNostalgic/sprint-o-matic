@@ -93,6 +93,7 @@ async def setTheStageForNewRound(cfg):
         # effects initialization
         uiControlEffectRestart()
         startEffect()
+        await asyncio.sleep(0)
         uiStartControlEffect(0)
 
         zoom = gameSettings.zoom
@@ -333,17 +334,20 @@ async def main():
         running = True
         if showInitScreen:
             startBirds()
+            await asyncio.sleep(0)
             if gameSettings.autoTest:
                 (quitting, gameSettings) = fakeInitScreen(gameSettings.imageRoot, gameSettings, externalImageData)
             else:
-                time.sleep(1)
+                await asyncio.sleep(1)
                 await uiFlushEvents()
                 (quitting, gameSettings) = await initScreen(gameSettings.imageRoot, gameSettings, externalImageData, externalWorldCityMap, news)
             running = True
             if quitting:
                 running = False
             stopBirds()
+            await asyncio.sleep(0)
             startElevatorMelody()
+            await asyncio.sleep(0)
         if not quitting:
             config, controls, faLookup, saLookup, ssaLookup, vsaLookup, tunnelLookup, generatedOrDownloadedMap, tmpMetersPerPixel, externalZoom = await returnConfig(gameSettings, externalImageData, externalWorldCityMap)
 
@@ -383,12 +387,14 @@ async def main():
 
             # Stop the elevator music
             stopMelody()
+            await asyncio.sleep(0)
 
         # main loop of the gameplay itself:
         while running and controls and not quitting:
             # Keep on running (sound)
             if datetime.now() - startTime > timedelta(seconds=gameMovingStartThreshold):
                 maintainRunningStepEffect()
+                await asyncio.sleep(0)
 
             # If we just moved or not
             movement = False
@@ -414,6 +420,7 @@ async def main():
                     if gameSettings.autoTest:
                         fakeResetAgain()
                     stopMelody()
+                    await asyncio.sleep(0)
                     stopEffects()
                     if not showInitScreen:
                         quitting = True
@@ -455,7 +462,9 @@ async def main():
                         if controlFound(controls, position, nextControl):
                             reachedControl, nextControl = startControlFanfare(nextControl)
                             stopMelody()
+                            await asyncio.sleep(0)
                             shoutEffect()
+                            await asyncio.sleep(0)
                             if longLapEveryOther(controls[reachedControl], controls[nextControl]):
                                 startMelody()
                             await updateRoutesAndDistances(gameSettings.amaze)
@@ -503,12 +512,15 @@ async def main():
                                 if angleDiff < amazeAcceptedAngleDifference:
                                     finishTexts[1] = "I AGREE!"
                                     shoutEffect()
+                                    await asyncio.sleep(0)
                                 elif angleDiff < amazeAcceptedAngleDifference * 2:
                                     finishTexts[1] = "ALMOST RIGHT..."
                                     shoutEffect()
+                                    await asyncio.sleep(0)
                                 else:
                                     finishTexts[1] = "REALLY?"
                                     pacemakerShoutEffect()
+                                    await asyncio.sleep(0)
                                 finishTexts[2] = str(round(fromRadiansToDegrees(angleDiff), 0))
                                 finishTexts[0] = str(normalizedDifference)
 
@@ -517,7 +529,9 @@ async def main():
                             reachedControl, nextControl = startFinishFanfare(nextControl)
                             pacemakerRunning = False
                             stopMelody()
+                            await asyncio.sleep(0)
                             finishEffect()
+                            await asyncio.sleep(0)
                             await updateRoutesAndDistances(gameSettings.amaze)
                             shortestRoutes = shortestRoutesArray[reachedControl - 1]
                             if not gameSettings.accurate:
