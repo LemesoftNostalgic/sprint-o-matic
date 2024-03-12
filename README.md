@@ -48,22 +48,20 @@ which have improved a little bit during this winter.
 
 ### Web application
 
-Use the web version if you want to try the application quickly, or you are using a MacBook. It might also work with a tablet, if you have a Bluetooth mouse paired with the tablet. The web version is not a full version, for example the sounds are awful and there is smaller amount of maps, but it gives you an idea what the application is like.
-You may need to restart the browser, if the app does not start properly.
+Use the web version if you want to just try the application quickly.
+The web application is a bit slow, and it doesn't
+have the background music, but it is always up-to date.
 
   * [Web application starts here](https://lemesoftnostalgic.github.io/sprint-o-matic/)
 
-### Windows
+### Downloadable application
 
-[Windows installation](/WINDOWS.md)
+You can use the command-line options only with the downloadable application.
+It is also faster and nicer to play than the web application.
 
-### Linux
-
-[Linux installation](/LINUX.md)
-
-### MacBook
-
-[MacBook installation](/MACBOOK.md)
+  * [Windows installation](/WINDOWS.md)
+  * [Linux installation](/LINUX.md)
+  * [MacBook installation](/MACBOOK.md)
 
 ### Hardware requirements
 
@@ -72,9 +70,6 @@ Windows 10. The web version requires a relatively modern browser.
 Using the **--accurate** command-line parameter requires relatively modern
 Linux PC due to
 its search algorithms that run in separate processes.
-
-The World series maps take a while to start, sometimes even half a minute
-or so. The time is well spent on map data downloading and track rendering. 
 
 ## Usage
 

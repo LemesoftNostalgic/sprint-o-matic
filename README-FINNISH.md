@@ -41,35 +41,26 @@ alustavan kuvan siitä miten peli toimii:
 
 ### Web-sovellus
 
-Jos haluat vain testata sovellusta pikaisesti,
-tai haluat ajaa sitä Macissa, käytä web-versiota.
-Web-version ei ole yhtä hyvä kuin asennettava versio: äänet ovat huonommat,
-ja karttoja vähemmän,
-mutta siitä saa nopeasti idean miten ohjelma toimii.
-Voit joutua uudelleenkäynnistämään selaimen jos sovellus ei starttaa kunnolla.
+Käytä web-versiota, jos haluat vain testata sovellusta pikaisesti.
+Web-sovellus on vähän hitaampi kuin ladattava sovellus,
+eikä siinä ole taustaääniä, mutta toisaalta se on aina ajan tasalla.
 
-  * [Web-sovellus käynnistyyn tästä](https://lemesoftnostalgic.github.io/sprint-o-matic/)
+  * [Web-sovellus käynnistyy tästä linkistä](https://lemesoftnostalgic.github.io/sprint-o-matic/)
 
-### Windows
+### Ladattava sovellus
 
-[Windows-asennus](/WINDOWS-FINNISH.md)
+Sinun täytyy ladata ja asentaa sovellus jotta voit käyttää komentoriviparametrejä. Ladattava sovellus on myös nopeampi kuin web-sovellus ja pelattavuudeltaan
+parempi.
 
-### Linux
-
-[Linux-asennus](/LINUX-FINNISH.md)
-
-### MacBook
-
-[MacBook-asennus](/MACBOOK-FINNISH.md)
+  * [Windows-asennus](/WINDOWS-FINNISH.md)
+  * [Linux-asennus](/LINUX-FINNISH.md)
+  * [MacBook-asennus](/MACBOOK-FINNISH.md)
 
 ### Laitteistovaatimukset
 
 Sovellus on testattu Ubuntu 20.04 ja
 Windows 10 -laitteissa.  Web-versio tarvitsee suhteellisen modernin selaimen. **--accurate** komentoparametrin käyttäminen vaatii suhteellisen nykyaikaisen
 tietokoneen, koska sen hakualgoritmit suoritetaan useissa prosesseissa.
-
-World-sarjan karttojen alustaminen kestää hieman tavanomaista kauemmin,
-joskus jopa puolisen minuuttia.
 
 
 ## Käyttö
