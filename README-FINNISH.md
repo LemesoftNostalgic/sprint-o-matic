@@ -190,16 +190,13 @@ Tämänhetkinen idealista on seuraava:
 Helpot jutut:
 
 * lisää ulkoisia karttoja linkitettynä karttaluetteloon [ohje](/README-MAPS-FINNISH.md)
-* Tiettyyn suuntaan hidastava maastokuvaus, parantaisi portaikkojen ja kukkuloiden
-mallinnusta
+* Korkeusmerkinnät -> ylämäestä hitaampi kuin alamäestä
 * Rastien numerointi, rastimääritteet, jne.
-* grafiikan parantelu
+
+* Muistiharjoitus n.s. valkoisen kartan suunnistus (poista osa karttamerkeistä esim 10 sekunnin päästä)
 * Score-O -tyyppinen (n.s. rogaining, kerää pisteet missä tahansa järjestyksessä, aikaraja)
 * Salli kuhunkin karttaan liittyvien käsinsuunniteltujen ratojen julkaiseminen
 * tapahtumien/moninpelin tuki (joutuisi olemaan maksullinen toiminto kattaakseen palvelinkulut)
-
-Hieman enemmän työtä vaatisi:
-
 * automaattinen maastokuvausten luominen.
 * 3d tila
 

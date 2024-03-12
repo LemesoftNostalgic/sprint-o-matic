@@ -164,16 +164,12 @@ branch it for extra development or propose pull requests for it.
 The following ideas are next on the table:
 
 * more maps to the map listing [using this procedure](/README-MAPS.md)
-* Gradient slow terrain, for better modeling of staircases and hills
+* Height map -> uphill becomes slower than downhill
+* White map orienteering (remove some items from map after e.g 10 sec)
 * Add control numbering, control descriptions, etc.
-* Graphics beautification
-* Score-O mode (collect contols with score in any order, time limit)
-* Allow creation of hand-crafted track designs for a given map
+* Allow hand-crafted track designs for a given map, in addition to random ones
 * events/multiplayer support (might have to be a paid subcription to cover the
 server costs)
-
-A bit more involved:
-
 * Automatic creation of terrain descriptions, making [this procedure](/README-MAPS.md) easier.
 * 3d mode
 
