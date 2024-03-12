@@ -260,8 +260,7 @@ async def uiCompleteRender(finishTexts, mapInfoTextList, pacemakerInd, pacemaker
     showInfoBoxTxt(getBigScreen())
     if firstTime:
         uiUnSubmitSlide()
-    else:
-        await uiFlip(True)
+    await uiFlip(False)
 
 
 previousTime = time.time()

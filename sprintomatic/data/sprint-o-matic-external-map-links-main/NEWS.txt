@@ -1,1 +1,2 @@
-This is lite version. Download full version from homepage.
+You are not connected to network. Minimal functionality.
+

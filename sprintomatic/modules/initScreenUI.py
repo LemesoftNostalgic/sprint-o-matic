@@ -21,7 +21,7 @@ import asyncio
 import pygame
 import math
 
-from .gameUIUtils import getApplicationTitle, getMasterFont, getStopKey, getUpKey, getLeftKey, getRightKey, getDownKey, getEnterKey, getSpaceKey, getBackKey, getPlayerColor, getPacemakerColor, getTrackColor, getCreditColor, getGreyColor, convertXCoordinate, convertYCoordinate, getBigScreen, getTimerStep, uiDrawTriangle, checkAutoTestKey, uiFlip, uiSubmitSlide, uiFlushEvents, uiFadeVisibleSlide, uiDrawLine, uiDrawCircle
+from .gameUIUtils import getApplicationTitle, getMasterFont, getStopKey, getUpKey, getLeftKey, getRightKey, getDownKey, getEnterKey, getSpaceKey, getBackKey, getPlayerColor, getPacemakerColor, getTrackColor, getCreditColor, getGreyColor, convertXCoordinate, convertYCoordinate, getBigScreen, getTimerStep, uiDrawTriangle, checkAutoTestKey, uiFlip, uiSubmitSlide, uiFlushEvents, uiFadeVisibleSlide, uiFadeUnVisibleSlide, uiDrawLine, uiDrawCircle
 
 from .infiniteWorld import getInfiniteWorldPlace
 from .mathUtils import distanceBetweenPoints
@@ -374,84 +374,91 @@ async def initScreen(imagePath, gameSettings, externalImageData, externalWorldCi
                         if worldExampleCtr >= len(externalWorldCityMap):
                             worldExampleCtr = 0
 
-        # renderer
-        externalExampleTeamText = ""
-        externalExampleText = ""
-        if len(externalImageData) > 0 and (selections[-2] == True or selections[-1] == True):
-            externalExampleTeamText = externalImageData[externalExampleTeamCtr]["team-name"]
-            externalExampleText = externalImageData[externalExampleTeamCtr]["sub-listing"][externalExampleCtr]["name"]
-            selections[-2] = True
-            selections[-1] = True
+        if not quitting:
+            # renderer
+            externalExampleTeamText = ""
+            externalExampleText = ""
+            if len(externalImageData) > 0 and (selections[-2] == True or selections[-1] == True):
+                externalExampleTeamText = externalImageData[externalExampleTeamCtr]["team-name"]
+                externalExampleText = externalImageData[externalExampleTeamCtr]["sub-listing"][externalExampleCtr]["name"]
+                selections[-2] = True
+                selections[-1] = True
 
-        worldExampleText = ""
-        if len(externalWorldCityMap) > 0 and selections[-4] == True:
-            worldExampleText = externalWorldCityMap[worldExampleCtr][0]
-            selections[-4] = True
+            worldExampleText = ""
+            if len(externalWorldCityMap) > 0 and selections[-4] == True:
+                worldExampleText = externalWorldCityMap[worldExampleCtr][0]
+                selections[-4] = True
 
-        getBigScreen().blit(backgroundImage, backgroundImage.get_rect())
-        showInitSelections(getBigScreen(), positions, selections, initCircleRadius, texts, titleTexts, titleTextPositions, creditTexts, creditTextPositions, externalExampleOverallText, externalExampleOverallPosition, externalExampleTeamText, externalExampleTeamSelectionPosition, externalExampleText, externalExampleSelectionPosition, ouluExampleText, ouluExampleSelectionPosition, news, newsPosition, worldExampleText, worldExampleSelectionPosition)
-        showInitArrow(getBigScreen(), positions[initScreenPos], arrowScale)
-        if gameSettings.infoBox:
-            showInfoBoxTxt(getBigScreen())
-        if firstTime:
-                uiFadeVisibleSlide()
-                firstTime = False
-        await uiFlip(True)
-        await asyncio.sleep(0)
-
-    retSettings = []
-    for subindexes in indexes:
-        for index in subindexes:
-            if selections[index]:
-                retSettings.append(values[indexes.index(subindexes)][subindexes.index(index)])
-    gameSettings.trackLength = retSettings[0]
-    for ind in range(len(retSettings[1])):
-        gameSettings.distributionOfControlLegs[ind][2] = retSettings[1][ind]
-    gameSettings.infiniteOuluTerrain = infiniteOuluTerrains[values[1].index(retSettings[1])]
-    if retSettings[2] in values[2][:2]:
-        gameSettings.continuous = True if retSettings[2]=="repeat" else False
-        gameSettings.speed = "regular"
-        gameSettings.pacemaker = 0
-        gameSettings.amaze = False
-    elif retSettings[2] == "pacemaker":
-        gameSettings.pacemaker = randrange(1, 4)
-        gameSettings.speed = "regular"
-        gameSettings.continuous = False
-        gameSettings.amaze = False
-    elif retSettings[2] == "amaze":
-        gameSettings.amaze = True
-        gameSettings.pacemaker = False
-        gameSettings.speed = "regular"
-        gameSettings.continuous = True
-    else:
-        gameSettings.speed = "superfast"
-        gameSettings.pacemaker = 0
-        gameSettings.continuous = False
-        gameSettings.amaze = False
-
-    if retSettings[3] == "infinite-oulu":
-        gameSettings.infiniteOulu = True
-        gameSettings.infiniteWorld = False
-        gameSettings.externalExample = ""
-        uiSubmitSlide(str(randrange(1000000,9999999)) + "th District of Infinite Oulu!")
-        await uiRenderImmediate(loadingPosition, loadingText, True)
-    elif retSettings[3] == "infinite-world":
-        gameSettings.infiniteOulu = False
-        gameSettings.infiniteWorld = True
-        gameSettings.infiniteWorldCity = worldExampleText
-        gameSettings.place, placeName = getInfiniteWorldPlace(worldExampleText, externalWorldCityMap)
-        gameSettings.externalExample = ""
-        if placeName:
-           uiSubmitSlide("Welcome to " + placeName + "...")
+            getBigScreen().blit(backgroundImage, backgroundImage.get_rect())
+            showInitSelections(getBigScreen(), positions, selections, initCircleRadius, texts, titleTexts, titleTextPositions, creditTexts, creditTextPositions, externalExampleOverallText, externalExampleOverallPosition, externalExampleTeamText, externalExampleTeamSelectionPosition, externalExampleText, externalExampleSelectionPosition, ouluExampleText, ouluExampleSelectionPosition, news, newsPosition, worldExampleText, worldExampleSelectionPosition)
+            showInitArrow(getBigScreen(), positions[initScreenPos], arrowScale)
+            if gameSettings.infoBox:
+                showInfoBoxTxt(getBigScreen())
+            if firstTime:
+                    uiFadeVisibleSlide()
+                    firstTime = False
+            await uiFlip(False)
+            await asyncio.sleep(0)
         else:
-           uiSubmitSlide("Somewhere in " + worldExampleText + "...")
-        await uiRenderImmediate(loadingPosition, loadingText, True)
-    elif retSettings[3] == "external-team" or retSettings[3] == "external-map":
-        gameSettings.infiniteOulu = False
-        gameSettings.infiniteWorld = False
-        gameSettings.externalExample = externalExampleText
-        gameSettings.externalExampleTeam = externalExampleTeamText
-        uiSubmitSlide("Welcome to " + externalExampleText)
-        await uiRenderImmediate(loadingPosition, loadingText, False)
+            uiFadeUnVisibleSlide()
+            await uiFlip(False)
+            await asyncio.sleep(0)
+
+    if not quitting:
+        retSettings = []
+        for subindexes in indexes:
+            for index in subindexes:
+                if selections[index]:
+                    retSettings.append(values[indexes.index(subindexes)][subindexes.index(index)])
+        gameSettings.trackLength = retSettings[0]
+        for ind in range(len(retSettings[1])):
+            gameSettings.distributionOfControlLegs[ind][2] = retSettings[1][ind]
+        gameSettings.infiniteOuluTerrain = infiniteOuluTerrains[values[1].index(retSettings[1])]
+        if retSettings[2] in values[2][:2]:
+            gameSettings.continuous = True if retSettings[2]=="repeat" else False
+            gameSettings.speed = "regular"
+            gameSettings.pacemaker = 0
+            gameSettings.amaze = False
+        elif retSettings[2] == "pacemaker":
+            gameSettings.pacemaker = randrange(1, 4)
+            gameSettings.speed = "regular"
+            gameSettings.continuous = False
+            gameSettings.amaze = False
+        elif retSettings[2] == "amaze":
+            gameSettings.amaze = True
+            gameSettings.pacemaker = False
+            gameSettings.speed = "regular"
+            gameSettings.continuous = True
+        else:
+            gameSettings.speed = "superfast"
+            gameSettings.pacemaker = 0
+            gameSettings.continuous = False
+            gameSettings.amaze = False
+
+        if retSettings[3] == "infinite-oulu":
+            gameSettings.infiniteOulu = True
+            gameSettings.infiniteWorld = False
+            gameSettings.externalExample = ""
+            uiSubmitSlide(str(randrange(1000000,9999999)) + "th District of Infinite Oulu!")
+            await uiRenderImmediate(loadingPosition, loadingText, False)
+        elif retSettings[3] == "infinite-world":
+            gameSettings.infiniteOulu = False
+            gameSettings.infiniteWorld = True
+            gameSettings.infiniteWorldCity = worldExampleText
+            gameSettings.place, placeName = getInfiniteWorldPlace(worldExampleText, externalWorldCityMap)
+            gameSettings.externalExample = ""
+            if placeName:
+               uiSubmitSlide("Welcome to " + placeName + "...")
+            else:
+               uiSubmitSlide("Somewhere in " + worldExampleText + "...")
+            await uiRenderImmediate(loadingPosition, loadingText, False)
+        elif retSettings[3] == "external-team" or retSettings[3] == "external-map":
+            gameSettings.infiniteOulu = False
+            gameSettings.infiniteWorld = False
+            gameSettings.externalExample = externalExampleText
+            gameSettings.externalExampleTeam = externalExampleTeamText
+            uiSubmitSlide("Welcome to " + externalExampleText)
+            await uiRenderImmediate(loadingPosition, loadingText, False)
+
     pygame.time.set_timer(TIMER_EVENT, 0)
     return quitting, gameSettings

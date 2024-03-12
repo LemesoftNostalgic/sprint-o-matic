@@ -23,7 +23,7 @@ from random import randrange
 
 import sys
 
-from .pathPruning import pruneShortestRoute, pruneShortestRouteAsync, pruneEnsureGoodShortcut, pruneEnsureLineOfSight
+from .pathPruning import pruneShortestRouteAsync, pruneEnsureGoodShortcut, pruneEnsureLineOfSight
 from .mathUtils import getBoundingBox, getNearestPointOfList, distanceBetweenPoints, calculatePathDistance
 from .utils import getSlowdownFactor, getSemiSlowdownFactor, getVerySlowdownFactor, getAiPoolMaxTimeLimit
 
@@ -306,7 +306,7 @@ def calculateCoarseRouteExt(pointA, pointB, forbiddenAreaLookup, tfNum, left, ri
 
 
 # fastest one so far
-def calculateShortestRoute(setupList):
+async def calculateShortestRouteAsync(setupList):
     left = True
     right = True
     pointA = setupList[0]
@@ -346,7 +346,7 @@ def calculateShortestRoute(setupList):
 
     # Straighten the route into a beautiful one
     if pacemakerInd != 2:
-        shortestRoute = pruneShortestRoute(shortestRoute, forbiddenLookup, slowLookup, semiSlowLookup, verySlowLookup)
+        shortestRoute = await pruneShortestRouteAsync(shortestRoute, forbiddenLookup, slowLookup, semiSlowLookup, verySlowLookup)
 
     shortestRoute = [(x[0] * tf, x[1] * tf) for x in shortestRoute.copy()]
 
@@ -378,6 +378,7 @@ async def slowAccurateCalculateShortestRouteAsync(setupList):
         routeLookup = {}
         backRouteLookup = {}
         start_time = time.time()
+        sleep_time = time.time()
         forbiddenLookup = forbiddenAreaLookup[tf]
         slowLookup = {}
         if tf in slowAreaLookup:
@@ -419,7 +420,10 @@ async def slowAccurateCalculateShortestRouteAsync(setupList):
                         newScore = direction[1] * factor
                         backRouteLookup[newPoint] = backRouteLookup[point] + newScore
                         backPoints.append(newPoint)
-            await asyncio.sleep(0)
+
+                if time.time() - sleep_time > sleepTimeThreshold:
+                    sleep_time = time.time()
+                    await asyncio.sleep(0)
 
             for point in routeLookup.copy():
                 directions = getDirections(point)
@@ -442,11 +446,15 @@ async def slowAccurateCalculateShortestRouteAsync(setupList):
                             break
                     if stop:
                         break
-            await asyncio.sleep(0)
+
+                if time.time() - sleep_time > sleepTimeThreshold:
+                    sleep_time = time.time()
+                    await asyncio.sleep(0)
+
             if time.time() - start_time > getAiPoolMaxTimeLimit(tf):
                 break
-        # this is also intentional!
 
+        # this is also intentional!
         if time.time() - start_time > getAiPoolMaxTimeLimit(tf):
             continue
 
@@ -468,7 +476,9 @@ async def slowAccurateCalculateShortestRouteAsync(setupList):
             point = minPoint
             shortestRoute.insert(0, point)
 
-        await asyncio.sleep(0)
+            if time.time() - sleep_time > sleepTimeThreshold:
+                sleep_time = time.time()
+                await asyncio.sleep(0)
 
         point = intersectionPointFront
         shortestRoute.append(point)
@@ -487,7 +497,10 @@ async def slowAccurateCalculateShortestRouteAsync(setupList):
                 return []
             point = minPoint
             shortestRoute.append(point)
-        await asyncio.sleep(0)
+
+            if time.time() - sleep_time > sleepTimeThreshold:
+                sleep_time = time.time()
+                await asyncio.sleep(0)
 
         scaledShortestRoute = []
         for point in shortestRoute:

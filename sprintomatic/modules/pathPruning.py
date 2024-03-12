@@ -19,12 +19,14 @@
 
 import asyncio
 from random import randrange
+import time
 
 from .mathUtils import distanceBetweenPoints
 from .utils import getSlowdownFactor, getSemiSlowdownFactor, getVerySlowdownFactor
 
 pruneDefaultRes = 16
 tfs = [1, 2, 4, 8, 16]
+sleepTimeThreshold = 0.02
 
 def pruneDistanceWeighter(testPt, lookup, semilookup, verylookup):
     testPtInt = (int(testPt[0]), int(testPt[1]))
@@ -137,107 +139,9 @@ def pruneCheckLineOfSight(ptA, ptB, ptMid, forbiddenLookup, slowLookup, semiSlow
     return False, 0.0
 
 
-# Straighten the rudimentary angular route that was found intially
-def pruneShortestRouteRes(route, forbiddenLookup, slowLookup, semiSlowLookup, verySlowLookup, thisStep, maxIt):
-    prunedRoute = route.copy()
-
-    index = 0
-    for dummy in range(maxIt):
-        if index:
-            index = 0
-        else:
-            index = 1
-
-        found = False
-
-        while True:
-            if index >= len(prunedRoute) - thisStep * 2:
-                break
-            pt1 = prunedRoute[index]
-            ptMid = prunedRoute[index + thisStep]
-            pt2 = prunedRoute[index + thisStep * 2]
-            index = index + 1
-
-            shortcutFound, delta = pruneCheckLineOfSight(pt1, pt2, ptMid, forbiddenLookup, slowLookup, semiSlowLookup, verySlowLookup)
-            if shortcutFound:
-                found = True
-                for step in range(0, thisStep * 2 - 1):
-                    prunedRoute.pop(index)
-                prunedRoute.insert(index, ((pt1[0]+pt2[0])/2, (pt1[1]+pt2[1])/2))
-
-        if not found:
-            break
-
-    return prunedRoute
-
-
-# aloitetaan 1:stä toisella kertaa
-def pruneShortestRoute(route, forbiddenLookup, slowLookup, semiSlowLookup, verySlowLookup):
-    iters = { 7: 1, 3: 2, 1: 256 }
-    res = pruneDefaultRes
-    route = pruneShortestRouteRes(route, forbiddenLookup, slowLookup, semiSlowLookup, verySlowLookup, 1, 16)
-    for res in [7, 3, 1]:
-        route = pruneShortestRouteRes(route, forbiddenLookup, slowLookup, semiSlowLookup, verySlowLookup, res, iters[res])
-
-    return route
-
-
-def pruneShortestRouteExt(route, forbiddenAreaLookup, slowAreaLookup, semiSlowAreaLookup, verySlowAreaLookup, tfNum):
-    tf = tfs[tfNum]
-    forbiddenLookup = forbiddenAreaLookup[tf]
-    slowLookup = slowAreaLookup[tf]
-    semiSlowLookup = semiSlowAreaLookup[tf]
-    verySlowLookup = verySlowAreaLookup[tf]
-
-    scaledRoute = []
-    for item in route:
-        scaledRoute.append((item[0] // tf, item[1] // tf))
-    tmpRoute = pruneShortestRoute(scaledRoute, forbiddenLookup, slowLookup, semiSlowLookup, verySlowLookup)
-    route = []
-    for item in tmpRoute:
-        route.append((item[0]*tf, item[1]*tf))
-    return route
-
-
-# Straighten the rudimentary angular route that was found intially
-async def pruneShortestRouteResAsync(route, forbiddenLookup, slowLookup, semiSlowLookup, verySlowLookup, thisStep, maxIt):
-    prunedRoute = route.copy()
-
-    index = 0
-    for dummy in range(maxIt):
-        if index:
-            index = 0
-        else:
-            index = 1
-
-        found = False
-
-        while True:
-            if index >= len(prunedRoute) - thisStep * 2:
-                break
-            pt1 = prunedRoute[index]
-            ptMid = prunedRoute[index + thisStep]
-            pt2 = prunedRoute[index + thisStep * 2]
-            index = index + 1
-
-            shortcutFound, delta = pruneCheckLineOfSight(pt1, pt2, ptMid, forbiddenLookup, slowLookup, semiSlowLookup, verySlowLookup)
-            if shortcutFound:
-                found = True
-                for step in range(0, thisStep * 2 - 1):
-                    prunedRoute.pop(index)
-                prunedRoute.insert(index, ((pt1[0]+pt2[0])/2, (pt1[1]+pt2[1])/2))
-                index = index + 1
-
-        await asyncio.sleep(0)
-
-        if not found:
-            break
-
-    return prunedRoute
-
-
 async def pruneCutTheCornersAsync(route, forbiddenLookup, slowLookup, semiSlowLookup, verySlowLookup, split, jump):
     prunedRoute = route.copy()
+    sleep_time = time.time()
 
     index = 0
     while True:
@@ -259,7 +163,48 @@ async def pruneCutTheCornersAsync(route, forbiddenLookup, slowLookup, semiSlowLo
             prunedRoute.insert(index, pt1)
             index = index + 2
 
-    await asyncio.sleep(0)
+        if time.time() - sleep_time > sleepTimeThreshold:
+            sleep_time = time.time()
+            await asyncio.sleep(0)
+
+    return prunedRoute
+
+
+# Straighten the rudimentary angular route that was found intially
+async def pruneShortestRouteResAsync(route, forbiddenLookup, slowLookup, semiSlowLookup, verySlowLookup, thisStep, maxIt):
+    prunedRoute = route.copy()
+    sleep_time = time.time()
+
+    index = 0
+    for dummy in range(maxIt):
+        if index:
+            index = 0
+        else:
+            index = 1
+
+        found = False
+
+        while True:
+            if index >= len(prunedRoute) - thisStep * 2:
+                break
+            pt1 = prunedRoute[index]
+            ptMid = prunedRoute[index + thisStep]
+            pt2 = prunedRoute[index + thisStep * 2]
+            index = index + 1
+
+            shortcutFound, delta = pruneCheckLineOfSight(pt1, pt2, ptMid, forbiddenLookup, slowLookup, semiSlowLookup, verySlowLookup)
+            if shortcutFound:
+                found = True
+                for step in range(0, thisStep * 2 - 1):
+                    prunedRoute.pop(index)
+                prunedRoute.insert(index, ((pt1[0]+pt2[0])/2, (pt1[1]+pt2[1])/2))
+
+            if time.time() - sleep_time > sleepTimeThreshold:
+                sleep_time = time.time()
+                await asyncio.sleep(0)
+
+        if not found:
+            break
 
     return prunedRoute
 
@@ -274,4 +219,21 @@ async def pruneShortestRouteAsync(route, forbiddenLookup, slowLookup, semiSlowLo
         for jump in range(2, 0, -1):
             route = await pruneCutTheCornersAsync(route, forbiddenLookup, slowLookup, semiSlowLookup, verySlowLookup, split, jump)
 
+    return route
+
+
+async def pruneShortestRouteExtAsync(route, forbiddenAreaLookup, slowAreaLookup, semiSlowAreaLookup, verySlowAreaLookup, tfNum):
+    tf = tfs[tfNum]
+    forbiddenLookup = forbiddenAreaLookup[tf]
+    slowLookup = slowAreaLookup[tf]
+    semiSlowLookup = semiSlowAreaLookup[tf]
+    verySlowLookup = verySlowAreaLookup[tf]
+
+    scaledRoute = []
+    for item in route:
+        scaledRoute.append((item[0] // tf, item[1] // tf))
+    tmpRoute = await pruneShortestRouteAsync(scaledRoute, forbiddenLookup, slowLookup, semiSlowLookup, verySlowLookup)
+    route = []
+    for item in tmpRoute:
+        route.append((item[0]*tf, item[1]*tf))
     return route

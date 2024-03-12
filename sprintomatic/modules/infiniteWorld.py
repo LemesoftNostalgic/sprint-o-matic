@@ -9,6 +9,7 @@ import time
 from .utils import getSlowAreaMask, getSemiSlowAreaMask, getVerySlowAreaMask, getForbiddenAreaMask, getControlMask, getNoMask, getPackagePath
 from .mathUtils import calculatePathDistance
 from .gameUIUtils import uiFlushEvents, uiDrawLine
+from .imageDownloader import downloadOsmData
 
 offlineMapDataFolder = os.path.join("data", "offline-map-data", "")
 spotnessFactor = 4
@@ -338,54 +339,54 @@ def oppositeToLatLonCoordinates(latlonMapOrigo, xyPictureSize, metersPerPixel):
 
 def checkIfWaydbInLocalCache(latlonMapOrigo):
     waydb = {}
+    print("foo")
     offlineMapData = offlineMapDataFolder + str(round(latlonMapOrigo[0] ,5)) + "_" + str(round(latlonMapOrigo[1],5)) + ".json"
     fname = os.path.join(getPackagePath(), offlineMapData)
+    print(fname)
     if os.path.isfile(fname):
         with open(fname, 'rb') as f:
             waydb = json.load(f)
+            print(waydb)
     return waydb
-    
+
 
 async def constructWayDb(latlonMapOrigo, xyPictureSize, metersPerPixel):
-    waydb = checkIfWaydbInLocalCache(latlonMapOrigo)
-    if waydb:
-        return waydb
 
-    # if not cached then do the hard way and download fresh one
-    try:
-        import overpy
+    waydb = {}
+    latlonMapOppositeCorner = oppositeToLatLonCoordinates(latlonMapOrigo, xyPictureSize, metersPerPixel)
+    result = await downloadOsmData(latlonMapOrigo, latlonMapOppositeCorner, waytypes)
+    nodes = {}
+    if 'elements' in result:
+        for element in result['elements']:
+            if 'type' in element and element['type'] == 'node':
+                nodes[element['id']] = (float(element['lat']), float(element['lon']))
+    ways = []
+    if 'elements' in result:
+        for element in result['elements']:
+            if 'type' in element and element['type'] == 'way':
+                wayNodes = []
+                for id in element['nodes']:
+                    wayNodes.append(nodes[id])
+                ways.append({ 'tags': element['tags'], 'nodes': wayNodes})
 
-        latlonMapOppositeCorner = oppositeToLatLonCoordinates(latlonMapOrigo, xyPictureSize, metersPerPixel)
+    for way in ways:
+        if await uiFlushEvents():
+            return None
 
-        api = overpy.Overpass()
+        for waytype in way['tags']:
+            if waytype in waytypes:
+                subway = way['tags'][waytype]
+                if waytype not in waydb:
+                    waydb[waytype] = {}
+                if subway not in waydb[waytype]:
+                    waydb[waytype][subway] = []
+                poslistToAppend = []
+                for node in way['nodes']:
+                    xyPos = toPictureCoordinates(latlonMapOrigo, node, xyPictureSize, metersPerPixel)
+                    poslistToAppend.append(xyPos)
+                waydb[waytype][subway].append(poslistToAppend)
 
-        queryStr = """[out:json];("""
-        for waytype in waytypes:
-            queryStr = queryStr + """
-                way("""+str(latlonMapOrigo[0])+""","""+str(latlonMapOrigo[1])+""","""+str(latlonMapOppositeCorner[0])+""","""+str(latlonMapOppositeCorner[1])+""") [\"""" + waytype + """\"];
-                """
-        queryStr = queryStr + """); (._;>;); out body;"""
-        result = api.query(queryStr)
-
-        for way in result.ways:
-            if await uiFlushEvents():
-                return None
-
-            for waytype in way.tags:
-                if waytype in waytypes:
-                    subway = way.tags[waytype]
-                    if waytype not in waydb:
-                        waydb[waytype] = {}
-                    if subway not in waydb[waytype]:
-                        waydb[waytype][subway] = []
-                    poslistToAppend = []
-                    for node in way.nodes:
-                        xyPos = toPictureCoordinates(latlonMapOrigo, (float(node.lat), float(node.lon)), xyPictureSize, metersPerPixel)
-                        poslistToAppend.append(xyPos)
-                    waydb[waytype][subway].append(poslistToAppend)
-    except Exception as err:
-        waydb = {}
-
+    print(json.dumps(waydb, indent=4))
     if not waydb:
         waydb = checkIfWaydbInLocalCache(latlonMapOrigo)
 

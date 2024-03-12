@@ -21,6 +21,7 @@ import pygame
 import json
 import asyncio
 import os
+import sys
 from .utils import getPackagePath
 
 
@@ -34,13 +35,54 @@ offlineMapsInCities = "data/sprint-o-matic-external-map-links-main/world-city-ma
 
 offlineExamplePath = "data/sprint-o-matic-map-image-example-main"
 
+
+osmQueryPathBase = "https://overpass-api.de/api/interpreter?data=[out%3Ajson]%3B("
+osmQueryWayStart = "way("
+osmQueryWayBtwNum = "%2C"
+osmQueryWayBefWaytype = ")[%22"
+osmQueryWayAftWaytype = "%22]%3B"
+osmQueryPathEnd = ")%3B%20(._%3B%3E%3B)%3B%20out%20body%3B"
+
+async def downloadOsmData(latlonMapOrigo, latlonMapOppositeCorner, waytypes):
+
+    # compose query, raw manner due to emscripten issues
+    osmUrl = osmQueryPathBase
+    for waytype in waytypes:
+        osmUrl = osmUrl + osmQueryWayStart + str(latlonMapOrigo[0]) + osmQueryWayBtwNum + str(latlonMapOrigo[1]) + osmQueryWayBtwNum + str(latlonMapOppositeCorner[0]) + osmQueryWayBtwNum + str(latlonMapOppositeCorner[1]) + osmQueryWayBefWaytype + waytype + osmQueryWayAftWaytype
+    osmUrl = osmUrl + osmQueryPathEnd
+
+    try:
+        if sys.platform == 'emscripten':
+            import platform
+            from pathlib import Path
+            pth = Path(osmUrl)
+            data = ""
+            async with platform.fopen(pth, "r") as textfile:
+                data = textfile.read()
+        else:
+            import requests
+            response = requests.get(osmUrl)
+            data = response.text
+        osmDb = json.loads(data)
+    except Exception as err:
+        osmDb = []
+    return osmDb
+
+
 async def downloadNews():
     news = ""
     try:
-        import requests
-        import io
-        response = requests.get(newsUrl)
-        news = response.text
+        if sys.platform == 'emscripten':
+            import platform
+            from pathlib import Path
+            pth = Path(newsUrl)
+            news = ""
+            async with platform.fopen(pth, "r") as textfile:
+                news = textfile.read()
+        else:
+            import requests
+            response = requests.get(newsUrl)
+            news = response.text
     except Exception as err:
         news = ""
 
@@ -55,10 +97,17 @@ async def downloadNews():
 async def downloadExternalWorldCityMap():
     listingofmaps = []
     try:
-        import requests
-        import io
-        response = requests.get(listingOfMapsInCities)
-        data = response.text
+        if sys.platform == 'emscripten':
+            import platform
+            from pathlib import Path
+            pth = Path(listingOfMapsInCities)
+            data = ""
+            async with platform.fopen(pth, "r") as textfile:
+                data = textfile.read()
+        else:
+            import requests
+            response = requests.get(listingOfMapsInCities)
+            data = response.text
         listingofmaps = json.loads(data)
     except Exception as err:
         listingofmaps = []
@@ -76,13 +125,21 @@ async def downloadExternalImageData(ownMasterListing):
 
     offline = False
     try:
-        import requests
-        import io
+        listingUrl = listingOfTeamsWithListing
         if ownMasterListing:
-            response = requests.get(ownMasterListing)
+            listingUrl = ownMasterListing
+
+        if sys.platform == 'emscripten':
+            import platform
+            from pathlib import Path
+            pth = Path(listingUrl)
+            data = ""
+            async with platform.fopen(pth, "r") as textfile:
+                data = textfile.read()
         else:
-            response = requests.get(listingOfTeamsWithListing)
-        data = response.text
+            import requests
+            response = requests.get(listingUrl)
+            data = response.text
         listingofteams = json.loads(data)
     except Exception as err:
         listingofteams = []
@@ -99,9 +156,17 @@ async def downloadExternalImageData(ownMasterListing):
         teamdata = None
 
         try:
-            teamMapListingUrl = team["map-listing-url"]
-            response = requests.get(teamMapListingUrl)
-            data = response.text
+            if sys.platform == 'emscripten':
+                import platform
+                from pathlib import Path
+                pth = Path(teamMapListingUrl)
+                data = ""
+                async with platform.fopen(pth, "r") as textfile:
+                    data = textfile.read()
+            else:
+                teamMapListingUrl = team["map-listing-url"]
+                response = requests.get(teamMapListingUrl)
+                data = response.text
             teamdata = json.loads(data)
         except Exception as err:
             teamdata = None
@@ -126,12 +191,22 @@ async def downloadMapSurfacesBasedOnUrl(item):
     pngsurf = None
 
     try:
-        import requests
-        import io
         name = item["map-url"]
-        r = requests.get(name)
-        img = io.BytesIO(r.content)
-        imgsurf = pygame.image.load(img) # -> Surface
+        if sys.platform == 'emscripten':
+            import platform
+            from pathlib import Path
+            pth = Path(name)
+            r_content = b''
+            async with platform.fopen(pth, "rb") as binfile:
+                r_content = binfile.read()
+            img = io.BytesIO(r_content)
+            imgsurf = pygame.image.load(img) # -> Surface
+        else:
+            import requests
+            import io
+            r = requests.get(name)
+            img = io.BytesIO(r.content)
+            imgsurf = pygame.image.load(img) # -> Surface
     except Exception as err:
         imgsurf = None
 
@@ -141,12 +216,22 @@ async def downloadMapSurfacesBasedOnUrl(item):
         imgsurf = pygame.image.load(img) # -> Surface
 
     try:
-        import requests
-        import io
         name = item["lookup-png-url"]
-        r = requests.get(name)
-        png = io.BytesIO(r.content)
-        pngsurf = pygame.image.load(png) # -> Surface
+        if sys.platform == 'emscripten':
+            import platform
+            from pathlib import Path
+            pth = Path(name)
+            r_content = b''
+            async with platform.fopen(pth, "rb") as binfile:
+                r_content = binfile.read()
+            img = io.BytesIO(r_content)
+            imgsurf = pygame.image.load(img) # -> Surface
+        else:
+            import requests
+            import io
+            r = requests.get(name)
+            png = io.BytesIO(r.content)
+            pngsurf = pygame.image.load(png) # -> Surface
     except Exception as err:
         pngsurf = None
 

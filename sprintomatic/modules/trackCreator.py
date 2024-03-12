@@ -24,8 +24,8 @@ import asyncio
 
 from .mathUtils import angleBetweenLineSegments, distanceBetweenPoints, distanceBetweenPointAndLine, calculatePathDistance
 from .gameUIUtils import uiFlushEvents
-from .pathPruning import pruneEnsureLineOfSightExt, pruneShortestRouteExt
-from .routeAI import calculateCoarseRouteExt, calculateShortestRoute, slowAccurateCalculateShortestRouteAsync
+from .pathPruning import pruneEnsureLineOfSightExt, pruneShortestRouteExtAsync
+from .routeAI import calculateCoarseRouteExt, calculateShortestRouteAsync, slowAccurateCalculateShortestRouteAsync
 
 
 firstControlMinDistance = 100
@@ -216,7 +216,7 @@ async def createAutoControls(cfg, trackLength, distribution, metersPerPixel, faL
     # only complete the work afterwards
     start_tot_time = time.time()
     for ind in range(len(shortests)):
-        shortests[ind] = [calculateShortestRoute([ctrls[ind], ctrls[ind + 1], faLookups, saLookups, ssaLookups, vsaLookups, precision, pacemakerInd, shortests[ind][0].copy()])]
+        shortests[ind] = [await calculateShortestRouteAsync([ctrls[ind], ctrls[ind + 1], faLookups, saLookups, ssaLookups, vsaLookups, precision, pacemakerInd, shortests[ind][0].copy()])]
         if time.time() - start_tot_time > totMaxTime:
             break
 
@@ -276,11 +276,11 @@ async def createAmazeControls(cfg, distribution, metersPerPixel, faLookups, saLo
 
         beautifiedLeft = preComputedLeft
         beautifiedRight = preComputedRight
-        beautifiedLeft = pruneShortestRouteExt(preComputedLeft, faLookups, saLookups, ssaLookups, vsaLookups, 1)
+        beautifiedLeft = await pruneShortestRouteExtAsync(preComputedLeft, faLookups, saLookups, ssaLookups, vsaLookups, 1)
         if time.time() - start_tot_time > totMaxTimeAmaze or await uiFlushEvents():
             return [], [], [], [], 0.0
 
-        beautifiedRight = pruneShortestRouteExt(preComputedRight, faLookups, saLookups, ssaLookups, vsaLookups, 1)
+        beautifiedRight = await pruneShortestRouteExtAsync(preComputedRight, faLookups, saLookups, ssaLookups, vsaLookups, 1)
         if time.time() - start_tot_time > totMaxTimeAmaze or await uiFlushEvents():
             return [], [], [], [], 0.0
 

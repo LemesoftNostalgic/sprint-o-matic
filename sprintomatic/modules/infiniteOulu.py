@@ -1374,7 +1374,10 @@ async def getInfiniteOulu(blockSize, gridSize, boundary):
                 return None, None
             oulu, ouluMask = installOuluBlock(oulu, png, ouluMask, mask, (x, y), blockSize, boundary)
             await asyncio.sleep(0)
-    dummy_heightmap, oulu = addContours(randrange(countoursMinKernelWidth, countoursMaxKernelWidth), oulu, randrange(countoursMinOutOf, countoursMaxOutOf))
+
+    # Leaving out due to slow speed in the web application
+    # dummy_heightmap, oulu = addContours(randrange(countoursMinKernelWidth, countoursMaxKernelWidth), oulu, randrange(countoursMinOutOf, countoursMaxOutOf))
+
     return oulu, ouluMask
 
 

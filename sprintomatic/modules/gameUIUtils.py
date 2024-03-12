@@ -214,6 +214,19 @@ def uiFadeVisibleSlide():
     bigScreenNew = bigScreen.copy()
 
 
+def uiFadeUnVisibleSlide():
+    global slideCtr
+    global bigScreenCopy
+    global bigScreenNew
+    global slideCtrStart
+    slideCtr = slideCtrStartDown
+    slideCtrStart = slideCtrStartDown
+    if bigScreenNew == None:
+        bigScreenNew = bigScreen.copy()
+    bigScreenNew.fill(getBlackColor())
+    bigScreenCopy = bigScreen.copy()
+
+
 def uiUnSubmitSlide():
     global slideCtr
     global bigScreenCopy
