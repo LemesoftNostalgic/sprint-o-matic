@@ -315,7 +315,9 @@ async def createAmazeControls(cfg, distribution, metersPerPixel, faLookups, saLo
         if not shortests[ind][0]:
             return [], [], [], [], 0.0
 
-    return ctrls, shortests, beautifiedLeft, beautifiedRight, normalizedDifference
+    difficulty = int((calculatePathDistance(preComputedLeft) + dist) / (normalizedDifference * 100))
+    
+    return ctrls, shortests, beautifiedLeft, beautifiedRight, difficulty
 
 
 def createPairedList(trivialList):

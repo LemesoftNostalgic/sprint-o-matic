@@ -67,7 +67,7 @@ async def setTheStageForNewRound(cfg):
     global futureShortestRoutes
     global trackLengthInPixels
     global amazeCounter
-    global normalizedDifference
+    global difficulty
     global beautifiedLeft
     global beautifiedRight
     global amazeThresholdWaiting
@@ -75,10 +75,7 @@ async def setTheStageForNewRound(cfg):
     # Ensure we have a list of controls
     ctrls = []
     if gameSettings.amaze:
-        ctrls, shortestRoutesArray, beautifiedLeft, beautifiedRight, normalizedDifference = await createAmazeControls(cfg, gameSettings.distributionOfControlLegs, gameSettings.metersPerPixel, faLookup, saLookup, ssaLookup, vsaLookup)
-        if normalizedDifference < 0.01:
-            normalizedDifference = 0.01
-        normalizedDifference = round(1/ normalizedDifference, 0)
+        ctrls, shortestRoutesArray, beautifiedLeft, beautifiedRight, difficulty = await createAmazeControls(cfg, gameSettings.distributionOfControlLegs, gameSettings.metersPerPixel, faLookup, saLookup, ssaLookup, vsaLookup)
         beautifiedLeft.reverse()
 
     else:
@@ -204,6 +201,7 @@ async def updateRoutesAndDistances(amaze):
     if shortestRoutes:
         shortestDistance = shortestDistance + calculatePathDistance(shortestRoutes[0])
         shortestWeightedDistance = shortestWeightedDistance + calculatePathWeightedDistance(shortestRoutes[0], saLookup, ssaLookup, vsaLookup)
+        await asyncio.sleep(0)
         playerWeightedDistance = playerWeightedDistance + calculatePathWeightedDistance(playerRoutes[0], saLookup, ssaLookup, vsaLookup)
     startOverPlayerRoute()
 
@@ -256,7 +254,7 @@ async def main():
     global tunnelLookup
     global vsaLookup
     global amazeCounter
-    global normalizedDifference
+    global difficulty
     global beautifiedLeft
     global beautifiedRight
     global amazeThresholdWaiting
@@ -311,7 +309,7 @@ async def main():
     amazeMidTimeThreshold = 15
     amazeSecondTimeThreshold = 20
     amazeAcceptedAngleDifference = math.pi / 10
-    normalizedDifference = 0
+    difficulty = 0
 
     # the choice between specific route file and an automatic route
     autoControls = True
@@ -522,7 +520,7 @@ async def main():
                                     pacemakerShoutEffect()
                                     await asyncio.sleep(0)
                                 finishTexts[2] = str(round(fromRadiansToDegrees(angleDiff), 0))
-                                finishTexts[0] = str(normalizedDifference)
+                                finishTexts[0] = str(difficulty)
 
                         # 2. the finish line is found
                         elif finishFound(controls, position, nextControl):
@@ -623,7 +621,7 @@ async def main():
                                             externalMapInfoTexts = [stripMapName(subitem["map-url"]), subitem["map-license"], subitem["map-credits"], stripMapName(subitem["lookup-png-url"]), subitem["lookup-png-license"], subitem["lookup-png-credits"]]
                                             break
                         if gameSettings.noUiTest != "yes":
-                            await uiCompleteRender(finishTexts, externalMapInfoTexts, gameSettings.pacemaker, pacemakerTextNeeded, aiTextNeeded, gameSettings.amaze, normalizedDifference, firstTime)
+                            await uiCompleteRender(finishTexts, externalMapInfoTexts, gameSettings.pacemaker, pacemakerTextNeeded, aiTextNeeded, gameSettings.amaze, difficulty, firstTime)
                             firstTime = False
             await asyncio.sleep(0)
 

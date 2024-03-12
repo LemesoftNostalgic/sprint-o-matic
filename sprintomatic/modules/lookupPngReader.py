@@ -22,6 +22,7 @@ import os
 from random import randrange
 
 import pygame
+import asyncio
 
 from .pathPruning import pruneWeightedDistance
 from .utils import getForbiddenAreaMask, getSlowAreaMask, getSemiSlowAreaMask, getVerySlowAreaMask, getControlMask, getTunnelMask
@@ -33,7 +34,7 @@ def getTfs():
     return [1, 2, 4, 8, 16]
 
 
-def extractPngLookups(oMapMask):
+async def extractPngLookups(oMapMask):
     faLookup = {}
     saLookup = {}
     ssaLookup = {}
@@ -55,6 +56,7 @@ def extractPngLookups(oMapMask):
     for yBig in range(0, size[1]//spacingBetweenControls + 1):
         for xBig in range(0, size[0]//spacingBetweenControls + 1):
             controlToAdd = None
+            await asyncio.sleep(0)
             for ySmall in range(0, spacingBetweenControls):
                 for xSmall in range(0, spacingBetweenControls):
                     x = xBig * spacingBetweenControls + xSmall
@@ -87,12 +89,12 @@ def extractPngLookups(oMapMask):
     return faLookup, saLookup, ssaLookup, vsaLookup, tunnelLookup, controls
 
 
-def extractPngLookupsFromFile(pngFileName):
+async def extractPngLookupsFromFile(pngFileName):
     try:
         oMapMask = pygame.image.load(pngFileName)
     except Exception as err:
         print(f"Cannot load map from file: {err=}, {type(err)=}")
         return {}, {}, {}, {}, {}, []
 
-    faLookup, saLookup, ssaLookup, vsaLookup, tunnelLookup, controls = extractPngLookups(oMapMask)
+    faLookup, saLookup, ssaLookup, vsaLookup, tunnelLookup, controls = await extractPngLookups(oMapMask)
     return faLookup, saLookup, ssaLookup, vsaLookup, tunnelLookup, controls

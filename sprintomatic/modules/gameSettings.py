@@ -168,11 +168,11 @@ async def returnConfig(gameSettings, externalImageData, infiniteWorldCityMap):
 
     if gameSettings.infiniteOulu:
         png, pngMask = await getInfiniteOulu((160, 160), (4, 5), 40 + randrange(0, 20))
-        faLookup, saLookup, ssaLookup, vsaLookup, tunnelLookup, config = extractPngLookups(pngMask)
+        faLookup, saLookup, ssaLookup, vsaLookup, tunnelLookup, config = await extractPngLookups(pngMask)
 
     elif gameSettings.infiniteWorld:
         png, pngMask = await getInfiniteWorldDefault(gameSettings.place, gameSettings.imageRoot, gameSettings.offline)
-        faLookup, saLookup, ssaLookup, vsaLookup, tunnelLookup, config = extractPngLookups(pngMask)
+        faLookup, saLookup, ssaLookup, vsaLookup, tunnelLookup, config = await extractPngLookups(pngMask)
 
     elif not gameSettings.lookupPngName and (gameSettings.externalExampleTeam and gameSettings.externalExample):
         for item in externalImageData:
@@ -187,10 +187,10 @@ async def returnConfig(gameSettings, externalImageData, infiniteWorldCityMap):
         # I use these to test lost internet connection
         #png = None
         #pngMask = None
-        faLookup, saLookup, ssaLookup, vsaLookup, tunnelLookup, config = extractPngLookups(pngMask)
+        faLookup, saLookup, ssaLookup, vsaLookup, tunnelLookup, config = await extractPngLookups(pngMask)
 
     elif gameSettings.lookupPngName: # map given at command line
-        faLookup, saLookup, ssaLookup, vsaLookup, tunnelLookup, config = extractPngLookupsFromFile(gameSettings.lookupPngName)
+        faLookup, saLookup, ssaLookup, vsaLookup, tunnelLookup, config = await extractPngLookupsFromFile(gameSettings.lookupPngName)
         metersPerPixel = gameSettings.metersPerPixel
 
     controls = []
