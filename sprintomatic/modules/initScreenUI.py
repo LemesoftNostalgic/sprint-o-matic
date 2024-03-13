@@ -283,6 +283,7 @@ async def initScreen(imagePath, gameSettings, externalImageData, externalWorldCi
     await perfBenchmark()
 
     while running:
+        mousePressed = False
         for event in pygame.event.get():
             if gameSettings.infoBox:
                 updateInfoTxtByEvent(event, 1)
@@ -363,12 +364,7 @@ async def initScreen(imagePath, gameSettings, externalImageData, externalWorldCi
                                 if worldExampleCtr >= len(externalWorldCityMap):
                                     worldExampleCtr = 0
             elif event.type == pygame.MOUSEBUTTONDOWN:
-                if pygame.mouse.get_pressed()[0]:
-                    if initScreenPos > 0:
-                        initScreenPos = initScreenPos - 1
-                elif pygame.mouse.get_pressed()[2]:
-                    if initScreenPos < len(positions) - 1:
-                        initScreenPos = initScreenPos + 1
+                mousePressed = True
 
             elif event.type == pygame.QUIT:
                 quitting = True
@@ -384,30 +380,36 @@ async def initScreen(imagePath, gameSettings, externalImageData, externalWorldCi
                 initScreenPos = initScreenPos + 1
             fingerDirection = ""
             await asyncio.sleep(0.1)
-
-        if pygame.mouse.get_pressed()[1]:
-            stepEffect()
-            if initScreenPos == len(positions) - 1:
-                running = False
-            else:
-                if not (initScreenPos == len(selections) - 1 and len(externalImageData) == 0):
-                    for subindexes in indexes:
-                        if initScreenPos in subindexes:
-                            for ind in subindexes:
-                                selections[ind] = False
-                    selections[initScreenPos] = True
-                    if initScreenPos == len(selections) - 2:
-                        externalExampleTeamCtr = externalExampleTeamCtr + 1
-                        if externalExampleTeamCtr >= len(externalImageData):
-                            externalExampleTeamCtr = 0
-                    if initScreenPos == len(selections) - 1:
-                        externalExampleCtr = externalExampleCtr + 1
-                        if externalExampleCtr >= len(externalImageData[externalExampleTeamCtr]["sub-listing"]):
-                            externalExampleCtr = 0
-                    if initScreenPos == len(selections) - 4:
-                        worldExampleCtr = worldExampleCtr + 1
-                        if worldExampleCtr >= len(externalWorldCityMap):
-                            worldExampleCtr = 0
+        elif mousePressed:
+            if pygame.mouse.get_pressed()[0]:
+                if initScreenPos > 0:
+                    initScreenPos = initScreenPos - 1
+            elif pygame.mouse.get_pressed()[2]:
+                if initScreenPos < len(positions) - 1:
+                    initScreenPos = initScreenPos + 1
+            elif pygame.mouse.get_pressed()[1]:
+                stepEffect()
+                if initScreenPos == len(positions) - 1:
+                    running = False
+                else:
+                    if not (initScreenPos == len(selections) - 1 and len(externalImageData) == 0):
+                        for subindexes in indexes:
+                            if initScreenPos in subindexes:
+                                for ind in subindexes:
+                                    selections[ind] = False
+                        selections[initScreenPos] = True
+                        if initScreenPos == len(selections) - 2:
+                            externalExampleTeamCtr = externalExampleTeamCtr + 1
+                            if externalExampleTeamCtr >= len(externalImageData):
+                                externalExampleTeamCtr = 0
+                        if initScreenPos == len(selections) - 1:
+                            externalExampleCtr = externalExampleCtr + 1
+                            if externalExampleCtr >= len(externalImageData[externalExampleTeamCtr]["sub-listing"]):
+                                externalExampleCtr = 0
+                        if initScreenPos == len(selections) - 4:
+                            worldExampleCtr = worldExampleCtr + 1
+                            if worldExampleCtr >= len(externalWorldCityMap):
+                                worldExampleCtr = 0
 
         if not quitting:
             # renderer
