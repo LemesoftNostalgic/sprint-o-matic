@@ -7,8 +7,8 @@ from random import randrange, random, uniform
 import time
 
 from .utils import getSlowAreaMask, getSemiSlowAreaMask, getVerySlowAreaMask, getForbiddenAreaMask, getControlMask, getNoMask, getPackagePath
-from .mathUtils import calculatePathDistance
-from .gameUIUtils import uiFlushEvents, uiDrawLine
+from .mathUtils import calculatePathDistance, distanceBetweenPoints
+from .gameUIUtils import uiFlushEvents, uiDrawLine, uiSubmitSlide
 from .imageDownloader import downloadOsmData
 
 offlineMapDataFolder = os.path.join("data", "offline-map-data", "")
@@ -69,6 +69,17 @@ colors = {
 overlapkind = [colors[FOREST], colors[OPENAREA], colors[ASPHALT]]
 spotmodifying = [colors[FOREST], colors[DEEPFOREST],  colors[OPENAREA],    colors[ASPHALT]]
 newspotvalues = [STONE,  STONE,       GREENCIRCLE, BLACKX]
+
+
+namePoints = {
+    "amenity": ["place_of_worship"],
+    "historic": ["ruins"],
+    "building": ["sports_centre", "hotel", "chapel", "sports_hall", "church", "train_station"],
+    "highway": ["primary", "road"],
+    "water": ["lake","basin","cove","fish_pass"],
+    "natural": ["wetland","water"],
+    "waterway": ["boatyard"]
+    }
 
 
 spotArray = [
@@ -349,6 +360,11 @@ def checkIfWaydbInLocalCache(latlonMapOrigo):
 
 async def constructWayDb(latlonMapOrigo, xyPictureSize, metersPerPixel):
 
+    xRand = randrange(xyPictureSize[0]//2)
+    yRand = randrange(xyPictureSize[1]//2)
+    midPoint = (xyPictureSize[0]//4 + xRand, xyPictureSize[1]//4 + yRand)
+    middlestName = ""
+    middlestDist = xyPictureSize[0] + xyPictureSize[1]
     waydb = {}
     latlonMapOppositeCorner = oppositeToLatLonCoordinates(latlonMapOrigo, xyPictureSize, metersPerPixel)
     result = await downloadOsmData(latlonMapOrigo, latlonMapOppositeCorner, waytypes)
@@ -373,6 +389,9 @@ async def constructWayDb(latlonMapOrigo, xyPictureSize, metersPerPixel):
         for waytype in way['tags']:
             if waytype in waytypes:
                 subway = way['tags'][waytype]
+                name = ""
+                if 'name' in way['tags']:
+                    name = way['tags']['name']
                 if waytype not in waydb:
                     waydb[waytype] = {}
                 if subway not in waydb[waytype]:
@@ -382,11 +401,16 @@ async def constructWayDb(latlonMapOrigo, xyPictureSize, metersPerPixel):
                     xyPos = toPictureCoordinates(latlonMapOrigo, node, xyPictureSize, metersPerPixel)
                     poslistToAppend.append(xyPos)
                 waydb[waytype][subway].append(poslistToAppend)
+                if name and waytype in namePoints and subway in namePoints[waytype]:
+                    dist = distanceBetweenPoints(xyPos, midPoint)
+                    if dist < middlestDist:
+                        middlestName = name
+                        middlestDist = xyPictureSize[0] + xyPictureSize[1]
 
     if not waydb:
         waydb = checkIfWaydbInLocalCache(latlonMapOrigo)
 
-    return waydb
+    return waydb, middlestName
 
 
 def queryForbiddenSpot(mask, x, y):
@@ -863,11 +887,13 @@ async def getInfiniteWorld(latlonMapOrigo, xyPictureSize, metersPerPixel, imageP
         return None, None
 
     await asyncio.sleep(0)
-    db = await constructWayDb(latlonMapOrigo, xyPictureSize, metersPerPixel)
+    db, mapName = await constructWayDb(latlonMapOrigo, xyPictureSize, metersPerPixel)
 
     if db == None:
         return None, None
 
+    if mapName:
+        uiSubmitSlide("Map name: " + mapName)
     await asyncio.sleep(0)
     if await uiFlushEvents():
         return None, None
