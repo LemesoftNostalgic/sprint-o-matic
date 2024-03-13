@@ -333,7 +333,7 @@ async def initScreen(imagePath, gameSettings, externalImageData, externalWorldCi
             elif event.type == pygame.FINGERDOWN:
                 leftThreshold = 1 / 3
                 rightThreshold = 2 / 3
-                fingerPos = (event.x, event-y)
+                fingerPos = (event.x, event.y)
                 if event.x < leftThreshold:
                     fingerDirection = "left"
                 elif event.x > rightThreshold:
