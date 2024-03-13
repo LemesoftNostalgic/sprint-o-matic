@@ -44,12 +44,17 @@ def perfAddStop(key):
         elif perfDB[key][-1][1] is None:
             perfDB[key][-1] = (perfDB[key][-1][0], stopTime)
 
-def perfShowResults():
+def perfShowResults(titleStr):
     global perfDBFlag
     global perfDB
     if perfDBFlag:
-        y = 0
+        y = 30
         x = 0
+        perfText = pygame.font.Font(getMasterFont(), 20).render(titleStr, True, getTrackColor())
+        perfRect = perfText.get_rect()
+        perfRect.x = x
+        perfRect.y = y
+        getBigScreen().blit(perfText, perfRect)
         for item in perfDB:
             numDeltas = 0
             totDelta = 0.0

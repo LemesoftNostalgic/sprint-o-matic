@@ -273,6 +273,7 @@ async def initScreen(imagePath, gameSettings, externalImageData, externalWorldCi
     ouluExampleText = "iOulu"
     loadingText = "Loading..."
     fingerDirection = ""
+    fingerPos = (0,0)
 
     pygame.key.set_repeat(200, 50)
     pygame.time.set_timer(TIMER_EVENT, getTimerStep())
@@ -332,6 +333,7 @@ async def initScreen(imagePath, gameSettings, externalImageData, externalWorldCi
             elif event.type == pygame.FINGERDOWN:
                 leftThreshold = 1 / 3
                 rightThreshold = 2 / 3
+                fingerPos = (event.x, event-y)
                 if event.x < leftThreshold:
                     fingerDirection = "left"
                 elif event.x > rightThreshold:
@@ -377,7 +379,7 @@ async def initScreen(imagePath, gameSettings, externalImageData, externalWorldCi
                 initScreenPos = initScreenPos - 1
             fingerDirection = ""
             await asyncio.sleep(0.1)
-        elif fingerDirection == "left":
+        elif fingerDirection == "right":
             if initScreenPos < len(positions) - 1:
                 initScreenPos = initScreenPos + 1
             fingerDirection = ""
@@ -432,7 +434,7 @@ async def initScreen(imagePath, gameSettings, externalImageData, externalWorldCi
             if firstTime:
                     uiFadeVisibleSlide()
                     firstTime = False
-            perfShowResults()
+            perfShowResults(str(fingerPos))
             await uiFlip(False)
             await asyncio.sleep(0)
         else:
