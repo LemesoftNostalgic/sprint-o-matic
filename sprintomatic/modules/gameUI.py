@@ -45,10 +45,10 @@ finishTextStr5 =     " %"
 amazeStr1 =      "A MAZE BEGINS!   LEVEL: "
 amazeStr2 =      "   TURN TO RUNNING DIRECTION"
 
-amazeTextStr =      "Difficulty: "
-amazeTextStr2 =     "    Result: "
+amazeTextStr =      "LEVEL: "
+amazeTextStr2 =     "    RESULT: "
 amazeTextStr3 =     "  "
-amazeTextStr4 =     "    Angle difference: "
+amazeTextStr4 =     "    ANGLE DIFFERENCE: "
 amazeTextStr5 =     "° "
 
 pacemakerTextStr =    ["", "Pacemaker: Aino Inkeri (A.I.) Kiburtz", "Pacemaker: Pertti-Uolevi (P.A.) Keinonen, e.v.v.k.", "Pacemaker: Lex Martin Luthoer, Chem. Engr."]
@@ -279,16 +279,15 @@ async def uiEvent(showInfoTexts, speedMode):
                 events.append("quit")
         # maybe move these to scancode-level too
         elif event.type == pygame.FINGERDOWN:
-            finger_x, finger_y = event.pos
-            leftThreshold = getBigScreen().get_size()[0] // 3
-            rightThreshold = leftThreshold * 2
-            upThreshold = getBigScreen().get_size()[1] // 3
-            if finger_x < leftThreshold:
+            leftThreshold = 2 / 5
+            rightThreshold = 3 / 5
+            if event.x < leftThreshold:
                 events.append("left")
-            elif finger_x > rightThreshold:
+            elif event.x > rightThreshold:
                 events.append("right")
-            elif finger_y < upThreshold:
+            else:
                 events.append("quit")
+
     # scancode events for speed
     if time.time() - previousTime > getTimerStepSeconds(speedMode):
         keys = pygame.key.get_pressed()

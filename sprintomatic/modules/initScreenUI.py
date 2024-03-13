@@ -312,21 +312,19 @@ async def initScreen(imagePath, gameSettings, externalImageData, externalWorldCi
                     if initScreenPos < len(positions) - 1:
                         initScreenPos = initScreenPos + 1
             elif event.type == pygame.FINGERDOWN:
-                finger_x, finger_y = event.pos
-                leftThreshold = getBigScreen().get_size()[0] // 3
-                rightThreshold = leftThreshold * 2
-                upThreshold = getBigScreen().get_size()[1] // 3
-                if finger_x < leftThreshold:
+                leftThreshold = 2 / 5
+                rightThreshold = 3 / 5
+                if event.x < leftThreshold:
                     if initScreenPos > 0:
                         initScreenPos = initScreenPos - 1
-                elif finger_x > rightThreshold:
+                elif event.x > rightThreshold:
                     if initScreenPos < len(positions) - 1:
                         initScreenPos = initScreenPos + 1
-                elif finger_y < upThreshold:
-                    stepEffect()
+                else:
                     if initScreenPos == len(positions) - 1:
                         running = False
                     else:
+                        stepEffect()
                         if not (initScreenPos == len(selections) - 1 and len(externalImageData) == 0):
                             for subindexes in indexes:
                                 if initScreenPos in subindexes:
@@ -334,6 +332,7 @@ async def initScreen(imagePath, gameSettings, externalImageData, externalWorldCi
                                         selections[ind] = False
                             selections[initScreenPos] = True
                             if initScreenPos == len(selections) - 2:
+                                externalExampleCtr = 0
                                 externalExampleTeamCtr = externalExampleTeamCtr + 1
                                 if externalExampleTeamCtr >= len(externalImageData):
                                     externalExampleTeamCtr = 0

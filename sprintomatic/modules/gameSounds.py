@@ -19,6 +19,7 @@
 
 import pygame
 import os
+import sys
 from random import randrange
 
 stepsChannelNumber = 0
@@ -122,11 +123,17 @@ def initSounds(soundRoot):
         rightSounds[-1].set_volume(5*fact + fact * randrange(0, 3))
     for melodyPath in melodyPaths:
         sound = pygame.mixer.Sound(os.path.join(soundRoot, melodyPath))
-        sound.set_volume(0.8)
+        if sys.platform == 'emscripten':
+            sound.set_volume(0.3)
+        else:
+            sound.set_volume(0.8)
         melodySounds.append(sound)
     melodyCtr = len(melodySounds) - 1
     birdsSound = pygame.mixer.Sound(os.path.join(soundRoot,  birdsPath))
-    birdsSound.set_volume(0.8)
+    if sys.platform == 'emscripten':
+        birdsSound.set_volume(0.0)
+    else:
+        birdsSound.set_volume(0.8)
     shoutSound = pygame.mixer.Sound(os.path.join(soundRoot, shoutPath))
     shoutSound.set_volume(0.3)
     pacemakerShoutSound = pygame.mixer.Sound(os.path.join(soundRoot, pacemakerShoutPath))

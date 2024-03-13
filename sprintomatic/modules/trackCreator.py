@@ -315,7 +315,11 @@ async def createAmazeControls(cfg, distribution, metersPerPixel, faLookups, saLo
         if not shortests[ind][0]:
             return [], [], [], [], 0.0
 
-    difficulty = int((calculatePathDistance(preComputedLeft) + dist) / (normalizedDifference * 100))
+    if normalizedDifference < 0.01:
+        normalizedDifference = 0.01
+    difficulty = int((calculatePathDistance(preComputedLeft) + dist) / (normalizedDifference * 1000))
+    if difficulty < 1:
+        difficulty = 1
     
     return ctrls, shortests, beautifiedLeft, beautifiedRight, difficulty
 
