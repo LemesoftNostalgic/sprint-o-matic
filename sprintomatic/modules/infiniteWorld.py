@@ -893,7 +893,7 @@ async def getInfiniteWorld(latlonMapOrigo, xyPictureSize, metersPerPixel, imageP
         return None, None
 
     if mapName:
-        uiSubmitSlide("Map name: " + mapName)
+        uiSubmitSlide("Creating map: " + mapName)
     await asyncio.sleep(0)
     if await uiFlushEvents():
         return None, None

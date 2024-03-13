@@ -35,6 +35,7 @@ triangleRadius = 15
 controlApproachZoom = 1.2
 controlApproachZoomUsed = False
 metersPerPixel = 1
+fingerDirection = ""
 
 finishTextStr =      "Finish time: "
 finishTextStr2 =     "    Distance: "
@@ -267,6 +268,7 @@ previousTime = time.time()
 async def uiEvent(showInfoTexts, speedMode):
     global mousePressed
     global previousTime
+    global fingerDirection
     events = []
     # regular events
     for event in pygame.event.get():
@@ -282,16 +284,20 @@ async def uiEvent(showInfoTexts, speedMode):
             leftThreshold = 2 / 5
             rightThreshold = 3 / 5
             if event.x < leftThreshold:
-                events.append("left")
+                fingerDirection = "left"
             elif event.x > rightThreshold:
-                events.append("right")
+                fingerDirection = "right"
             else:
                 events.append("quit")
+        elif event.type == pygame.FINGERUP:
+            fingerDirection = ""
 
     # scancode events for speed
     if time.time() - previousTime > getTimerStepSeconds(speedMode):
         keys = pygame.key.get_pressed()
-        if keys[pygame.K_LEFT] and not keys[pygame.K_RIGHT]:
+        if fingerDirection:
+            events.append(fingerDirection)
+        elif keys[pygame.K_LEFT] and not keys[pygame.K_RIGHT]:
             events.append("left")
         elif keys[pygame.K_RIGHT] and not keys[pygame.K_LEFT]:
             events.append("right")
@@ -316,9 +322,11 @@ async def uiEvent(showInfoTexts, speedMode):
 def uiStartControlEffect(ctrl):
     global effectControl
     global effectStep
+    global fingerDirection
     if ctrl:
         effectControl = ctrl
     effectStep = effectStepStart
+    fingerDirection = ""
 
 
 def uiControlEffectEnded():
