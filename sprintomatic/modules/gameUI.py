@@ -292,8 +292,8 @@ async def uiEvent(showInfoTexts, speedMode):
                 events.append("quit")
         # maybe move these to scancode-level too
         elif event.type == pygame.FINGERDOWN:
-            leftThreshold = 2 / 5
-            rightThreshold = 3 / 5
+            leftThreshold = 1 / 3
+            rightThreshold = 2 / 3
             if event.x < leftThreshold:
                 fingerDirection = "left"
             elif event.x > rightThreshold:

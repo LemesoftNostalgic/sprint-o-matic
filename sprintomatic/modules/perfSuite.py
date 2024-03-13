@@ -2,6 +2,8 @@ import time
 
 import pygame
 from .gameUIUtils import getBigScreen, getMasterFont, getTrackColor
+from .routeAI import slowAccurateCalculateShortestRouteAsync
+import asyncio
 
 perfDBFlag = False
 perfDB = {}
@@ -55,14 +57,18 @@ def perfShowResults():
                 if queueItem[1] is not None:
                     numDeltas = numDeltas + 1
                     totDelta = totDelta + queueItem[1] - queueItem[0]
-            trueDelta = round(totDelta / numDeltas, 5)
-            y = y + 30
-            perfStr = item + ": " + str(trueDelta)
-            perfText = pygame.font.Font(getMasterFont(), 20).render(perfStr, True, getTrackColor())
-            perfRect = perfText.get_rect()
-            perfRect.x = x
-            perfRect.y = y
-            getBigScreen().blit(perfText, perfRect)
-    pygame.display.flip()
+            if numDeltas:
+                trueDelta = round(totDelta / numDeltas, 5)
+                y = y + 30
+                perfStr = item + ": " + str(trueDelta)
+                perfText = pygame.font.Font(getMasterFont(), 20).render(perfStr, True, getTrackColor())
+                perfRect = perfText.get_rect()
+                perfRect.x = x
+                perfRect.y = y
+                getBigScreen().blit(perfText, perfRect)
 
-    
+
+async def perfBenchmark():
+    perfAddStart("benchmark")
+    await slowAccurateCalculateShortestRouteAsync([(0,50), (100,50), {1: {(50,50): True}}, {1: {}}, {1:{}}, {1:{}}, 1, 0])
+    perfAddStop("benchmark")
