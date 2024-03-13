@@ -51,6 +51,8 @@ which have improved a little bit during this winter.
 Use the web version if you want to just try the application quickly.
 The web application is a bit slow, and it doesn't
 have the background music, but it is always up-to date.
+It can also be tried out with Android phones, but it is fast enough only
+with the best smartphones.
 
   * [Web application starts here](https://lemesoftnostalgic.github.io/sprint-o-matic/)
 
@@ -163,6 +165,7 @@ branch it for extra development or propose pull requests for it.
 
 The following ideas are next on the table:
 
+* Improve the usability and speed of the web application in Android platform
 * more maps to the map listing [using this procedure](/README-MAPS.md)
 * Height map -> uphill becomes slower than downhill
 * White map orienteering (remove some items from map after e.g 10 sec)

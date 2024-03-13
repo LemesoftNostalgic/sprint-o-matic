@@ -43,7 +43,9 @@ alustavan kuvan siitä miten peli toimii:
 
 Käytä web-versiota, jos haluat vain testata sovellusta pikaisesti.
 Web-sovellus on vähän hitaampi kuin ladattava sovellus,
-eikä siinä ole taustaääniä, mutta toisaalta se on aina ajan tasalla.
+eikä siinä ole kaikkia taustaääniä, mutta toisaalta se on aina ajan tasalla.
+Sitä voi kokeilla myös Android-puhelimessa, mutta se toimii kunnolla vain
+muutamassa tehokkaimmassa puhelinmallissa.
 
   * [Web-sovellus käynnistyy tästä linkistä](https://lemesoftnostalgic.github.io/sprint-o-matic/)
 
