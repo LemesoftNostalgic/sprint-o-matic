@@ -29,6 +29,8 @@ from .infoBox import showInfoBoxTxt, updateInfoTxtByEvent
 from .gameSounds import stepEffect
 from random import randrange
 
+from .perfSuite import perfShowResults, perfClearSuite, perfActivate, perfAddStart, perfAddStop
+from .routeAI import slowAccurateCalculateShortestRouteAsync
 
 selections = [
     False, True, False, False, False, False,
@@ -275,6 +277,12 @@ async def initScreen(imagePath, gameSettings, externalImageData, externalWorldCi
     pygame.key.set_repeat(200, 50)
     pygame.time.set_timer(TIMER_EVENT, getTimerStep())
 
+    perfClearSuite()
+    perfActivate()
+    perfAddStart("ref")
+    await slowAccurateCalculateShortestRouteAsync([(0,50), (100,50), {1: {(50,50): True}}, {1: {}}, {1:{}}, {1:{}}, 1, 0])
+    perfAddStop("ref")
+
     while running:
         for event in pygame.event.get():
             if gameSettings.infoBox:
@@ -321,13 +329,6 @@ async def initScreen(imagePath, gameSettings, externalImageData, externalWorldCi
                         worldExampleCtr = worldExampleCtr - 1
                         if worldExampleCtr < 0:
                             worldExampleCtr =  len(externalWorldCityMap) - 1
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                if pygame.mouse.get_pressed()[0]:
-                    if initScreenPos > 0:
-                        initScreenPos = initScreenPos - 1
-                elif pygame.mouse.get_pressed()[2]:
-                    if initScreenPos < len(positions) - 1:
-                        initScreenPos = initScreenPos + 1
             elif event.type == pygame.FINGERDOWN:
                 leftThreshold = 2 / 5
                 rightThreshold = 3 / 5
@@ -361,8 +362,15 @@ async def initScreen(imagePath, gameSettings, externalImageData, externalWorldCi
                                 worldExampleCtr = worldExampleCtr + 1
                                 if worldExampleCtr >= len(externalWorldCityMap):
                                     worldExampleCtr = 0
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if pygame.mouse.get_pressed()[0]:
+                    if initScreenPos > 0:
+                        initScreenPos = initScreenPos - 1
+                elif pygame.mouse.get_pressed()[2]:
+                    if initScreenPos < len(positions) - 1:
+                        initScreenPos = initScreenPos + 1
 
-            if event.type == pygame.QUIT:
+            elif event.type == pygame.QUIT:
                 quitting = True
                 running = False
 
@@ -421,7 +429,7 @@ async def initScreen(imagePath, gameSettings, externalImageData, externalWorldCi
             uiFadeUnVisibleSlide()
             await uiFlip(False)
             await asyncio.sleep(0)
-
+        perfShowResults()
     if not quitting:
         retSettings = []
         for subindexes in indexes:
