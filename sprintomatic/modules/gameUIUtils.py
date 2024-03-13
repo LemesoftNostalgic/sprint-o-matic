@@ -50,6 +50,9 @@ def getMasterFont():
 def getStopKey():
     return 41
 
+def getPerfKey():
+    return 19
+
 def getBackKey():
     return 42
 

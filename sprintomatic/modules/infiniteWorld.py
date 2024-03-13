@@ -384,7 +384,7 @@ async def constructWayDb(latlonMapOrigo, xyPictureSize, metersPerPixel):
 
     for way in ways:
         if await uiFlushEvents():
-            return None
+            return None, ""
 
         for waytype in way['tags']:
             if waytype in waytypes:

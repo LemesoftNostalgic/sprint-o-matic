@@ -46,16 +46,16 @@ xStartOrig = 280
 yStartOrig = 300
 
 
-def showTextShadowed(textCenter, fontSize, textStr, textColor, textShadowShift):
+def showTextShadowed(surf, textCenter, fontSize, textStr, textColor, textShadowShift):
         textShadow = pygame.font.Font(getMasterFont(), convertXCoordinate(fontSize)).render(textStr, True, getGreyColor())
         textShadowRect = textShadow.get_rect()
         textShadowRect.center = (textCenter[0] + textShadowShift, textCenter[1] + textShadowShift)
-        getBigScreen().blit(textShadow, textShadowRect)
+        surf.blit(textShadow, textShadowRect)
 
         aText = pygame.font.Font(getMasterFont(), convertXCoordinate(fontSize)).render(textStr, True, textColor)
         textRect = aText.get_rect()
         textRect.center = textCenter
-        getBigScreen().blit(aText, textRect)
+        surf.blit(aText, textRect)
 
 
 def showInitArrow(surf, spot, inScale):
@@ -70,11 +70,11 @@ def showInitArrow(surf, spot, inScale):
 
 
 async def uiRenderImmediate(pos, textStr, fast):
-    showTextShadowed(pos, 32, textStr, getTrackColor(), 2)
+    showTextShadowed(getBigScreen(), pos, 32, textStr, getTrackColor(), 2)
     await uiFlip(fast)
 
 
-def showInitSelections(surf, positions, selections, inScale, texts, titleTexts, titleTextPositions, creditTexts, creditTextPositions, externalOverallText, externalOverallPos, externalTeamText, externalTeamPosition, externalText, externalPosition, ouluText, ouluPosition, news, newsPosition, worldText, worldPosition):
+def showInitSelectionConstantTexts(surf, positions, selections, inScale, texts, titleTexts, titleTextPositions, creditTexts, creditTextPositions, news, newsPosition, externalOverallText, externalOverallPos):
     # scale for the current display
     xStep = convertXCoordinate(xStepOrig)
     yStep = convertYCoordinate(yStepOrig)
@@ -82,16 +82,14 @@ def showInitSelections(surf, positions, selections, inScale, texts, titleTexts, 
     yStart = convertYCoordinate(yStartOrig)
     scale = convertXCoordinate(inScale)
 
-    titleColorRandomElem = randrange(56, 64)
+    titleColorRandomElem = 60
     creditColor = getCreditColor()
     titleColorRandom = (creditColor[0] - titleColorRandomElem, creditColor[1] - titleColorRandomElem, creditColor[2])
     for ind in range(len(positions) - 1):
         pos = (positions[ind][0], positions[ind][1])
-        selectedColor = titleColorRandom if selections[ind] else getGreyColor()
-        pygame.draw.circle(surf, selectedColor, pos, scale)
         uiDrawCircle(surf, getTrackColor(), pos, (scale * 1.6), int(scale / 5))
         theTextCenter = (pos[0], pos[1] - scale * 2.0)
-        showTextShadowed(theTextCenter, 32, texts[ind], getTrackColor(), 2)
+        showTextShadowed(surf, theTextCenter, 32, texts[ind], getTrackColor(), 2)
         lineItself = (pos[0] - positions[ind + 1][0], pos[1] - positions[ind + 1][1])
         fraction = 2 * scale / distanceBetweenPoints((0,0), lineItself)
         lineDelta = (lineItself[0]*fraction, lineItself[1]*fraction)
@@ -104,17 +102,37 @@ def showInitSelections(surf, positions, selections, inScale, texts, titleTexts, 
     pygame.draw.circle(surf, getTrackColor(), pos, scale, width = int(scale / 5))
     pygame.draw.circle(surf, getTrackColor(), pos, scale * 1.6, width = int(scale / 5))
     theTextCenter = (positions[len(positions) - 1][0], positions[len(positions) - 1][1] - scale * 2.0)
-    showTextShadowed(theTextCenter, 32, texts[len(positions) - 1], getTrackColor(), 2)
+    showTextShadowed(surf, theTextCenter, 32, texts[len(positions) - 1], getTrackColor(), 2)
 
     for ind in range(len(titleTextPositions)):
         pos = titleTextPositions[ind]
         theTextCenter = (pos[0], pos[1] - scale * 2.0)
-        showTextShadowed(theTextCenter, 40, titleTexts[ind], getTrackColor(), 2)
+        showTextShadowed(surf, theTextCenter, 40, titleTexts[ind], getTrackColor(), 2)
     for ind in range(len(creditTextPositions)):
-        showTextShadowed(creditTextPositions[ind], 24, creditTexts[ind], getTrackColor(), 2)
+        showTextShadowed(surf, creditTextPositions[ind], 24, creditTexts[ind], getTrackColor(), 2)
     titleTextCenter = (surf.get_size()[0] / 2, xStart / 3)
-    showTextShadowed(titleTextCenter, 128, getApplicationTitle(), titleColorRandom, 5)
-    showTextShadowed(externalOverallPos, 32, externalOverallText, getTrackColor(), 2)
+    showTextShadowed(surf, titleTextCenter, 128, getApplicationTitle(), titleColorRandom, 5)
+    if news:
+        showTextShadowed(surf, newsPosition, 24, "News: " + news, getPacemakerColor(2), 2)
+    showTextShadowed(surf, (newsPosition[0], newsPosition[1] * 1.2), 24, "Homepage: tinyurl.com/sprint-o-matic", getPacemakerColor(2), 2)
+    showTextShadowed(surf, externalOverallPos, 32, externalOverallText, getTrackColor(), 2)
+
+
+def showInitSelections(surf, positions, selections, inScale, texts, titleTexts, titleTextPositions, creditTexts, creditTextPositions, externalTeamText, externalTeamPosition, externalText, externalPosition, ouluText, ouluPosition, worldText, worldPosition):
+    # scale for the current display
+    xStep = convertXCoordinate(xStepOrig)
+    yStep = convertYCoordinate(yStepOrig)
+    xStart = convertXCoordinate(xStartOrig)
+    yStart = convertYCoordinate(yStartOrig)
+    scale = convertXCoordinate(inScale)
+    titleColorRandomElem = randrange(56, 64)
+    creditColor = getCreditColor()
+    titleColorRandom = (creditColor[0] - titleColorRandomElem, creditColor[1] - titleColorRandomElem, creditColor[2])
+    for ind in range(len(positions) - 1):
+        pos = (positions[ind][0], positions[ind][1])
+        selectedColor = titleColorRandom if selections[ind] else getGreyColor()
+        pygame.draw.circle(surf, selectedColor, pos, scale)
+
     extTeamTextSize = 32
     extTextThreshold = 8
     extTextUpperThreshold = 14
@@ -122,18 +140,15 @@ def showInitSelections(surf, positions, selections, inScale, texts, titleTexts, 
             externalTeamText = externalTeamText[:extTextUpperThreshold] + ".."
     if len(externalTeamText) >= extTextThreshold:
         extTeamTextSize = (extTeamTextSize * extTextThreshold) // len(externalTeamText)
-    showTextShadowed(externalTeamPosition, extTeamTextSize, externalTeamText, getTrackColor(), 2)
+    showTextShadowed(surf, externalTeamPosition, extTeamTextSize, externalTeamText, getTrackColor(), 2)
     extTextSize = 32
     if len(externalText) >= extTextUpperThreshold:
             externalText = externalText[:extTextUpperThreshold] + ".."
     if len(externalText) >= extTextThreshold:
         extTextSize = (extTextSize * extTextThreshold) // len(externalText)
-    showTextShadowed(externalPosition, extTextSize, externalText, getTrackColor(), 2)
-    showTextShadowed(ouluPosition, 32, ouluText, getTrackColor(), 2)
-    showTextShadowed(worldPosition, 32, worldText, getTrackColor(), 2)
-    if news:
-        showTextShadowed(newsPosition, 24, "News: " + news, getPacemakerColor(2), 2)
-    showTextShadowed((newsPosition[0], newsPosition[1] * 1.2), 24, "Homepage: tinyurl.com/sprint-o-matic", getPacemakerColor(2), 2)
+    showTextShadowed(surf, externalPosition, extTextSize, externalText, getTrackColor(), 2)
+    showTextShadowed(surf, ouluPosition, 32, ouluText, getTrackColor(), 2)
+    showTextShadowed(surf, worldPosition, 32, worldText, getTrackColor(), 2)
 
 
 initScreenPos = 0
@@ -247,7 +262,9 @@ async def initScreen(imagePath, gameSettings, externalImageData, externalWorldCi
     quitting = False
     TIMER_EVENT = pygame.USEREVENT + 1
     backgroundImageFile = imagePath + "lemesoftnostalgic/SettingsBackgroundImage.jpg"
-    backgroundImage = pygame.transform.scale(pygame.image.load(backgroundImageFile), getBigScreen().get_size())
+    backgroundImage = getBigScreen().copy()
+    tmpImage = pygame.transform.scale(pygame.image.load(backgroundImageFile), getBigScreen().get_size())
+    backgroundImage.blit(tmpImage, (0, 0))
     externalExampleTeamText = ""
     externalExampleText = ""
     worldExampleText = ""
@@ -388,8 +405,10 @@ async def initScreen(imagePath, gameSettings, externalImageData, externalWorldCi
                 worldExampleText = externalWorldCityMap[worldExampleCtr][0]
                 selections[-4] = True
 
+            if firstTime:
+                showInitSelectionConstantTexts(backgroundImage, positions, selections, initCircleRadius, texts, titleTexts, titleTextPositions, creditTexts, creditTextPositions, news, newsPosition, externalExampleOverallText, externalExampleOverallPosition)
             getBigScreen().blit(backgroundImage, backgroundImage.get_rect())
-            showInitSelections(getBigScreen(), positions, selections, initCircleRadius, texts, titleTexts, titleTextPositions, creditTexts, creditTextPositions, externalExampleOverallText, externalExampleOverallPosition, externalExampleTeamText, externalExampleTeamSelectionPosition, externalExampleText, externalExampleSelectionPosition, ouluExampleText, ouluExampleSelectionPosition, news, newsPosition, worldExampleText, worldExampleSelectionPosition)
+            showInitSelections(getBigScreen(), positions, selections, initCircleRadius, texts, titleTexts, titleTextPositions, creditTexts, creditTextPositions, externalExampleTeamText, externalExampleTeamSelectionPosition, externalExampleText, externalExampleSelectionPosition, ouluExampleText, ouluExampleSelectionPosition, worldExampleText, worldExampleSelectionPosition)
             showInitArrow(getBigScreen(), positions[initScreenPos], arrowScale)
             if gameSettings.infoBox:
                 showInfoBoxTxt(getBigScreen())
