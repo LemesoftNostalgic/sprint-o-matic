@@ -269,6 +269,7 @@ async def main():
 
     benchmark = await perfBenchmark()
 
+    
     # all the initialization that happens only once at the startup
     perfClearSuite()
 

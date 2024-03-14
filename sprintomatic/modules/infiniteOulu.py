@@ -26,6 +26,7 @@ from .mathUtils import rotateVector, rotatePoint, getBoundingBox, polygonCreate,
 from .lookupPngReader import getTfs
 from .utils import getSlowAreaMask, getSemiSlowAreaMask, getVerySlowAreaMask, getForbiddenAreaMask, getControlMask, getNoMask, getAiPoolMaxTimeLimit, getTunnelMask
 from .gameUIUtils  import uiFlushEvents
+from .perfSuite import perfAddStart, perfAddStop
 
 # types
 FOREST = '.'
@@ -1363,16 +1364,22 @@ def initOuluCreator(blockSize, gridSize, boundary):
 
 async def getInfiniteOulu(blockSize, gridSize, boundary):
     terranizer(terrains[randrange(len(terrains))])
+    perfAddStart("oCreator")    
     oulu, ouluMask = initOuluCreator(blockSize, gridSize, boundary)
+    perfAddStop("oCreator")    
     for x in range(gridSize[0]):
         for y in range(gridSize[1]):
             if await uiFlushEvents():
                 return None, None
+            perfAddStart("oBlock")    
             yard, png, mask = await addBlock(blockSize, True)
+            perfAddStop("oBlock")    
             await asyncio.sleep(0)
             if yard == None:
                 return None, None
+            perfAddStart("oInstal")    
             oulu, ouluMask = installOuluBlock(oulu, png, ouluMask, mask, (x, y), blockSize, boundary)
+            perfAddStop("oInstal")    
             await asyncio.sleep(0)
 
     # Leaving out due to slow speed in the web application

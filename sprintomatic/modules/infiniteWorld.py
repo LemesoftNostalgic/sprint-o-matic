@@ -10,6 +10,7 @@ from .utils import getSlowAreaMask, getSemiSlowAreaMask, getVerySlowAreaMask, ge
 from .mathUtils import calculatePathDistance, distanceBetweenPoints
 from .gameUIUtils import uiFlushEvents, uiDrawLine, uiSubmitSlide
 from .imageDownloader import downloadOsmData
+from .perfSuite import perfAddStart, perfAddStop
 
 offlineMapDataFolder = os.path.join("data", "offline-map-data", "")
 spotnessFactor = 4
@@ -364,10 +365,13 @@ async def constructWayDb(latlonMapOrigo, xyPictureSize, metersPerPixel):
     yRand = randrange(xyPictureSize[1]//2)
     midPoint = (xyPictureSize[0]//4 + xRand, xyPictureSize[1]//4 + yRand)
     middlestName = ""
-    middlestDist = xyPictureSize[0] + xyPictureSize[1]
     waydb = {}
     latlonMapOppositeCorner = oppositeToLatLonCoordinates(latlonMapOrigo, xyPictureSize, metersPerPixel)
+    perfAddStart("wDBLoad")
+    
     result = await downloadOsmData(latlonMapOrigo, latlonMapOppositeCorner, waytypes)
+    perfAddStop("wDBLoad")
+    perfAddStart("wDBHandle1")
     nodes = {}
     if 'elements' in result:
         for element in result['elements']:
@@ -380,32 +384,37 @@ async def constructWayDb(latlonMapOrigo, xyPictureSize, metersPerPixel):
                 wayNodes = []
                 for id in element['nodes']:
                     wayNodes.append(nodes[id])
-                ways.append({ 'tags': element['tags'], 'nodes': wayNodes})
+                if wayNodes:
+                    ways.append({ 'tags': element['tags'], 'nodes': wayNodes})
 
+    perfAddStop("wDBHandle1")
+    perfAddStart("wDBHandle2")
+    nameFound = False
     for way in ways:
         if await uiFlushEvents():
             return None, ""
+        waySet = set(way['tags']) & set(waytypes)
+        nodeList = way['nodes']
 
-        for waytype in way['tags']:
-            if waytype in waytypes:
-                subway = way['tags'][waytype]
+        for waytype in waySet:
+            subway = way['tags'][waytype]
+            if waytype not in waydb:
+                waydb[waytype] = {}
+            if subway not in waydb[waytype]:
+                waydb[waytype][subway] = []
+            poslistToAppend = []
+            for node in nodeList:
+                xyPos = toPictureCoordinates(latlonMapOrigo, node, xyPictureSize, metersPerPixel)
+                poslistToAppend.append(xyPos)
+            waydb[waytype][subway].append(poslistToAppend)
+            if not nameFound:
                 name = ""
                 if 'name' in way['tags']:
                     name = way['tags']['name']
-                if waytype not in waydb:
-                    waydb[waytype] = {}
-                if subway not in waydb[waytype]:
-                    waydb[waytype][subway] = []
-                poslistToAppend = []
-                for node in way['nodes']:
-                    xyPos = toPictureCoordinates(latlonMapOrigo, node, xyPictureSize, metersPerPixel)
-                    poslistToAppend.append(xyPos)
-                waydb[waytype][subway].append(poslistToAppend)
-                if name and waytype in namePoints and subway in namePoints[waytype]:
-                    dist = distanceBetweenPoints(xyPos, midPoint)
-                    if dist < middlestDist:
+                    if name and waytype in namePoints and subway in namePoints[waytype]:
+                        nameFound = True
                         middlestName = name
-                        middlestDist = xyPictureSize[0] + xyPictureSize[1]
+    perfAddStop("wDBHandle2")
 
     if not waydb:
         waydb = checkIfWaydbInLocalCache(latlonMapOrigo)
@@ -886,12 +895,15 @@ async def getInfiniteWorld(latlonMapOrigo, xyPictureSize, metersPerPixel, imageP
     if world == None:
         return None, None
 
+    perfAddStart("wDB")
     await asyncio.sleep(0)
     db, mapName = await constructWayDb(latlonMapOrigo, xyPictureSize, metersPerPixel)
+    perfAddStop("wDB")
 
     if db == None:
         return None, None
 
+    perfAddStart("wAreas")
     if mapName:
         uiSubmitSlide("Creating map: " + mapName)
     await asyncio.sleep(0)
@@ -968,6 +980,7 @@ async def getInfiniteWorld(latlonMapOrigo, xyPictureSize, metersPerPixel, imageP
     world, worldMask = drawSpots(world, worldMask, db)
     x, y = worldMask.get_size()
     pygame.draw.rect(worldMask, getForbiddenAreaMask(), [(2,2), ((x-2, y-2))], width=2)
+    perfAddStop("wAreas")
 
     return world, worldMask
 
