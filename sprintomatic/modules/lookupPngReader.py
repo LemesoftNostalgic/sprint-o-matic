@@ -27,14 +27,16 @@ import asyncio
 from .pathPruning import pruneWeightedDistance
 from .utils import getForbiddenAreaMask, getSlowAreaMask, getSemiSlowAreaMask, getVerySlowAreaMask, getControlMask, getTunnelMask
 
+from .perfSuite import perfAddStart, perfAddStop
 boundaryThreshold = 10
 spacingBetweenControls = 16
 
 def getTfs():
-    return [1, 2, 4, 8, 16]
+    return [1, 4, 16]
+tfsShort = [1, 4]
 
 
-async def extractPngLookups(oMapMask):
+async def extractPngLookups(oMapMask, benchmark):
     faLookup = {}
     saLookup = {}
     ssaLookup = {}
@@ -53,68 +55,58 @@ async def extractPngLookups(oMapMask):
         vsaLookup[tf] = {}
         tunnelLookup[tf] = {}
 
+    fam = getForbiddenAreaMask()
+    tm = getTunnelMask()
+    cm = getControlMask()
+    sm = getSlowAreaMask()
+    ssm = getSemiSlowAreaMask()
+    vsm = getVerySlowAreaMask()
+    phone = True if benchmark == "phone" else False
     for y in range(0, size[1]):
         for x in range(0, size[0]):
             col = oMapMask.get_at((x, y))
-            if col == getSlowAreaMask():
-                for tf in getTfs():
-                    saLookup[tf][(int(x/tf), int(y/tf))] = True
-            elif col == getTunnelMask():
-                for tf in getTfs():
-                    tunnelLookup[tf][(int(x/tf), int(y/tf))] = True
-            elif col == getSemiSlowAreaMask():
-                for tf in getTfs():
-                    ssaLookup[tf][(int(x/tf), int(y/tf))] = True
-            elif col == getVerySlowAreaMask():
-                for tf in getTfs():
-                    vsaLookup[tf][(int(x/tf), int(y/tf))] = True
-            elif col == getForbiddenAreaMask():
-                for tf in getTfs():
+            if col == fam:
+                for tf in tfsShort:
                     faLookup[tf][(int(x/tf), int(y/tf))] = True
-            elif col == getControlMask():
-                if x > boundaryThreshold and x < size[0] - boundaryThreshold and y > boundaryThreshold and y < size[1] - boundaryThreshold:
-                    controls.append((x, y))
+            elif col == tm:
+                for tf in tfsShort:
+                    tunnelLookup[tf][(int(x/tf), int(y/tf))] = True
+            elif col == cm:
+                controls.append((x, y))
+            elif not phone:
+                if col == sm:
+                    for tf in tfsShort:
+                        saLookup[tf][(int(x/tf), int(y/tf))] = True
+                elif col == ssm:
+                    for tf in tfsShort:
+                        ssaLookup[tf][(int(x/tf), int(y/tf))] = True
+                elif col == vsm:
+                    for tf in tfsShort:
+                        vsaLookup[tf][(int(x/tf), int(y/tf))] = True
+                    
+    prunedControls = []
+    steps = len(controls) // 500
+    step = 0
+    for item in controls:
+        x = item[0]
+        y = item[1]
+        step = step + 1
+        thisStep = steps
+        if steps:
+            thisStep = randrange(steps)
+        if step > thisStep:
+            step = 0
+        if step == 0:
+            if x > boundaryThreshold and x < size[0] - boundaryThreshold and y > boundaryThreshold and y < size[1] - boundaryThreshold:
+                if not ((x, y-1) in faLookup[1] and (x, y+1) in faLookup[1]) and not ((x-1, y) in faLookup[1] and (x+1, y) in faLookup[1]):
+                    prunedControls.append(item)
 
-# This had bad perf in phones...
-#    for yBig in range(0, size[1]//spacingBetweenControls + 1):
-#        for xBig in range(0, size[0]//spacingBetweenControls + 1:
-#            controlToAdd = None
-#            await asyncio.sleep(0)
-#            for ySmall in range(0, spacingBetweenControls):
-#                for xSmall in range(0, spacingBetweenControls):
-#                    x = xBig * spacingBetweenControls + xSmall
-#                    y = yBig * spacingBetweenControls + ySmall
-#                    if y < size[1] and x < size[0]:
-#                        col = oMapMask.get_at((x, y))
-#                        if col == getSlowAreaMask():
-#                            for tf in getTfs():
-#                                saLookup[tf][(int(x/tf), int(y/tf))] = True
-#                        elif col == getTunnelMask():
-#                            for tf in getTfs():
-#                                tunnelLookup[tf][(int(x/tf), int(y/tf))] = True
-#                        elif col == getSemiSlowAreaMask():
-#                            for tf in getTfs():
-#                                ssaLookup[tf][(int(x/tf), int(y/tf))] = True
-#                        elif col == getVerySlowAreaMask():
-#                            for tf in getTfs():
-#                                vsaLookup[tf][(int(x/tf), int(y/tf))] = True
-#                        elif col == getForbiddenAreaMask():
-#                            for tf in getTfs():
-#                                faLookup[tf][(int(x/tf), int(y/tf))] = True
-#                        elif col == getControlMask():
-#                            if x > boundaryThreshold and x < size[0] - boundaryThreshold and y > boundaryThreshold and y < size[1] - boundaryThreshold:
-#                                if not ((x, y-1) in faLookup[1] and (x, y+1) in faLookup[1]) and not ((x-1, y) in faLookup[1] and (x+1, y) in faLookup[1]):
-#                                    if not ((x//2, y//2-1) in faLookup[2] and (x//2, y//2+1) in faLookup[2]) and not ((x//2-1, y//2) in faLookup[2] and (x//2+1, y//2) in faLookup[2]):
-#                                        controlToAdd = (x, y)
-#            if controlToAdd is not None:
-#                controls.append(controlToAdd)
-
-    return faLookup, saLookup, ssaLookup, vsaLookup, tunnelLookup, controls
+    return faLookup, saLookup, ssaLookup, vsaLookup, tunnelLookup, prunedControls
 
 
-async def extractPngLookupsFromFile(pngFileName):
+async def extractPngLookupsFromFile(pngFileName, benchmark):
     try:
-        oMapMask = pygame.image.load(pngFileName)
+        oMapMask = pygame.image.load(pngFileName, benchmark)
     except Exception as err:
         print(f"Cannot load map from file: {err=}, {type(err)=}")
         return {}, {}, {}, {}, {}, []

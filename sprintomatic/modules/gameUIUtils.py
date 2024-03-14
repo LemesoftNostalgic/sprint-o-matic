@@ -136,6 +136,12 @@ def getTimerStepSeconds(speedMode):
         return 0.050
     return 0.080
 
+def getEffectStepStart(benchmark):
+    if benchmark == "phone":
+        return 12
+    else:
+        return 64
+
 
 def uiEarlyInit(fullScreen, benchmark):
     global xCurrent
@@ -153,7 +159,7 @@ def uiEarlyInit(fullScreen, benchmark):
     xCurrent, yCurrent = bigScreen.get_size()
 
     
-def uiDrawLine(surf, color, start, end, width):
+def uiDrawLine(surfa, color, start, end, width):
     angle = angleOfLine([start, end])
 
     for ind in range(1, width):
@@ -161,12 +167,12 @@ def uiDrawLine(surf, color, start, end, width):
             inc = rotateVector(angle + dir * math.pi / 2, 0.5)
             st = (start[0] + ind * inc[0], start[1] + ind * inc[1])
             ed = (end[0] + ind * inc[0], end[1] + ind * inc[1])
-            pygame.draw.aalines(surf, color, False, [st, ed])
+            pygame.draw.aalines(surfa, color, False, [st, ed])
 
-    pygame.draw.aalines(surf, color, False, [start, end])
+    pygame.draw.aalines(surfa, color, False, [start, end])
 
 
-def uiDrawCircle(surf, color, center, radius, width):
+def uiDrawCircle(surfa, color, center, radius, width):
     numSteps = int(radius) * 4
     angleStep = (2 * math.pi) / numSteps
     for ind in range(numSteps):
@@ -174,14 +180,14 @@ def uiDrawCircle(surf, color, center, radius, width):
         endV = rotateVector((ind + 1) * angleStep, radius)
         start = (center[0]+startV[0], center[1]+startV[1])
         end = (center[0]+endV[0], center[1]+endV[1])
-        uiDrawLine(surf, color, start, end, width)
+        uiDrawLine(surfa, color, start, end, width)
     
 
-def uiDrawTriangle(surf, radius, angle, pos, wd):
+def uiDrawTriangle(surfa, radius, angle, pos, wd):
     triangle = triangleCreator(radius, angle, pos)
-    uiDrawLine(surf, getTrackColor(), triangle[0], triangle[1], wd)
-    uiDrawLine(surf, getTrackColor(), triangle[1], triangle[2], wd)
-    uiDrawLine(surf, getTrackColor(), triangle[2], triangle[0], wd)
+    uiDrawLine(surfa, getTrackColor(), triangle[0], triangle[1], wd)
+    uiDrawLine(surfa, getTrackColor(), triangle[1], triangle[2], wd)
+    uiDrawLine(surfa, getTrackColor(), triangle[2], triangle[0], wd)
 
 
 

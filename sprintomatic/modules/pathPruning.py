@@ -25,7 +25,7 @@ from .mathUtils import distanceBetweenPoints
 from .utils import getSlowdownFactor, getSemiSlowdownFactor, getVerySlowdownFactor
 
 pruneDefaultRes = 16
-tfs = [1, 2, 4, 8, 16]
+tfs = [1, 4, 16]
 sleepTimeThreshold = 0.02
 
 def pruneDistanceWeighter(testPt, lookup, semilookup, verylookup):

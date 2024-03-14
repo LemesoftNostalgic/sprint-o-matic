@@ -24,7 +24,7 @@ import asyncio
 from datetime import datetime
 from random import randrange
 
-from .gameUIUtils import getMasterFont, getStopKey, getLeftKey, getRightKey, getPlayerColor, getTrackColor, getShortestRouteColor, getCreditColor, getPacemakerColor, getPlayerRouteColor, getFinishTextColor, getWhiteColor, convertXCoordinate, convertXCoordinateSpecificSurface, convertYCoordinate, getBigScreen, getTimerStepSeconds, getAnalysisResultsFileBase, uiFlip, uiUnSubmitSlide, uiDrawLine, uiDrawCircle
+from .gameUIUtils import getMasterFont, getStopKey, getLeftKey, getRightKey, getPlayerColor, getTrackColor, getShortestRouteColor, getCreditColor, getPacemakerColor, getPlayerRouteColor, getFinishTextColor, getWhiteColor, convertXCoordinate, convertXCoordinateSpecificSurface, convertYCoordinate, getBigScreen, getTimerStepSeconds, getAnalysisResultsFileBase, uiFlip, uiUnSubmitSlide, uiDrawLine, uiDrawCircle, getEffectStepStart
 from .mathUtils import rotatePoint, fromRadiansToDegrees, distanceBetweenPoints, triangleCreator
 from .infoBox import showInfoBoxTxt, updateInfoTxtByEvent
 from .perfSuite import perfShowResults, perfAddStart, perfAddStop
@@ -37,9 +37,6 @@ controlApproachZoom = 1.2
 controlApproachZoomUsed = False
 metersPerPixel = 1
 fingerDirection = ""
-
-#optimization
-previousZoom = 0.001
 
 finishTextStr =      "Finish time: "
 finishTextStr2 =     "    Distance: "
@@ -67,7 +64,6 @@ oMapEarly = None
 oMap = None
 oMapCopy = None
 surf = None
-tmpSurf = None
 screen = None
 me = None
 
@@ -77,22 +73,23 @@ mousePressed = False
 
 effectControl = 0
 effectStep = 0
+previousEffectStep = 0
 effectStepStart = 64
 
 
-def uiInit(fileName, generatedMap, metersPerPixerInput):
-    global oMap, oMapEarly, surf, tmpSurf, screen, bigScreen, me, metersPerPixel
+def uiInit(fileName, generatedMap, metersPerPixerInput, benchmark):
+    global effectStepStart
+    effectStepStart = getEffectStepStart(benchmark)
+    global oMap, oMapEarly, surf, screen, bigScreen, me, metersPerPixel
     if generatedMap is not None:
         oMapEarly = generatedMap
     else:
         oMapEarly = pygame.image.load(fileName)
     size = oMapEarly.get_size()
     surf = pygame.Surface(size)
-    tmpSurf = pygame.Surface(size)
     screen = pygame.Surface(size)
 
     surf = surf.convert_alpha()
-    tmpSurf = surf.convert_alpha()
     screen = screen.convert_alpha()
     oMapEarly = oMapEarly.convert_alpha()
     me = tuple(ti/2.0 for ti in size)
@@ -180,8 +177,6 @@ def lowerControlApproachZoom():
 
 
 def uiCenterTurnZoomTheMap(pos, zoom, angle, benchmark):
-    global previousZoom
-    global tmpSurf
     perfAddStart("renTurnZoom")
     if benchmark == "phone":
         surf.blit(oMapCopy, tuple(map(lambda i, j: i - j, me, pos)))
@@ -195,10 +190,7 @@ def uiCenterTurnZoomTheMap(pos, zoom, angle, benchmark):
         zoom = zoom * metersPerPixel
         if controlApproachZoomUsed:
             zoom = zoom * controlApproachZoom
-        if zoom != previousZoom:
-            tmpSurf = pygame.transform.smoothscale_by(oMapCopy, zoom)
-            previousZoom = zoom
-        surf.blit(tmpSurf, tuple(map(lambda i, j: i - j * zoom, me, pos)))
+        surf.blit(pygame.transform.smoothscale_by(oMapCopy, zoom), tuple(map(lambda i, j: i - j * zoom, me, pos)))
 
     oMapRotated = pygame.transform.rotate(surf, fromRadiansToDegrees(math.pi - angle))
     new_rect = oMapRotated.get_rect(center = surf.get_rect().center)
@@ -347,9 +339,11 @@ async def uiEvent(showInfoTexts, speedMode):
 def uiStartControlEffect(ctrl):
     global effectControl
     global effectStep
+    global previousEffectStep
     global fingerDirection
     if ctrl:
         effectControl = ctrl
+    previousEffectStep = effectStep
     effectStep = effectStepStart
     fingerDirection = ""
 
@@ -360,15 +354,16 @@ def uiControlEffectEnded():
     return False
 
 
+def uiClearBuffers():
+    global oMap
+    oMap = None
+    
+
 def uiControlEffectRestart():
     global effectControl
     global effectStep
-    global previousZoom
-    global oMap
-    previousZoom = 0.001
     effectControl = 0
     effectStep = 0
-    oMap = None
 
 
 def uiInitStartTriangle(angle, pos):
@@ -427,7 +422,7 @@ def uiClearCanvas(controls):
                     controlShrinked = (control[0]-lineDelta[0], control[1]-lineDelta[1])
                     uiDrawLine(oMap, getTrackColor(), previousControlShrinked, controlShrinked, max(2, int(2/metersPerPixel)))
             previousControl = control
-        
+  
     oMapCopy = oMap.copy()
 
 

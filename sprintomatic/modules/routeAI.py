@@ -30,7 +30,7 @@ from .utils import getSlowdownFactor, getSemiSlowdownFactor, getVerySlowdownFact
 minScoreInit = 10000
 maxScoreInit = -10000
 
-tfs = [1, 2, 4, 8, 16]
+tfs = [1, 4, 16]
 
 bddTimeThreshold = 1.5
 sleepTimeThreshold = 0.05
@@ -52,7 +52,7 @@ def lookupContains(lookups, point):
     for tf in tfs:
         if tf in lookups and lookups[tf]:
             # found a valid tf
-            if (int(point[0]/tf), int(point[1]/tf)) in lookups[tf]:
+            if (point[0]//tf, point[1]//tf) in lookups[tf]:
                 contains = True
             break
     return contains

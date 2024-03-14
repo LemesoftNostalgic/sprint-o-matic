@@ -30,7 +30,7 @@ from sprintomatic.modules.mathUtils import angleOfLine, angleOfPath, getRandomAn
 from sprintomatic.modules.trackCreator import createAutoControls, createAmazeControls
 from sprintomatic.modules.gameUIUtils import uiEarlyInit, uiLateQuit, uiFlushEvents
 from sprintomatic.modules.initScreenUI import initScreen
-from sprintomatic.modules.gameUI import uiInit, uiInitStartTriangle, uiStartControlEffect, uiControlEffectEnded, uiCenterTurnZoomTheMap, uiAnimatePlayer, uiAnimatePacemaker, uiRenderRoutes, uiRenderControls, uiCompleteRender, uiEvent, uiClearCanvas, raiseControlApproachZoom, lowerControlApproachZoom, uiRenderPacemakerText, uiRenderAIText, uiControlEffectRestart, uiRenderExternalMapInfo, uiStoreAnalysis
+from sprintomatic.modules.gameUI import uiInit, uiInitStartTriangle, uiStartControlEffect, uiControlEffectEnded, uiCenterTurnZoomTheMap, uiAnimatePlayer, uiAnimatePacemaker, uiRenderRoutes, uiRenderControls, uiCompleteRender, uiEvent, uiClearCanvas, raiseControlApproachZoom, lowerControlApproachZoom, uiRenderPacemakerText, uiRenderAIText, uiControlEffectRestart, uiRenderExternalMapInfo, uiStoreAnalysis, uiClearBuffers
 from sprintomatic.modules.gameEngine import startOverPlayerRoute, playerRoute, calculateNextStep, closeToControl, quiteCloseToControl, longLapEveryOther, generateAngleStep, normalizeAngleStep, defaultAngle, getPlayerRoute, getPacemakerThreshold, getPacemakerPos
 from sprintomatic.modules.pathPruning import calculatePathWeightedDistance
 from sprintomatic.modules.gameSounds import initSounds, stopSounds, maintainRunningStepEffect, startMelody, startElevatorMelody, stopMelody, startBirds, stopBirds, shoutEffect, pacemakerShoutEffect, finishEffect, startEffect, stopEffects
@@ -86,7 +86,6 @@ async def setTheStageForNewRound(cfg):
         perfAddStart("crTrack")
         ctrls, shortestRoutesArray = await createAutoControls(cfg, trackLengthInPixels, gameSettings.distributionOfControlLegs, gameSettings.metersPerPixel, faLookup, saLookup, ssaLookup, vsaLookup, gameSettings.pacemaker)
         perfAddStop("crTrack")
-
 
     perfAddStart("crOth")
     news = await downloadNews()
@@ -272,6 +271,8 @@ async def main():
 
     # all the initialization that happens only once at the startup
     perfClearSuite()
+
+    # this can be left out from prod. build
     perfActivate()
     perfAddStart("ini")
     gameSettings = returnSettings()
@@ -390,12 +391,13 @@ async def main():
                 # Ok for init...
 
                 # generic default unless modified when setting the stage
-                position = uiInit(gameSettings.mapFileName, generatedOrDownloadedMap, gameSettings.metersPerPixel)
+                position = uiInit(gameSettings.mapFileName, generatedOrDownloadedMap, gameSettings.metersPerPixel, benchmark)
 
                 trackLengthInPixels = gameSettings.trackLength / gameSettings.metersPerPixel
 
                 # initializations specific to a particular track
                 controls = await setTheStageForNewRound(config)
+                uiClearBuffers()
                 firstTime = True
 
                 # Flush events again
@@ -502,6 +504,9 @@ async def main():
                                 running = False
                             else:
                                 controls = await setTheStageForNewRound(config)
+                                uiClearBuffers()
+                                uiClearCanvas(controls)
+                                firstTime = True
 
                         elif gameSettings.amaze and datetime.now() - startTime > timedelta(seconds=amazeMidTimeThreshold):
                             beautifiedLeftDistance = calculatePathDistance(beautifiedLeft)
@@ -582,6 +587,9 @@ async def main():
                                 running = False
                             else:
                                 controls = await setTheStageForNewRound(config)
+                                uiClearBuffers()
+                                uiClearCanvas(controls)
+                                firstTime = True
                                 # There might have been a delay
                                 await uiFlushEvents()
 
