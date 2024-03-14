@@ -57,8 +57,7 @@ mutta tyypillisessä älypuhelimessa sovellys toimii hitaammin kuin tietokoneess
 
 ### Ladattava sovellus
 
-Sinun täytyy ladata ja asentaa sovellus jotta voit käyttää komentoriviparametrejä. Ladattava sovellus on myös nopeampi kuin web-sovellus ja pelattavuudeltaan
-parempi.
+Sinun täytyy ladata ja asentaa sovellus jotta voit käyttää komentoriviparametrejä. Ladattava sovellus on hiukan nopeampi kuin web-sovellus ja pelattavuudeltaan hieman parempi.
 
   * [Windows-asennus](/WINDOWS-FINNISH.md)
   * [Linux-asennus](/LINUX-FINNISH.md)

@@ -57,7 +57,7 @@ but the speed is not that good on an average smartphones.
 ### Downloadable application
 
 You can use the command-line options only with the downloadable application.
-It is also faster and nicer to play than the web application.
+It is also a bit faster and nicer to play than the web application.
 
   * [Windows installation](/WINDOWS.md)
   * [Linux installation](/LINUX.md)

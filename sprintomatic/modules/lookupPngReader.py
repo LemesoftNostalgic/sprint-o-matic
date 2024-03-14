@@ -32,8 +32,8 @@ boundaryThreshold = 10
 spacingBetweenControls = 16
 
 def getTfs():
-    return [1, 4, 16]
-tfsShort = [1, 4]
+    return [1, 2, 4, 16]
+tfsShort = [1, 2, 4]
 
 
 async def extractPngLookups(oMapMask, benchmark):

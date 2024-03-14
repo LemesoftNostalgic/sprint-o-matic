@@ -30,7 +30,7 @@ from .utils import getSlowdownFactor, getSemiSlowdownFactor, getVerySlowdownFact
 minScoreInit = 10000
 maxScoreInit = -10000
 
-tfs = [1, 4, 16]
+tfs = [1, 2, 4, 16]
 
 bddTimeThreshold = 1.5
 sleepTimeThreshold = 0.05
