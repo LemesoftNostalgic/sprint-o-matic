@@ -65,6 +65,7 @@ oMap = None
 oMapCopy = None
 surf = None
 screen = None
+screen_rect = None
 me = None
 
 feetPlusStart = 3.0
@@ -177,6 +178,8 @@ def lowerControlApproachZoom():
 
 
 def uiCenterTurnZoomTheMap(pos, zoom, angle, benchmark):
+    global screen
+    global screen_rect
     perfAddStart("renTurnZoom")
     if benchmark == "phone":
         surf.blit(oMapCopy, tuple(map(lambda i, j: i - j, me, pos)))
@@ -192,9 +195,8 @@ def uiCenterTurnZoomTheMap(pos, zoom, angle, benchmark):
             zoom = zoom * controlApproachZoom
         surf.blit(pygame.transform.smoothscale_by(oMapCopy, zoom), tuple(map(lambda i, j: i - j * zoom, me, pos)))
 
-    oMapRotated = pygame.transform.rotate(surf, fromRadiansToDegrees(math.pi - angle))
-    new_rect = oMapRotated.get_rect(center = surf.get_rect().center)
-    screen.blit(oMapRotated, new_rect)
+    screen = pygame.transform.rotate(surf, fromRadiansToDegrees(math.pi - angle))
+    screen_rect = screen.get_rect(center = surf.get_rect().center)
     # just a good point to get prepared
     getBigScreen().fill(getWhiteColor())
     perfAddStop("renTurnZoom")
@@ -242,12 +244,12 @@ def uiAnimateCharacter(where, origin, angle, color, scale, feetPlus, inTunnel, b
 
 
 feetPlusPlayer = feetPlusStart
-def uiAnimatePlayer(legsMoving, inTunnel, amaze):
+def uiAnimatePlayer(legsMoving, inTunnel, amaze, position):
     global feetPlusPlayer
     if not legsMoving:
-        uiAnimateCharacter(screen, me, 0, getPlayerColor(), 1, 0, inTunnel, True, amaze)
+        uiAnimateCharacter(getBigScreen(), position, 0, getPlayerColor(), 1, 0, inTunnel, True, amaze)
     else:
-        feetPlusPlayer = uiAnimateCharacter(screen, me, 0, getPlayerColor(), 1, feetPlusPlayer, inTunnel, False, amaze)
+        feetPlusPlayer = uiAnimateCharacter(getBigScreen(), position, 0, getPlayerColor(), 1, feetPlusPlayer, inTunnel, False, amaze)
 
 
 feetPlusPacemaker = feetPlusStart
@@ -256,11 +258,14 @@ def uiAnimatePacemaker(pos, angle, scale, pacemakerInd, inTunnel, background):
     feetPlusPacemaker = uiAnimateCharacter(oMapCopy, pos, math.pi - angle, getPacemakerColor(pacemakerInd), 0.6 * scale / metersPerPixel, feetPlusPacemaker, inTunnel, background, False)
 
 
-async def uiCompleteRender(finishTexts, mapInfoTextList, pacemakerInd, pacemakerTextNeeded, aiTextNeeded, amaze, amazeNumber, firstTime):
+async def uiCompleteRender(finishTexts, mapInfoTextList, pacemakerInd, pacemakerTextNeeded, aiTextNeeded, amaze, amazeNumber, firstTime, moveLegs, inTunnel):
     perfAddStart("renComlete")
-    xShift = (getBigScreen().get_size()[0] - screen.get_size()[0]) / 2
-    yShift = (getBigScreen().get_size()[1] - screen.get_size()[1]) / 2
-    getBigScreen().blit(screen, (xShift, yShift))
+    xShift = (getBigScreen().get_size()[0]//2 - me[0])
+    yShift = (getBigScreen().get_size()[1]//2 - me[1])
+    pos = (me[0] + xShift, me[1] + yShift)
+    getBigScreen().blit(screen, (screen_rect[0] + xShift, screen_rect[1] + yShift, screen_rect[2], screen_rect[3]))
+    uiAnimatePlayer(moveLegs, inTunnel, amaze, pos)
+
     if pacemakerTextNeeded:
         uiRenderPacemakerText(pacemakerInd)
     if amaze:

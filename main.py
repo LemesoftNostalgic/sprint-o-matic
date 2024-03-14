@@ -73,6 +73,11 @@ async def setTheStageForNewRound(cfg):
     global beautifiedLeft
     global beautifiedRight
     global amazeThresholdWaiting
+    global phoneRenderSkipCtr
+    global phoneRenderSkipMax
+
+    phoneRenderSkipMax = 2
+    phoneRenderSkipCtr = 0
 
     # Ensure we have a list of controls
     ctrls = []
@@ -266,6 +271,8 @@ async def main():
     global beautifiedRight
     global amazeThresholdWaiting
     global benchmark
+    global phoneRenderSkipCtr
+    global phoneRenderSkipMax
 
     benchmark = await perfBenchmark()
 
@@ -273,8 +280,9 @@ async def main():
     # all the initialization that happens only once at the startup
     perfClearSuite()
 
-    # this can be left out from prod. build
-    perfActivate()
+    # this can be used in debugging
+    #perfActivate()
+
     perfAddStart("ini")
     gameSettings = returnSettings()
     if gameSettings.accurate:
@@ -468,8 +476,6 @@ async def main():
                         if gameSettings.accurate:
                             shortestRoutesArray = getReadyShortestRoutes()
 
-                    # Now enter the rendering phase
-                    uiClearCanvas(controls)
 
                     # this "state machine" is run only when there is controls
                     if controls:
@@ -506,7 +512,6 @@ async def main():
                             else:
                                 controls = await setTheStageForNewRound(config)
                                 uiClearBuffers()
-                                uiClearCanvas(controls)
                                 firstTime = True
 
                         elif gameSettings.amaze and datetime.now() - startTime > timedelta(seconds=amazeMidTimeThreshold):
@@ -589,68 +594,77 @@ async def main():
                             else:
                                 controls = await setTheStageForNewRound(config)
                                 uiClearBuffers()
-                                uiClearCanvas(controls)
                                 firstTime = True
                                 # There might have been a delay
                                 await uiFlushEvents()
 
 
                         # Now the render phase, need to sort out the pacemaker code
-                        if running:
-                            if gameSettings.pacemaker == 0:
-                                uiRenderRoutes(shortestRoutes, "shortest")
-                                uiRenderRoutes(playerRoutes, "player")
-                            uiRenderControls(controls, gameSettings.pacemaker, gameSettings.amaze)
-                            if gameSettings.pacemaker != 0 and pacemakerPath is not None and pacemakerPosition is not None:
-                                if pacemakerPosition == pacemakerPath[-1]:
-                                    uiAnimatePacemaker(pacemakerPosition, pacemakerAngle, 1.0, gameSettings.pacemaker, inTunnelPacemaker, True)
-                                    pacemakerPrepareForShout = True
-                                    pacemakerStep = -5
-                                elif pacemakerPosition == pacemakerPath[0]:
+
+                        if phoneRenderSkipCtr == 0:
+                            if running:
+                                # Now enter the rendering phase
+                                uiClearCanvas(controls)
+
+                                if gameSettings.pacemaker == 0:
+                                    uiRenderRoutes(shortestRoutes, "shortest")
+                                    uiRenderRoutes(playerRoutes, "player")
+                                uiRenderControls(controls, gameSettings.pacemaker, gameSettings.amaze)
+                                if gameSettings.pacemaker != 0 and pacemakerPath is not None and pacemakerPosition is not None:
+                                    if pacemakerPosition == pacemakerPath[-1]:
+                                        uiAnimatePacemaker(pacemakerPosition, pacemakerAngle, 1.0, gameSettings.pacemaker, inTunnelPacemaker, True)
+                                        pacemakerPrepareForShout = True
+                                        pacemakerStep = -5
+                                    elif pacemakerPosition == pacemakerPath[0]:
+                                        pacemakerStep = pacemakerStep + 1
+                                        if pacemakerStep > 5:
+                                            pacemakerStep = -5
+
+                                        uiAnimatePacemaker(pacemakerPosition, pacemakerAngle, 1.5 + abs(pacemakerStep) * 0.1, gameSettings.pacemaker, inTunnelPacemaker, True)
+                                        if pacemakerPrepareForShout:
+                                            pacemakerShoutEffect()
+                                            pacemakerPrepareForShout = False
+                                    else:
+                                        pacemakerStep = -5
+                                        pacemakerPrepareForShout = True
+                                        uiAnimatePacemaker(pacemakerPosition, pacemakerAngle, 1.0, gameSettings.pacemaker, inTunnelPacemaker, True)
+                                elif gameSettings.pacemaker != 0 and pacemakerPath == None:
                                     pacemakerStep = pacemakerStep + 1
                                     if pacemakerStep > 5:
                                         pacemakerStep = -5
-                                
-                                    uiAnimatePacemaker(pacemakerPosition, pacemakerAngle, 1.5 + abs(pacemakerStep) * 0.1, gameSettings.pacemaker, inTunnelPacemaker, True)
-                                    if pacemakerPrepareForShout:
-                                        pacemakerShoutEffect()
-                                        pacemakerPrepareForShout = False
-                                else:
-                                    pacemakerStep = -5
                                     pacemakerPrepareForShout = True
-                                    uiAnimatePacemaker(pacemakerPosition, pacemakerAngle, 1.0, gameSettings.pacemaker, inTunnelPacemaker, True)
-                            elif gameSettings.pacemaker != 0 and pacemakerPath == None:
-                                pacemakerStep = pacemakerStep + 1
-                                if pacemakerStep > 5:
-                                    pacemakerStep = -5
-                                pacemakerPrepareForShout = True
-                                uiAnimatePacemaker(controls[nextControl], pacemakerAngle, 1.5 + abs(pacemakerStep) * 0.1, gameSettings.pacemaker, inTunnelPacemaker, True)
+                                    uiAnimatePacemaker(controls[nextControl], pacemakerAngle, 1.5 + abs(pacemakerStep) * 0.1, gameSettings.pacemaker, inTunnelPacemaker, True)
 
-                        uiCenterTurnZoomTheMap(position, zoom, angle, benchmark)
+                            uiCenterTurnZoomTheMap(position, zoom, angle, benchmark)
 
-                        # After that it is ok to draw to "big screen"
-                        moveLegs = True if datetime.now() - startTime > timedelta(seconds=gameMovingStartThreshold) else False
-                        uiAnimatePlayer(moveLegs, inTunnel, gameSettings.amaze)
-                        aiTextNeeded = False
-                        pacemakerTextNeeded = False
-                        amazeTextNeeded = False
-                        if gameSettings.pacemaker != 0:
-                            if (len(futureShortestRoutes) == 0 or len(futureShortestRoutes[0]) == 0) and (reachedControl > 0 and reachedControl < len(controls) - 1):
-                                aiTextNeeded = True
-                            else:
-                                pacemakerTextNeeded = True
+                            # After that it is ok to draw to "big screen"
+                            moveLegs = True if datetime.now() - startTime > timedelta(seconds=gameMovingStartThreshold) else False
+                            aiTextNeeded = False
+                            pacemakerTextNeeded = False
+                            amazeTextNeeded = False
+                            if gameSettings.pacemaker != 0:
+                                if (len(futureShortestRoutes) == 0 or len(futureShortestRoutes[0]) == 0) and (reachedControl > 0 and reachedControl < len(controls) - 1):
+                                    aiTextNeeded = True
+                                else:
+                                    pacemakerTextNeeded = True
 
-                        externalMapInfoTexts = []
-                        if gameSettings.externalExampleTeam and gameSettings.externalExample:
-                            for item in externalImageData:
-                                if gameSettings.externalExampleTeam == item["team-name"]:
-                                    for subitem in item["sub-listing"]:
-                                        if gameSettings.externalExample == subitem["name"]:
-                                            externalMapInfoTexts = [stripMapName(subitem["map-url"]), subitem["map-license"], subitem["map-credits"], stripMapName(subitem["lookup-png-url"]), subitem["lookup-png-license"], subitem["lookup-png-credits"]]
-                                            break
-                        if gameSettings.noUiTest != "yes":
-                            await uiCompleteRender(finishTexts, externalMapInfoTexts, gameSettings.pacemaker, pacemakerTextNeeded, aiTextNeeded, gameSettings.amaze, difficulty, firstTime)
+                            externalMapInfoTexts = []
+                            if gameSettings.externalExampleTeam and gameSettings.externalExample:
+                                for item in externalImageData:
+                                    if gameSettings.externalExampleTeam == item["team-name"]:
+                                        for subitem in item["sub-listing"]:
+                                            if gameSettings.externalExample == subitem["name"]:
+                                                externalMapInfoTexts = [stripMapName(subitem["map-url"]), subitem["map-license"], subitem["map-credits"], stripMapName(subitem["lookup-png-url"]), subitem["lookup-png-license"], subitem["lookup-png-credits"]]
+                                                break
+                            if gameSettings.noUiTest != "yes":
+                                await uiCompleteRender(finishTexts, externalMapInfoTexts, gameSettings.pacemaker, pacemakerTextNeeded, aiTextNeeded, gameSettings.amaze, difficulty, firstTime, moveLegs, inTunnel)
                             firstTime = False
+
+                        if benchmark == "phone":
+                            phoneRenderSkipCtr = phoneRenderSkipCtr + 1
+                            if phoneRenderSkipCtr > phoneRenderSkipMax:
+                                phoneRenderSkipCtr = 0
+
             await asyncio.sleep(0)
 
     # Final freeing of resources
