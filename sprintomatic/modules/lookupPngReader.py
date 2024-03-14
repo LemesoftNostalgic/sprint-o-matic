@@ -53,38 +53,61 @@ async def extractPngLookups(oMapMask):
         vsaLookup[tf] = {}
         tunnelLookup[tf] = {}
 
-    for yBig in range(0, size[1]//spacingBetweenControls + 1):
-        for xBig in range(0, size[0]//spacingBetweenControls + 1):
-            controlToAdd = None
-            await asyncio.sleep(0)
-            for ySmall in range(0, spacingBetweenControls):
-                for xSmall in range(0, spacingBetweenControls):
-                    x = xBig * spacingBetweenControls + xSmall
-                    y = yBig * spacingBetweenControls + ySmall
-                    if y < size[1] and x < size[0]:
-                        col = oMapMask.get_at((x, y))
-                        if col == getSlowAreaMask():
-                            for tf in getTfs():
-                                saLookup[tf][(int(x/tf), int(y/tf))] = True
-                        elif col == getTunnelMask():
-                            for tf in getTfs():
-                                tunnelLookup[tf][(int(x/tf), int(y/tf))] = True
-                        elif col == getSemiSlowAreaMask():
-                            for tf in getTfs():
-                                ssaLookup[tf][(int(x/tf), int(y/tf))] = True
-                        elif col == getVerySlowAreaMask():
-                            for tf in getTfs():
-                                vsaLookup[tf][(int(x/tf), int(y/tf))] = True
-                        elif col == getForbiddenAreaMask():
-                            for tf in getTfs():
-                                faLookup[tf][(int(x/tf), int(y/tf))] = True
-                        elif col == getControlMask():
-                            if x > boundaryThreshold and x < size[0] - boundaryThreshold and y > boundaryThreshold and y < size[1] - boundaryThreshold:
-                                if not ((x, y-1) in faLookup[1] and (x, y+1) in faLookup[1]) and not ((x-1, y) in faLookup[1] and (x+1, y) in faLookup[1]):
-                                    if not ((x//2, y//2-1) in faLookup[2] and (x//2, y//2+1) in faLookup[2]) and not ((x//2-1, y//2) in faLookup[2] and (x//2+1, y//2) in faLookup[2]):
-                                        controlToAdd = (x, y)
-            if controlToAdd is not None:
-                controls.append(controlToAdd)
+    for y in range(0, size[1]):
+        for x in range(0, size[0]):
+            col = oMapMask.get_at((x, y))
+            if col == getSlowAreaMask():
+                for tf in getTfs():
+                    saLookup[tf][(int(x/tf), int(y/tf))] = True
+            elif col == getTunnelMask():
+                for tf in getTfs():
+                    tunnelLookup[tf][(int(x/tf), int(y/tf))] = True
+            elif col == getSemiSlowAreaMask():
+                for tf in getTfs():
+                    ssaLookup[tf][(int(x/tf), int(y/tf))] = True
+            elif col == getVerySlowAreaMask():
+                for tf in getTfs():
+                    vsaLookup[tf][(int(x/tf), int(y/tf))] = True
+            elif col == getForbiddenAreaMask():
+                for tf in getTfs():
+                    faLookup[tf][(int(x/tf), int(y/tf))] = True
+            elif col == getControlMask():
+                if x > boundaryThreshold and x < size[0] - boundaryThreshold and y > boundaryThreshold and y < size[1] - boundaryThreshold:
+                    controls.append((x, y))
+
+# This had bad perf in phones...
+#    for yBig in range(0, size[1]//spacingBetweenControls + 1):
+#        for xBig in range(0, size[0]//spacingBetweenControls + 1:
+#            controlToAdd = None
+#            await asyncio.sleep(0)
+#            for ySmall in range(0, spacingBetweenControls):
+#                for xSmall in range(0, spacingBetweenControls):
+#                    x = xBig * spacingBetweenControls + xSmall
+#                    y = yBig * spacingBetweenControls + ySmall
+#                    if y < size[1] and x < size[0]:
+#                        col = oMapMask.get_at((x, y))
+#                        if col == getSlowAreaMask():
+#                            for tf in getTfs():
+#                                saLookup[tf][(int(x/tf), int(y/tf))] = True
+#                        elif col == getTunnelMask():
+#                            for tf in getTfs():
+#                                tunnelLookup[tf][(int(x/tf), int(y/tf))] = True
+#                        elif col == getSemiSlowAreaMask():
+#                            for tf in getTfs():
+#                                ssaLookup[tf][(int(x/tf), int(y/tf))] = True
+#                        elif col == getVerySlowAreaMask():
+#                            for tf in getTfs():
+#                                vsaLookup[tf][(int(x/tf), int(y/tf))] = True
+#                        elif col == getForbiddenAreaMask():
+#                            for tf in getTfs():
+#                                faLookup[tf][(int(x/tf), int(y/tf))] = True
+#                        elif col == getControlMask():
+#                            if x > boundaryThreshold and x < size[0] - boundaryThreshold and y > boundaryThreshold and y < size[1] - boundaryThreshold:
+#                                if not ((x, y-1) in faLookup[1] and (x, y+1) in faLookup[1]) and not ((x-1, y) in faLookup[1] and (x+1, y) in faLookup[1]):
+#                                    if not ((x//2, y//2-1) in faLookup[2] and (x//2, y//2+1) in faLookup[2]) and not ((x//2-1, y//2) in faLookup[2] and (x//2+1, y//2) in faLookup[2]):
+#                                        controlToAdd = (x, y)
+#            if controlToAdd is not None:
+#                controls.append(controlToAdd)
 
     return faLookup, saLookup, ssaLookup, vsaLookup, tunnelLookup, controls
 

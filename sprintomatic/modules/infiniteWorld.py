@@ -881,7 +881,7 @@ async def initWorldCreator(size, imagePath):
     return png, mask
 
 
-async def getInfiniteWorld(latlonMapOrigo, xyPictureSize, metersPerPixel, imagePath, offline):
+async def getInfiniteWorld(latlonMapOrigo, xyPictureSize, metersPerPixel, imagePath, benchmark):
     world, worldMask = await initWorldCreator(xyPictureSize, imagePath)
     if world == None:
         return None, None
@@ -924,7 +924,8 @@ async def getInfiniteWorld(latlonMapOrigo, xyPictureSize, metersPerPixel, imageP
         return None, None
     world, worldMask = drawSolidGreenArea(world, worldMask, db)
 
-    dummy_heightmap, world = drawContours(randrange(countoursMinKernelWidth, countoursMaxKernelWidth), world, randrange(countoursMinOutOf, countoursMaxOutOf))
+    if benchmark != "phone":
+        dummy_heightmap, world = drawContours(randrange(countoursMinKernelWidth, countoursMaxKernelWidth), world, randrange(countoursMinOutOf, countoursMaxOutOf))
 
     await asyncio.sleep(0)
     if await uiFlushEvents():
@@ -989,8 +990,8 @@ def getInfiniteWorldPlace(city, citymap):
     return None, None
 
 
-async def getInfiniteWorldDefault(place, imagePath, offline):
+async def getInfiniteWorldDefault(place, imagePath, benchmark):
     latlonMapOrigo = tuple(place)
     metersPerPixel = (0.9 + 0.2 *random())
     xyPictureSize = (1024, 720)
-    return await getInfiniteWorld(latlonMapOrigo, xyPictureSize, metersPerPixel, imagePath, offline)
+    return await getInfiniteWorld(latlonMapOrigo, xyPictureSize, metersPerPixel, imagePath, benchmark)

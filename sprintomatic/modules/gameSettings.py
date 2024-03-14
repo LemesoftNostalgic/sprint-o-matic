@@ -161,7 +161,7 @@ def returnSettings():
     return gameSettings
 
 
-async def returnConfig(gameSettings, externalImageData, infiniteWorldCityMap):
+async def returnConfig(gameSettings, externalImageData, infiniteWorldCityMap, benchmark):
 
     metersPerPixel = 0
     defaultZoom = 1.0
@@ -169,7 +169,18 @@ async def returnConfig(gameSettings, externalImageData, infiniteWorldCityMap):
 
     if gameSettings.infiniteOulu:
         perfAddStart("oulu")
-        png, pngMask = await getInfiniteOulu((160, 160), (4, 5), 40 + randrange(0, 20))
+        gridSize = (4, 5)
+        wid = 160
+        strt = 40
+        if benchmark == "web":
+            gridSize = (3, 4)
+            wid = 160
+            strt = 40
+        elif benchmark == "phone":
+            gridSize = (2, 3)
+            wid = 120
+            strt = 30
+        png, pngMask = await getInfiniteOulu((wid, wid), gridSize, strt + randrange(0, strt / 2))
         perfAddStop("oulu")
         perfAddStart("pngLookupMsk")
         faLookup, saLookup, ssaLookup, vsaLookup, tunnelLookup, config = await extractPngLookups(pngMask)
@@ -177,7 +188,7 @@ async def returnConfig(gameSettings, externalImageData, infiniteWorldCityMap):
 
     elif gameSettings.infiniteWorld:
         perfAddStart("world")
-        png, pngMask = await getInfiniteWorldDefault(gameSettings.place, gameSettings.imageRoot, gameSettings.offline)
+        png, pngMask = await getInfiniteWorldDefault(gameSettings.place, gameSettings.imageRoot, benchmark)
         perfAddStop("world")
         perfAddStart("pngLookupMsk")
         faLookup, saLookup, ssaLookup, vsaLookup, tunnelLookup, config = await extractPngLookups(pngMask)

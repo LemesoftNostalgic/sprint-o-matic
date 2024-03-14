@@ -268,7 +268,7 @@ async def main():
     global amazeThresholdWaiting
     global benchmark
 
-    benchmark = perfBenchmark()
+    benchmark = await perfBenchmark()
 
     # all the initialization that happens only once at the startup
     perfClearSuite()
@@ -278,7 +278,7 @@ async def main():
     if gameSettings.accurate:
         # start AI processes
         initializeAITables()
-    uiEarlyInit(gameSettings.fullScreen)
+    uiEarlyInit(gameSettings.fullScreen, benchmark)
     externalImageData, offline = await downloadExternalImageData(gameSettings.ownMasterListing)
     if offline:
          gameSettings.offline = offline
@@ -363,7 +363,7 @@ async def main():
             await asyncio.sleep(0)
         if not quitting:
             perfAddStart("cfg")
-            config, controls, faLookup, saLookup, ssaLookup, vsaLookup, tunnelLookup, generatedOrDownloadedMap, tmpMetersPerPixel, externalZoom = await returnConfig(gameSettings, externalImageData, externalWorldCityMap)
+            config, controls, faLookup, saLookup, ssaLookup, vsaLookup, tunnelLookup, generatedOrDownloadedMap, tmpMetersPerPixel, externalZoom = await returnConfig(gameSettings, externalImageData, externalWorldCityMap, benchmark)
             perfAddStop("cfg")
             perfAddStart("stage")
 

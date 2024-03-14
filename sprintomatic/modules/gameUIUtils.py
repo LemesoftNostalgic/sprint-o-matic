@@ -137,12 +137,14 @@ def getTimerStepSeconds(speedMode):
     return 0.080
 
 
-def uiEarlyInit(fullScreen):
+def uiEarlyInit(fullScreen, benchmark):
     global xCurrent
     global yCurrent
     global bigScreen
 
     pygame.init()
+    if benchmark == "phone":
+        bigScreen = pygame.display.set_mode((1024,576), pygame.FULLSCREEN|pygame.SCALED)
     if fullScreen:
         bigScreen = pygame.display.set_mode((0,0), pygame.FULLSCREEN)
     else:
