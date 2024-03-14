@@ -7,12 +7,8 @@
 _Linkki suomenkieliseen ohjeeseen_: [README-FINNISH.md](/README-FINNISH.md).
 
 Sprint-O-Matic is a training application for sprint orienteering, or
-Sprint-O for short.
-I created it initially for my own use, to give some variety to my
-exercise during cold winter days in Finland. After a while, it came to my
-mind, that someone else might be interested to try it out, so here it is.
-
-What then is sprint orienteering? It is a fast paced foot navigation
+Sprint-O for short. What then is sprint orienteering?
+It is a fast paced foot navigation
 sport arranged usually in urban environments. More description can be found
 from the [Wikipedia article on sprint orienteering](https://en.wikipedia.org/wiki/Orienteering#Sprint) or [sprint orienteering content in YouTube](https://www.youtube.com/results?search_query=sprint+orienteering).
 
@@ -49,10 +45,12 @@ which have improved a little bit during this winter.
 ### Web application
 
 Use the web version if you want to just try the application quickly.
-The web application is a bit slow, and it doesn't
-have the background music, but it is always up-to date.
-It can also be tried out with Android phones, but it is fast enough only
-with the best smartphones.
+The web application works quite ok with the modern browsers, except for
+the sound quality, that varies. However, the web version
+is always up-to date.
+
+The web app can also be tried out with phones, at least Android,
+but the speed is not that good on an average smartphones.
 
   * [Web application starts here](https://lemesoftnostalgic.github.io/sprint-o-matic/)
 
@@ -67,7 +65,7 @@ It is also faster and nicer to play than the web application.
 
 ### Hardware requirements
 
-The application has been tested against Ubuntu 20.04 and
+The native application has been tested against Ubuntu 20.04 and
 Windows 10. The web version requires a relatively modern browser.
 Using the **--accurate** command-line parameter requires relatively modern
 Linux PC due to

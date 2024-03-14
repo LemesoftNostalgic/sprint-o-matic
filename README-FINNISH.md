@@ -5,10 +5,6 @@
 ## Johdanto
 
 Sprint-O-Matic on harjoitussovellus sprinttisuunnistukseen.
-Tein sen alun perin omaan käyttööni, jotta voisin monipuolistaa harjoittelua kylminä
-talvipäivinä Suomessa. Sitten ajattelin, että joku muu saattaisi olla kiinnostunut
-kokeilemaan sitä, joten tässä se nyt sitten on.
-
 Mitä sprinttisuunnistus sitten on? Se on nopeatempoinen suunnistuksen alalaji, jota
 järjestetään yleensä urbaanissa ympäristössä. Katso lisätietoa
 [Wikipedian artikkelista](https://en.wikipedia.org/wiki/Orienteering#Sprint) tai
@@ -41,11 +37,21 @@ alustavan kuvan siitä miten peli toimii:
 
 ### Web-sovellus
 
+Use the web version if you want to just try the application quickly.
+The web application works quite ok with the modern browsers, except for
+the sound quality, that varies. However, the web version
+is always up-to date.
+
+The web app can also be tried out with phones, at least Android,
+but the speed is not that good on an average smartphones.
+
+
 Käytä web-versiota, jos haluat vain testata sovellusta pikaisesti.
-Web-sovellus on vähän hitaampi kuin ladattava sovellus,
-eikä siinä ole kaikkia taustaääniä, mutta toisaalta se on aina ajan tasalla.
-Sitä voi kokeilla myös Android-puhelimessa, mutta se toimii kunnolla vain
-muutamassa tehokkaimmassa puhelinmallissa.
+Web-sovellus toimii melko hyvin nykyaikaisessa selaimessa, paitsi
+äänen laatu, joka vaihtelee. Toisaalta web-versio on aina ajan tasalla.
+
+Sitä voi kokeilla myös puhelimessa, ainakin Androidissa,
+mutta tyypillisessä älypuhelimessa sovellys toimii hitaammin kuin tietokoneessa.
 
   * [Web-sovellus käynnistyy tästä linkistä](https://lemesoftnostalgic.github.io/sprint-o-matic/)
 
@@ -61,7 +67,8 @@ parempi.
 ### Laitteistovaatimukset
 
 Sovellus on testattu Ubuntu 20.04 ja
-Windows 10 -laitteissa.  Web-versio tarvitsee suhteellisen modernin selaimen. **--accurate** komentoparametrin käyttäminen vaatii suhteellisen nykyaikaisen
+Windows 10 -laitteissa.  Web-versio tarvitsee suhteellisen modernin selaimen.
+**--accurate** komentoparametrin käyttäminen vaatii suhteellisen nykyaikaisen
 tietokoneen, koska sen hakualgoritmit suoritetaan useissa prosesseissa.
 
 
