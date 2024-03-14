@@ -75,5 +75,5 @@ def perfShowResults(titleStr):
 
 async def perfBenchmark():
     perfAddStart("benchmark")
-    await slowAccurateCalculateShortestRouteAsync([(0,50), (100,50), {1: {(50,50): True}}, {1: {}}, {1:{}}, {1:{}}, 1, 0])
+    await slowAccurateCalculateShortestRouteAsync([(0,20), (40,20), {1: {(20,20): True}}, {1: {}}, {1:{}}, {1:{}}, 1, 0])
     perfAddStop("benchmark")
