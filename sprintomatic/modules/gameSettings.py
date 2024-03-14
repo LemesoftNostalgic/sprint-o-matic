@@ -180,7 +180,7 @@ async def returnConfig(gameSettings, externalImageData, infiniteWorldCityMap, be
             gridSize = (2, 3)
             wid = 120
             strt = 30
-        png, pngMask = await getInfiniteOulu((wid, wid), gridSize, strt + randrange(0, strt / 2))
+        png, pngMask = await getInfiniteOulu((wid, wid), gridSize, strt + randrange(0, strt // 2))
         perfAddStop("oulu")
         perfAddStart("pngLookupMsk")
         faLookup, saLookup, ssaLookup, vsaLookup, tunnelLookup, config = await extractPngLookups(pngMask, benchmark)
