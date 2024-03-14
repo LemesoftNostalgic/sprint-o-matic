@@ -29,8 +29,6 @@ from .infoBox import showInfoBoxTxt, updateInfoTxtByEvent
 from .gameSounds import stepEffect
 from random import randrange
 
-from .perfSuite import perfShowResults, perfClearSuite, perfActivate, perfAddStart, perfAddStop, perfBenchmark
-
 selections = [
     False, True, False, False, False, False,
     False, True, False, False, False, False,
@@ -278,10 +276,6 @@ async def initScreen(imagePath, gameSettings, externalImageData, externalWorldCi
     pygame.key.set_repeat(200, 50)
     pygame.time.set_timer(TIMER_EVENT, getTimerStep())
 
-    perfClearSuite()
-    perfActivate()
-    await perfBenchmark()
-
     while running:
         mousePressed = False
         for event in pygame.event.get():
@@ -436,7 +430,6 @@ async def initScreen(imagePath, gameSettings, externalImageData, externalWorldCi
             if firstTime:
                     uiFadeVisibleSlide()
                     firstTime = False
-            perfShowResults(str(fingerPos))
             await uiFlip(False)
             await asyncio.sleep(0)
         else:

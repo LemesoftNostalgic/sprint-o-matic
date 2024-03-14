@@ -91,6 +91,9 @@ def getPlayerColor():
 def getTrackColor():
     return pygame.Color(255, 0, 0)
 
+def getShortestRouteColor():
+    return pygame.Color(255, 0, 255)
+
 def getCreditColor():
     return pygame.Color(255, 215, 0)
 

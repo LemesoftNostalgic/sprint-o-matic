@@ -38,6 +38,8 @@ from sprintomatic.modules.imageDownloader import downloadExternalImageData, down
 
 from sprintomatic.modules.autoTest import fakeInitScreen, fakeCalculateNextStep, fakeUiEvent, fakeResetAgain
 
+from sprintomatic.modules.perfSuite import perfClearSuite, perfActivate, perfAddStart, perfAddStop
+
 
 # Re-initialize the game state, done each time a new run is started
 async def setTheStageForNewRound(cfg):
@@ -75,13 +77,18 @@ async def setTheStageForNewRound(cfg):
     # Ensure we have a list of controls
     ctrls = []
     if gameSettings.amaze:
+        perfAddStart("crAmaze")
         ctrls, shortestRoutesArray, beautifiedLeft, beautifiedRight, difficulty = await createAmazeControls(cfg, gameSettings.distributionOfControlLegs, gameSettings.metersPerPixel, faLookup, saLookup, ssaLookup, vsaLookup)
         beautifiedLeft.reverse()
+        perfAddStop("crAmaze")
 
     else:
+        perfAddStart("crTrack")
         ctrls, shortestRoutesArray = await createAutoControls(cfg, trackLengthInPixels, gameSettings.distributionOfControlLegs, gameSettings.metersPerPixel, faLookup, saLookup, ssaLookup, vsaLookup, gameSettings.pacemaker)
+        perfAddStop("crTrack")
 
 
+    perfAddStart("crOth")
     news = await downloadNews()
 
     # Initialize evereything that has to be initialized for a new run
@@ -130,6 +137,7 @@ async def setTheStageForNewRound(cfg):
         aiCounter = 0
     else:
         ctrls = []
+    perfAddStop("crOth")
     return ctrls
 
 
@@ -260,6 +268,9 @@ async def main():
     global amazeThresholdWaiting
 
     # all the initialization that happens only once at the startup
+    perfClearSuite()
+    perfActivate()
+    perfAddStart("ini")
     gameSettings = returnSettings()
     if gameSettings.accurate:
         # start AI processes
@@ -326,6 +337,7 @@ async def main():
     reachedControl = None
     quitting = False
     firstTime = True
+    perfAddStop("ini")
 
     # This is the main loop
     while not quitting:
@@ -347,7 +359,10 @@ async def main():
             startElevatorMelody()
             await asyncio.sleep(0)
         if not quitting:
+            perfAddStart("cfg")
             config, controls, faLookup, saLookup, ssaLookup, vsaLookup, tunnelLookup, generatedOrDownloadedMap, tmpMetersPerPixel, externalZoom = await returnConfig(gameSettings, externalImageData, externalWorldCityMap)
+            perfAddStop("cfg")
+            perfAddStart("stage")
 
             # scale from multiple sources...
             if gameSettings.infiniteOulu:
@@ -386,6 +401,7 @@ async def main():
             # Stop the elevator music
             stopMelody()
             await asyncio.sleep(0)
+            perfAddStop("stage")
 
         # main loop of the gameplay itself:
         while running and controls and not quitting:
@@ -447,7 +463,7 @@ async def main():
                             shortestRoutesArray = getReadyShortestRoutes()
 
                     # Now enter the rendering phase
-                    uiClearCanvas()
+                    uiClearCanvas(controls)
 
                     # this "state machine" is run only when there is controls
                     if controls:

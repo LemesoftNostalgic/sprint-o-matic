@@ -74,6 +74,14 @@ def perfShowResults(titleStr):
 
 
 async def perfBenchmark():
-    perfAddStart("benchmark")
+    start_time = time.time()
     await slowAccurateCalculateShortestRouteAsync([(0,20), (40,20), {1: {(20,20): True}}, {1: {}}, {1:{}}, {1:{}}, 1, 0])
     perfAddStop("benchmark")
+    full_time = time.time() - start_time
+    if full_time < 0.04:
+        return "pc"
+    elif full_time < 0.4:
+        return "web"
+    else:
+        return "phone"
+
