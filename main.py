@@ -38,7 +38,7 @@ from sprintomatic.modules.imageDownloader import downloadExternalImageData, down
 
 from sprintomatic.modules.autoTest import fakeInitScreen, fakeCalculateNextStep, fakeUiEvent, fakeResetAgain
 
-from sprintomatic.modules.perfSuite import perfClearSuite, perfActivate, perfAddStart, perfAddStop
+from sprintomatic.modules.perfSuite import perfClearSuite, perfActivate, perfAddStart, perfAddStop, perfBenchmark
 
 
 # Re-initialize the game state, done each time a new run is started
@@ -266,6 +266,9 @@ async def main():
     global beautifiedLeft
     global beautifiedRight
     global amazeThresholdWaiting
+    global benchmark
+
+    benchmark = perfBenchmark()
 
     # all the initialization that happens only once at the startup
     perfClearSuite()
@@ -614,7 +617,7 @@ async def main():
                                 pacemakerPrepareForShout = True
                                 uiAnimatePacemaker(controls[nextControl], pacemakerAngle, 1.5 + abs(pacemakerStep) * 0.1, gameSettings.pacemaker, inTunnelPacemaker, True)
 
-                        uiCenterTurnZoomTheMap(position, zoom, angle)
+                        uiCenterTurnZoomTheMap(position, zoom, angle, benchmark)
 
                         # After that it is ok to draw to "big screen"
                         moveLegs = True if datetime.now() - startTime > timedelta(seconds=gameMovingStartThreshold) else False

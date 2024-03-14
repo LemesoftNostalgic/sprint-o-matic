@@ -28,6 +28,7 @@ from .infiniteOulu import getInfiniteOulu
 from .infiniteWorld import getInfiniteWorldDefault
 from .lookupPngReader import extractPngLookups, extractPngLookupsFromFile
 from .imageDownloader import downloadMapSurfacesBasedOnUrl
+from .perfSuite import perfAddStart, perfAddStop
 
 def numRestrict(minVal, maxVal):
     def numChecker(val):
@@ -167,14 +168,23 @@ async def returnConfig(gameSettings, externalImageData, infiniteWorldCityMap):
     png = None
 
     if gameSettings.infiniteOulu:
+        perfAddStart("oulu")
         png, pngMask = await getInfiniteOulu((160, 160), (4, 5), 40 + randrange(0, 20))
+        perfAddStop("oulu")
+        perfAddStart("pngLookupMsk")
         faLookup, saLookup, ssaLookup, vsaLookup, tunnelLookup, config = await extractPngLookups(pngMask)
+        perfAddStop("pngLookupMsk")
 
     elif gameSettings.infiniteWorld:
+        perfAddStart("world")
         png, pngMask = await getInfiniteWorldDefault(gameSettings.place, gameSettings.imageRoot, gameSettings.offline)
+        perfAddStop("world")
+        perfAddStart("pngLookupMsk")
         faLookup, saLookup, ssaLookup, vsaLookup, tunnelLookup, config = await extractPngLookups(pngMask)
+        perfAddStop("pngLookupMsk")
 
     elif not gameSettings.lookupPngName and (gameSettings.externalExampleTeam and gameSettings.externalExample):
+        perfAddStart("loadMap")
         for item in externalImageData:
             if gameSettings.externalExampleTeam == item["team-name"]:
                 for subitem in item["sub-listing"]:
@@ -184,14 +194,19 @@ async def returnConfig(gameSettings, externalImageData, infiniteWorldCityMap):
                             metersPerPixel = subitem["meters-per-pixel"]
                         if "default-zoom" in subitem:
                             defaultZoom = subitem["default-zoom"]
+        perfAddStop("loadMap")
         # I use these to test lost internet connection
         #png = None
         #pngMask = None
+        perfAddStart("pngLookupMsk")
         faLookup, saLookup, ssaLookup, vsaLookup, tunnelLookup, config = await extractPngLookups(pngMask)
+        perfAddStop("pngLookupMsk")
 
     elif gameSettings.lookupPngName: # map given at command line
+        perfAddStart("pngLookupFil")
         faLookup, saLookup, ssaLookup, vsaLookup, tunnelLookup, config = await extractPngLookupsFromFile(gameSettings.lookupPngName)
         metersPerPixel = gameSettings.metersPerPixel
+        perfAddStop("pngLookupFil")
 
     controls = []
     if gameSettings.routeFileName:

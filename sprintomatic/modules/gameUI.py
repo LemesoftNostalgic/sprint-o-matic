@@ -179,23 +179,27 @@ def lowerControlApproachZoom():
     controlApproachZoomUsed = False
 
 
-def uiCenterTurnZoomTheMap(pos, zoom, angle):
+def uiCenterTurnZoomTheMap(pos, zoom, angle, benchmark):
     global previousZoom
     global tmpSurf
     perfAddStart("renTurnZoom")
-    if uiControlEffectEnded():
-        zoom = zoom * 1.8
-    elif effectStep < 10:
-        zoom = zoom * (1.8 - effectStep / 20)
+    if benchmark == "phone":
+        surf.blit(oMapCopy, tuple(map(lambda i, j: i - j, me, pos)))
     else:
-        zoom = zoom * 1.3
-    zoom = zoom * metersPerPixel
-    if controlApproachZoomUsed:
-        zoom = zoom * controlApproachZoom
-    if zoom != previousZoom:
-        tmpSurf = pygame.transform.smoothscale_by(oMapCopy, zoom)
-        previousZoom = zoom
-    surf.blit(tmpSurf, tuple(map(lambda i, j: i - j * zoom, me, pos)))
+        if uiControlEffectEnded():
+            zoom = zoom * 1.8
+        elif effectStep < 10:
+            zoom = zoom * (1.8 - effectStep / 20)
+        else:
+            zoom = zoom * 1.3
+        zoom = zoom * metersPerPixel
+        if controlApproachZoomUsed:
+            zoom = zoom * controlApproachZoom
+        if zoom != previousZoom:
+            tmpSurf = pygame.transform.smoothscale_by(oMapCopy, zoom)
+            previousZoom = zoom
+        surf.blit(tmpSurf, tuple(map(lambda i, j: i - j * zoom, me, pos)))
+
     oMapRotated = pygame.transform.rotate(surf, fromRadiansToDegrees(math.pi - angle))
     new_rect = oMapRotated.get_rect(center = surf.get_rect().center)
     screen.blit(oMapRotated, new_rect)
