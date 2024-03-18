@@ -334,6 +334,7 @@ async def initScreen(imagePath, gameSettings, externalImageData, externalWorldCi
                 elif event.x > rightThreshold:
                     fingerDirection = "right"
                 else:
+                    fingerDirection = ""
                     if initScreenPos == len(positions) - 1:
                         running = False
                     else:
@@ -375,6 +376,7 @@ async def initScreen(imagePath, gameSettings, externalImageData, externalWorldCi
             fingerDirection = ""
             await asyncio.sleep(0.1)
         elif mousePressed:
+            fingerDirection = ""
             if pygame.mouse.get_pressed()[0]:
                 if initScreenPos > 0:
                     initScreenPos = initScreenPos - 1
