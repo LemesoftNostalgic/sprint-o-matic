@@ -360,6 +360,7 @@ async def initScreen(imagePath, gameSettings, externalImageData, externalWorldCi
                                     worldExampleCtr = 0
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 mousePressed = True
+                fingerDirection = ""
 
             elif event.type == pygame.QUIT:
                 quitting = True
