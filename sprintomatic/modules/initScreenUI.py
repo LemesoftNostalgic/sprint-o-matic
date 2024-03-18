@@ -271,6 +271,7 @@ async def initScreen(imagePath, gameSettings, externalImageData, externalWorldCi
     ouluExampleText = "iOulu"
     loadingText = "Loading..."
     fingerDirection = ""
+    fingerInUse = False
     fingerPos = (0,0)
 
     pygame.key.set_repeat(200, 50)
@@ -325,9 +326,11 @@ async def initScreen(imagePath, gameSettings, externalImageData, externalWorldCi
                             worldExampleCtr =  len(externalWorldCityMap) - 1
             elif event.type == pygame.FINGERUP:
                 fingerDirection = ""
+                fingerInUse = True
                 mousePressed = False
             elif event.type == pygame.FINGERDOWN:
                 mousePressed = False
+                fingerInUse = True
                 leftThreshold = 1 / 3
                 rightThreshold = 2 / 3
                 fingerPos = (event.x, event.y)
@@ -380,7 +383,7 @@ async def initScreen(imagePath, gameSettings, externalImageData, externalWorldCi
                 initScreenPos = initScreenPos + 1
             fingerDirection = ""
             await asyncio.sleep(0.1)
-        elif mousePressed:
+        elif mousePressed and not fingerInUse:
             fingerDirection = ""
             if pygame.mouse.get_pressed()[0]:
                 if initScreenPos > 0:
