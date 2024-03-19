@@ -203,16 +203,17 @@ def uiSubmitSlide(textStr):
     global bigScreenCopy
     global bigScreenNew
     global slideCtrStart
-    slideCtr = slideCtrStartUp
-    sideCtrStart = slideCtrStartUp
-    bigScreenCopy = bigScreen.copy()
-    bigScreenNew = bigScreen.copy()
-    bigScreenNew.fill(getBlackColor())
-    middle = tuple(ti/2.0 for ti in bigScreenNew.get_size())
-    slideText = pygame.font.Font(getMasterFont(), convertXCoordinate(48)).render(textStr, True, getCreditColor())
-    slideTextRect = slideText.get_rect()
-    slideTextRect.center = middle
-    bigScreenNew.blit(slideText, slideTextRect)
+    if bigScreen:
+        slideCtr = slideCtrStartUp
+        sideCtrStart = slideCtrStartUp
+        bigScreenCopy = bigScreen.copy()
+        bigScreenNew = bigScreen.copy()
+        bigScreenNew.fill(getBlackColor())
+        middle = tuple(ti/2.0 for ti in bigScreenNew.get_size())
+        slideText = pygame.font.Font(getMasterFont(), convertXCoordinate(48)).render(textStr, True, getCreditColor())
+        slideTextRect = slideText.get_rect()
+        slideTextRect.center = middle
+        bigScreenNew.blit(slideText, slideTextRect)
 
 
 def uiFadeVisibleSlide():
@@ -220,12 +221,13 @@ def uiFadeVisibleSlide():
     global bigScreenCopy
     global bigScreenNew
     global slideCtrStart
-    slideCtr = slideCtrStartDown
-    slideCtrStart = slideCtrStartDown
-    if bigScreenCopy == None:
-        bigScreenCopy = bigScreen.copy()
-    bigScreenCopy.fill(getBlackColor())
-    bigScreenNew = bigScreen.copy()
+    if bigScreen:
+        slideCtr = slideCtrStartDown
+        slideCtrStart = slideCtrStartDown
+        if bigScreenCopy == None:
+            bigScreenCopy = bigScreen.copy()
+        bigScreenCopy.fill(getBlackColor())
+        bigScreenNew = bigScreen.copy()
 
 
 def uiFadeUnVisibleSlide():
@@ -233,12 +235,13 @@ def uiFadeUnVisibleSlide():
     global bigScreenCopy
     global bigScreenNew
     global slideCtrStart
-    slideCtr = slideCtrStartDown
-    slideCtrStart = slideCtrStartDown
-    if bigScreenNew == None:
-        bigScreenNew = bigScreen.copy()
-    bigScreenNew.fill(getBlackColor())
-    bigScreenCopy = bigScreen.copy()
+    if bigScreen:
+        slideCtr = slideCtrStartDown
+        slideCtrStart = slideCtrStartDown
+        if bigScreenNew == None:
+            bigScreenNew = bigScreen.copy()
+        bigScreenNew.fill(getBlackColor())
+        bigScreenCopy = bigScreen.copy()
 
 
 def uiUnSubmitSlide():
@@ -246,27 +249,29 @@ def uiUnSubmitSlide():
     global bigScreenCopy
     global bigScreenNew
     global slideCtrStart
-    slideCtr = slideCtrStartDown
-    slideCtrStart = slideCtrStartDown
-    bigScreenCopy = bigScreenNew
-    bigScreenNew = bigScreen.copy()
+    if bigScreen:
+        slideCtr = slideCtrStartDown
+        slideCtrStart = slideCtrStartDown
+        bigScreenCopy = bigScreenNew
+        bigScreenNew = bigScreen.copy()
 
 
 def uiSubFlip():
     global slideCtr
     global slideCtrStart
     global bigScreenMul
-    step = slideCtr * (255 // slideCtrStart)
-    stepBack = 255 - step
-    stepCol = (step, step, step)
-    stepBackCol = (stepBack, stepBack, stepBack)
-    bigScreen.fill(stepCol)
-    if bigScreenMul == None:
-        bigScreenMul = bigScreen.copy()        
-    bigScreenMul.fill(stepBackCol)
-    bigScreen.blit(bigScreenCopy, (0,0), special_flags=pygame.BLEND_MULT)
-    bigScreenMul.blit(bigScreenNew, (0,0), special_flags=pygame.BLEND_MULT)
-    bigScreen.blit(bigScreenMul, (0,0), special_flags=pygame.BLEND_ADD)
+    if bigScreen:
+        step = slideCtr * (255 // slideCtrStart)
+        stepBack = 255 - step
+        stepCol = (step, step, step)
+        stepBackCol = (stepBack, stepBack, stepBack)
+        bigScreen.fill(stepCol)
+        if bigScreenMul == None:
+            bigScreenMul = bigScreen.copy()
+        bigScreenMul.fill(stepBackCol)
+        bigScreen.blit(bigScreenCopy, (0,0), special_flags=pygame.BLEND_MULT)
+        bigScreenMul.blit(bigScreenNew, (0,0), special_flags=pygame.BLEND_MULT)
+        bigScreen.blit(bigScreenMul, (0,0), special_flags=pygame.BLEND_ADD)
 
 
 uiFlipFreq = 0.05

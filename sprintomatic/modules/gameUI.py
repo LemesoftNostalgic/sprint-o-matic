@@ -32,6 +32,7 @@ from .perfSuite import perfShowResults, perfAddStart, perfAddStop
 circleRadius = 15
 circleSpacing = 5
 circleRadiusMargin = 18
+surfThresh = 64
 triangleRadius = 15
 controlApproachZoom = 1.2
 controlApproachZoomUsed = False
@@ -67,6 +68,7 @@ surf = None
 screen = None
 screen_rect = None
 me = None
+surfMe = None
 
 feetPlusStart = 3.0
 
@@ -80,6 +82,7 @@ effectStepStart = 64
 
 def uiInit(fileName, generatedMap, metersPerPixerInput, benchmark):
     global effectStepStart
+    global surfMe
     effectStepStart = getEffectStepStart(benchmark)
     global oMap, oMapEarly, surf, screen, bigScreen, me, metersPerPixel
     if generatedMap is not None:
@@ -87,13 +90,15 @@ def uiInit(fileName, generatedMap, metersPerPixerInput, benchmark):
     else:
         oMapEarly = pygame.image.load(fileName)
     size = oMapEarly.get_size()
-    surf = pygame.Surface(size)
+    surfSize = (size[0] + 2 * surfThresh, size[1] + 2 * surfThresh)
+    surf = pygame.Surface(surfSize)
     screen = pygame.Surface(size)
 
     surf = surf.convert_alpha()
     screen = screen.convert_alpha()
     oMapEarly = oMapEarly.convert_alpha()
     me = tuple(ti/2.0 for ti in size)
+    surfMe = tuple(ti/2.0 for ti in surfSize)
     metersPerPixel = metersPerPixerInput
     oMap = None
 
@@ -182,7 +187,8 @@ def uiCenterTurnZoomTheMap(pos, zoom, angle, benchmark):
     global screen_rect
     perfAddStart("renTurnZoom")
     if benchmark == "phone":
-        surf.blit(oMapCopy, tuple(map(lambda i, j: i - j, me, pos)))
+        surf.blit(oMapCopy, tuple(map(lambda i, j: i - j, surfMe, pos)))
+        zoom = 1.0
     else:
         if uiControlEffectEnded():
             zoom = zoom * 1.8
@@ -193,12 +199,16 @@ def uiCenterTurnZoomTheMap(pos, zoom, angle, benchmark):
         zoom = zoom * metersPerPixel
         if controlApproachZoomUsed:
             zoom = zoom * controlApproachZoom
-        surf.blit(pygame.transform.smoothscale_by(oMapCopy, zoom), tuple(map(lambda i, j: i - j * zoom, me, pos)))
+        surf.blit(pygame.transform.smoothscale_by(oMapCopy, zoom), tuple(map(lambda i, j: i - j * zoom, surfMe, pos)))
+        scx, scy = surf.get_size()
+        pygame.draw.rect(surf, getWhiteColor(), [0, 0, scx, surfThresh])
+        pygame.draw.rect(surf, getWhiteColor(), [0, scy - surfThresh, scx, surfThresh])
+        pygame.draw.rect(surf, getWhiteColor(), [0, surfThresh, surfThresh, scy - 2 * surfThresh])
+        pygame.draw.rect(surf, getWhiteColor(), [scx - surfThresh, surfThresh, surfThresh, scy - 2 * surfThresh])
 
     screen = pygame.transform.rotate(surf, fromRadiansToDegrees(math.pi - angle))
-    screen_rect = screen.get_rect(center = surf.get_rect().center)
-    # just a good point to get prepared
-    getBigScreen().fill(getWhiteColor())
+    screenCenter = surf.get_rect().center
+    screen_rect = screen.get_rect(center = screenCenter)
     perfAddStop("renTurnZoom")
 
 
@@ -260,9 +270,9 @@ def uiAnimatePacemaker(pos, angle, scale, pacemakerInd, inTunnel, background):
 
 async def uiCompleteRender(finishTexts, mapInfoTextList, pacemakerInd, pacemakerTextNeeded, aiTextNeeded, amaze, amazeNumber, firstTime, moveLegs, inTunnel):
     perfAddStart("renComlete")
-    xShift = (getBigScreen().get_size()[0]//2 - me[0])
-    yShift = (getBigScreen().get_size()[1]//2 - me[1])
-    pos = (me[0] + xShift, me[1] + yShift)
+    xShift = (getBigScreen().get_size()[0]//2 - surfMe[0])
+    yShift = (getBigScreen().get_size()[1]//2 - surfMe[1])
+    pos = (getBigScreen().get_size()[0]//2, getBigScreen().get_size()[1]//2)
     getBigScreen().blit(screen, (screen_rect[0] + xShift, screen_rect[1] + yShift, screen_rect[2], screen_rect[3]))
     uiAnimatePlayer(moveLegs, inTunnel, amaze, pos)
 
@@ -405,10 +415,10 @@ def uiRenderControls(controls, usePacemaker, amaze):
 
 def uiClearCanvas(controls):
     global oMapCopy, oMapEarly, oMap
-    surf.fill(getWhiteColor())
-    screen.fill(getWhiteColor())
     if oMap is None:
         oMap = oMapEarly.copy()
+        getBigScreen().fill(getWhiteColor())
+        surf.fill(getWhiteColor())
 
         previousControl = None
         for control in controls:
