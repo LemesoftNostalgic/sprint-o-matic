@@ -200,11 +200,12 @@ def uiCenterTurnZoomTheMap(pos, zoom, angle, benchmark):
         if controlApproachZoomUsed:
             zoom = zoom * controlApproachZoom
         surf.blit(pygame.transform.smoothscale_by(oMapCopy, zoom), tuple(map(lambda i, j: i - j * zoom, surfMe, pos)))
-        scx, scy = surf.get_size()
-        pygame.draw.rect(surf, getWhiteColor(), [0, 0, scx, surfThresh])
-        pygame.draw.rect(surf, getWhiteColor(), [0, scy - surfThresh, scx, surfThresh])
-        pygame.draw.rect(surf, getWhiteColor(), [0, surfThresh, surfThresh, scy - 2 * surfThresh])
-        pygame.draw.rect(surf, getWhiteColor(), [scx - surfThresh, surfThresh, surfThresh, scy - 2 * surfThresh])
+
+    scx, scy = surf.get_size()
+    pygame.draw.rect(surf, getWhiteColor(), [0, 0, scx, surfThresh])
+    pygame.draw.rect(surf, getWhiteColor(), [0, scy - surfThresh, scx, surfThresh])
+    pygame.draw.rect(surf, getWhiteColor(), [0, surfThresh, surfThresh, scy - 2 * surfThresh])
+    pygame.draw.rect(surf, getWhiteColor(), [scx - surfThresh, surfThresh, surfThresh, scy - 2 * surfThresh])
 
     screen = pygame.transform.rotate(surf, fromRadiansToDegrees(math.pi - angle))
     screenCenter = surf.get_rect().center
