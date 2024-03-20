@@ -281,7 +281,7 @@ async def main():
     perfClearSuite()
 
     # this can be used in debugging
-    perfActivate()
+#    perfActivate()
 
 #    perfAddStart("ini")
     gameSettings = returnSettings()

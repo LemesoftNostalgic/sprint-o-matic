@@ -39,6 +39,7 @@ metersPerPixel = 1
 fingerDirection = ""
 prevReachedControl = 999999
 bboxThresh = 64
+prevBigRect = None
 
 finishTextStr =      "Finish time: "
 finishTextStr2 =     "    Distance: "
@@ -211,7 +212,6 @@ def uiCenterTurnZoomTheMap(pos, zoom, angle, benchmark, shift):
     screen = pygame.transform.rotate(surf, fromRadiansToDegrees(math.pi - angle))
     screenCenter = surf.get_rect().center
     screen_rect = screen.get_rect(center = screenCenter)
-    getBigScreen().fill(getWhiteColor())
     perfAddStop("renTurnZoom")
 
 
@@ -274,11 +274,16 @@ def uiAnimatePacemaker(pos, angle, scale, pacemakerInd, inTunnel, background, sh
 
 
 async def uiCompleteRender(finishTexts, mapInfoTextList, pacemakerInd, pacemakerTextNeeded, aiTextNeeded, amaze, amazeNumber, firstTime, moveLegs, inTunnel):
+    global prevBigRect
     perfAddStart("renComlete")
     xShift = (getBigScreen().get_size()[0]//2 - surfMe[0])
     yShift = (getBigScreen().get_size()[1]//2 - surfMe[1])
     pos = (getBigScreen().get_size()[0]//2, getBigScreen().get_size()[1]//2)
-    getBigScreen().blit(screen, (screen_rect[0] + xShift, screen_rect[1] + yShift, screen_rect[2], screen_rect[3]))
+    bigRect = (screen_rect[0] + xShift, screen_rect[1] + yShift, screen_rect[2], screen_rect[3])
+    if prevBigRect:
+        pygame.draw.rect(getBigScreen(), getWhiteColor(), prevBigRect)
+    getBigScreen().blit(screen, bigRect)
+    prevBigRect = bigRect
     uiAnimatePlayer(moveLegs, inTunnel, amaze, pos)
 
     if pacemakerTextNeeded:
@@ -433,6 +438,7 @@ def uiClearCanvas(controls, shortestRoutesArray, reachedControl, benchmark):
 
         previousControl = None
         for control in controls:
+            getBigScreen().fill(getWhiteColor())
             if control == controls[0]:
                 uiDrawLine(oMap, getTrackColor(), triangle[0], triangle[1], max(2, int(2/metersPerPixel)))
                 uiDrawLine(oMap, getTrackColor(), triangle[1], triangle[2], max(2, int( 2/metersPerPixel)))
@@ -451,6 +457,7 @@ def uiClearCanvas(controls, shortestRoutesArray, reachedControl, benchmark):
         oMapMid = oMap.copy()
     if benchmark == "phone" and reachedControl != prevReachedControl:
         prevReachedControl = reachedControl
+        getBigScreen().fill(getWhiteColor())
         points = shortestRoutesArray[reachedControl][0]
         tmpBBox = getBoundingBox([points[0], points[0]], points)
         bboxStartX = max(tmpBBox[0][0] - bboxThresh, 0)
