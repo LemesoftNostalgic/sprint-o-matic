@@ -82,17 +82,17 @@ async def setTheStageForNewRound(cfg):
     # Ensure we have a list of controls
     ctrls = []
     if gameSettings.amaze:
-        perfAddStart("crAmaze")
+#        perfAddStart("crAmaze")
         ctrls, shortestRoutesArray, beautifiedLeft, beautifiedRight, difficulty = await createAmazeControls(cfg, gameSettings.distributionOfControlLegs, gameSettings.metersPerPixel, faLookup, saLookup, ssaLookup, vsaLookup)
         beautifiedLeft.reverse()
-        perfAddStop("crAmaze")
+#        perfAddStop("crAmaze")
 
     else:
-        perfAddStart("crTrack")
+#        perfAddStart("crTrack")
         ctrls, shortestRoutesArray = await createAutoControls(cfg, trackLengthInPixels, gameSettings.distributionOfControlLegs, gameSettings.metersPerPixel, faLookup, saLookup, ssaLookup, vsaLookup, gameSettings.pacemaker)
-        perfAddStop("crTrack")
+#        perfAddStop("crTrack")
 
-    perfAddStart("crOth")
+#    perfAddStart("crOth")
     news = await downloadNews()
 
     # Initialize evereything that has to be initialized for a new run
@@ -141,7 +141,7 @@ async def setTheStageForNewRound(cfg):
         aiCounter = 0
     else:
         ctrls = []
-    perfAddStop("crOth")
+#    perfAddStop("crOth")
     return ctrls
 
 
@@ -283,7 +283,7 @@ async def main():
     # this can be used in debugging
     perfActivate()
 
-    perfAddStart("ini")
+#    perfAddStart("ini")
     gameSettings = returnSettings()
     if gameSettings.accurate:
         # start AI processes
@@ -350,7 +350,7 @@ async def main():
     reachedControl = None
     quitting = False
     firstTime = True
-    perfAddStop("ini")
+#    perfAddStop("ini")
 
     # This is the main loop
     while not quitting:
@@ -372,10 +372,10 @@ async def main():
             startElevatorMelody()
             await asyncio.sleep(0)
         if not quitting:
-            perfAddStart("cfg")
+#            perfAddStart("cfg")
             config, controls, faLookup, saLookup, ssaLookup, vsaLookup, tunnelLookup, generatedOrDownloadedMap, tmpMetersPerPixel, externalZoom = await returnConfig(gameSettings, externalImageData, externalWorldCityMap, benchmark)
-            perfAddStop("cfg")
-            perfAddStart("stage")
+#            perfAddStop("cfg")
+#            perfAddStart("stage")
 
             # scale from multiple sources...
             if gameSettings.infiniteOulu:
@@ -415,7 +415,7 @@ async def main():
             # Stop the elevator music
             stopMelody()
             await asyncio.sleep(0)
-            perfAddStop("stage")
+#            perfAddStop("stage")
 
         # main loop of the gameplay itself:
         while running and controls and not quitting:
