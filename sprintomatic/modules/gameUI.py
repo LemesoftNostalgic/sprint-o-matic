@@ -25,19 +25,20 @@ from datetime import datetime
 from random import randrange
 
 from .gameUIUtils import getMasterFont, getStopKey, getLeftKey, getRightKey, getPlayerColor, getTrackColor, getShortestRouteColor, getCreditColor, getPacemakerColor, getPlayerRouteColor, getFinishTextColor, getWhiteColor, convertXCoordinate, convertXCoordinateSpecificSurface, convertYCoordinate, getBigScreen, getTimerStepSeconds, getAnalysisResultsFileBase, uiFlip, uiUnSubmitSlide, uiDrawLine, uiDrawCircle, getEffectStepStart
-from .mathUtils import rotatePoint, fromRadiansToDegrees, distanceBetweenPoints, triangleCreator
+from .mathUtils import rotatePoint, fromRadiansToDegrees, distanceBetweenPoints, triangleCreator, getBoundingBox
 from .infoBox import showInfoBoxTxt, updateInfoTxtByEvent
 from .perfSuite import perfShowResults, perfAddStart, perfAddStop
 
 circleRadius = 15
 circleSpacing = 5
 circleRadiusMargin = 18
-surfThresh = 64
 triangleRadius = 15
 controlApproachZoom = 1.2
 controlApproachZoomUsed = False
 metersPerPixel = 1
 fingerDirection = ""
+prevReachedControl = 999999
+bboxThresh = 64
 
 finishTextStr =      "Finish time: "
 finishTextStr2 =     "    Distance: "
@@ -63,6 +64,7 @@ mapInfoTextTitles = [ "map: ", "map license: ", "created by: ", "terrain png: ",
 # Intermediate surfaces for the gameplay
 oMapEarly = None
 oMap = None
+oMapMid = None
 oMapCopy = None
 surf = None
 screen = None
@@ -90,7 +92,10 @@ def uiInit(fileName, generatedMap, metersPerPixerInput, benchmark):
     else:
         oMapEarly = pygame.image.load(fileName)
     size = oMapEarly.get_size()
-    surfSize = (size[0] + 2 * surfThresh, size[1] + 2 * surfThresh)
+    surfSize = size
+    if benchmark == "phone":
+        surfWidth = min(getBigScreen().get_size()[0], getBigScreen().get_size()[1])
+        surfSize = (surfWidth, surfWidth)
     surf = pygame.Surface(surfSize)
     screen = pygame.Surface(size)
 
@@ -101,6 +106,7 @@ def uiInit(fileName, generatedMap, metersPerPixerInput, benchmark):
     surfMe = tuple(ti/2.0 for ti in surfSize)
     metersPerPixel = metersPerPixerInput
     oMap = None
+    oMapMid = None
 
     pygame.key.set_repeat(200, 50)
 
@@ -182,12 +188,13 @@ def lowerControlApproachZoom():
     controlApproachZoomUsed = False
 
 
-def uiCenterTurnZoomTheMap(pos, zoom, angle, benchmark):
+def uiCenterTurnZoomTheMap(pos, zoom, angle, benchmark, shift):
     global screen
     global screen_rect
     perfAddStart("renTurnZoom")
     if benchmark == "phone":
-        surf.blit(oMapCopy, tuple(map(lambda i, j: i - j, surfMe, pos)))
+        surf.blit(oMapCopy, tuple(map(lambda i, j, k: i - j + k, surfMe, pos, shift)))
+#        surf.blit(oMapCopy, (0,0))
         zoom = 1.0
     else:
         if uiControlEffectEnded():
@@ -259,9 +266,11 @@ def uiAnimatePlayer(legsMoving, inTunnel, amaze, position):
 
 
 feetPlusPacemaker = feetPlusStart
-def uiAnimatePacemaker(pos, angle, scale, pacemakerInd, inTunnel, background):
+def uiAnimatePacemaker(pos, angle, scale, pacemakerInd, inTunnel, background, shift):
     global feetPlusPacemaker
-    feetPlusPacemaker = uiAnimateCharacter(oMapCopy, pos, math.pi - angle, getPacemakerColor(pacemakerInd), 0.6 * scale / metersPerPixel, feetPlusPacemaker, inTunnel, background, False)
+    p = tuple(map(lambda i, j: i - j, pos, shift))
+    if p[0] > 0 and p[0] < oMapCopy.get_size()[0] and p[1] > 0 and p[1] < oMapCopy.get_size()[1]:
+        feetPlusPacemaker = uiAnimateCharacter(oMapCopy, p, math.pi - angle, getPacemakerColor(pacemakerInd), 0.6 * scale / metersPerPixel, feetPlusPacemaker, inTunnel, background, False)
 
 
 async def uiCompleteRender(finishTexts, mapInfoTextList, pacemakerInd, pacemakerTextNeeded, aiTextNeeded, amaze, amazeNumber, firstTime, moveLegs, inTunnel):
@@ -366,8 +375,9 @@ def uiControlEffectEnded():
 
 
 def uiClearBuffers():
-    global oMap
+    global oMap, oMapMid
     oMap = None
+    oMapMid = None
     
 
 def uiControlEffectRestart():
@@ -382,7 +392,7 @@ def uiInitStartTriangle(angle, pos):
     triangle = triangleCreator(triangleRadius / metersPerPixel, angle, pos)
 
 
-def uiRenderControls(controls, usePacemaker, amaze):
+def uiRenderControls(controls, usePacemaker, amaze, shift):
     global effectStep
     global effectControl
 
@@ -400,20 +410,26 @@ def uiRenderControls(controls, usePacemaker, amaze):
             tmpEffectStep = effectStep
 
         if control != controls[0]:
-            if controlApproachZoomUsed:
-                pygame.draw.circle(oMapCopy, getTrackColor(), control, int(2/metersPerPixel))
+            c = tuple(map(lambda i, j: i - j, control, shift))
+            if c[0] > 0 and c[0] < oMapCopy.get_size()[0] and c[1] > 0 and c[1] < oMapCopy.get_size()[1]:
+                if controlApproachZoomUsed:
+                    pygame.draw.circle(oMapCopy, getTrackColor(), c, int(2/metersPerPixel))
 
-            if control == controls[-1] and not amaze:
-                uiDrawCircle(oMapCopy, (255, tmpEffectStep * 3, tmpEffectStep * 2), control, (circleRadius - circleSpacing)/metersPerPixel, max(2, int(2/metersPerPixel)))
+                if control == controls[-1] and not amaze:
+                    uiDrawCircle(oMapCopy, (255, tmpEffectStep * 3, tmpEffectStep * 2), c, (circleRadius - circleSpacing)/metersPerPixel, max(2, int(2/metersPerPixel)))
         previousControl = control
     perfAddStop("renCtrls")
 
 
-def uiClearCanvas(controls):
-    global oMapCopy, oMapEarly, oMap
+def uiClearCanvas(controls, shortestRoutesArray, reachedControl, benchmark):
+    global oMapCopy, oMapEarly, oMap, oMapMid, prevReachedControl, bboxStartX, bboxStartY
+
     surf.fill(getWhiteColor())
     if oMap is None:
         oMap = oMapEarly.copy()
+        prevReachedControl = 999999
+        bboxStartX = 0
+        bboxStartY = 0
 
         previousControl = None
         for control in controls:
@@ -432,22 +448,36 @@ def uiClearCanvas(controls):
                     controlShrinked = (control[0]-lineDelta[0], control[1]-lineDelta[1])
                     uiDrawLine(oMap, getTrackColor(), previousControlShrinked, controlShrinked, max(2, int(2/metersPerPixel)))
             previousControl = control
-  
-    oMapCopy = oMap.copy()
+        oMapMid = oMap.copy()
+    if benchmark == "phone" and reachedControl != prevReachedControl:
+        prevReachedControl = reachedControl
+        points = shortestRoutesArray[reachedControl][0]
+        tmpBBox = getBoundingBox([points[0], points[0]], points)
+        bboxStartX = max(tmpBBox[0][0] - bboxThresh, 0)
+        bboxStartY = max(tmpBBox[0][1] - bboxThresh, 0)
+        bboxEndX = min(tmpBBox[1][0] + bboxThresh, oMap.get_size()[0])
+        bboxEndY = min(tmpBBox[1][1] + bboxThresh, oMap.get_size()[1])
+        brect = pygame.Rect(bboxStartX, bboxStartY, bboxEndX - bboxStartX, bboxEndY - bboxStartY)
+        oMapMid = pygame.Surface((bboxEndX - bboxStartX, bboxEndY - bboxStartY))
+        oMapMid.blit(oMap, dest=(0,0), area=brect)
+
+    oMapCopy = oMapMid.copy()
+    return (bboxStartX, bboxStartY)
 
 
-def uiRenderRoute(whichmap, shortestRoute, color):
+def uiRenderRoute(whichmap, shortestRoute, color, shift):
     for i in range(len(shortestRoute) - 1):
-        pointA = shortestRoute[i]
-        pointB = shortestRoute[i + 1]
-        uiDrawLine(whichmap, color, pointA, pointB, max(2, int(2/metersPerPixel)))
+        pointA = tuple(map(lambda i, j: i - j, shortestRoute[i], shift))
+        pointB = tuple(map(lambda i, j: i - j, shortestRoute[i + 1], shift))
+        if pointA[0] > 0 and pointA[0] < whichmap.get_size()[0] and pointA[1] > 0 and pointA[1] < whichmap.get_size()[1] and pointB[0] > 0 and pointB[0] < whichmap.get_size()[0] and pointB[1] > 0 and pointB[1] < whichmap.get_size()[1]:
+            uiDrawLine(whichmap, color, pointA, pointB, max(2, int(2/metersPerPixel)))
 
 
-def uiRenderRoutes(shortestRoutes, whoami):
+def uiRenderRoutes(shortestRoutes, whoami, shift):
     colorMapping = { "shortest": getShortestRouteColor(), "player": getPlayerRouteColor() }
     if effectStep:
         for shortestRoute in shortestRoutes:
-            uiRenderRoute(oMapCopy, shortestRoute, colorMapping[whoami])
+            uiRenderRoute(oMapCopy, shortestRoute, colorMapping[whoami], shift)
 
 
 def uiDrawControlCircles(theMap, controls):
@@ -466,10 +496,10 @@ def uiStoreAnalysis(shortestRoutesArray, playerRoutesArray, controls, finishText
     theMap = oMap.copy()
     for shortestRoutes in shortestRoutesArray:
         for shortestRoute in shortestRoutes:
-            uiRenderRoute(theMap, shortestRoute, getPacemakerColor(1))
+            uiRenderRoute(theMap, shortestRoute, getPacemakerColor(1), (0,0))
     for playerRoutes in playerRoutesArray:
         for playerRoute in playerRoutes:
-            uiRenderRoute(theMap, playerRoute, getPlayerColor())
+            uiRenderRoute(theMap, playerRoute, getPlayerColor(), (0,0))
     uiDrawControlCircles(theMap, controls)
     uiShowFinishText(theMap, finishTexts, False)
 

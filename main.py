@@ -76,7 +76,7 @@ async def setTheStageForNewRound(cfg):
     global phoneRenderSkipCtr
     global phoneRenderSkipMax
 
-    phoneRenderSkipMax = 1
+    phoneRenderSkipMax = 0
     phoneRenderSkipCtr = 0
 
     # Ensure we have a list of controls
@@ -294,7 +294,7 @@ async def main():
          gameSettings.offline = offline
     externalWorldCityMap = await downloadExternalWorldCityMap()
     news = await downloadNews()
-    initSounds(gameSettings.soundRoot)
+    initSounds(gameSettings.soundRoot, benchmark)
     
     # statistics and route display initial values
     shortestRoutesArray = []
@@ -604,15 +604,15 @@ async def main():
                         if phoneRenderSkipCtr == 0:
                             if running:
                                 # Now enter the rendering phase
-                                uiClearCanvas(controls)
+                                shift = uiClearCanvas(controls, shortestRoutesArray, reachedControl, benchmark)
 
                                 if gameSettings.pacemaker == 0:
-                                    uiRenderRoutes(shortestRoutes, "shortest")
-                                    uiRenderRoutes(playerRoutes, "player")
-                                uiRenderControls(controls, gameSettings.pacemaker, gameSettings.amaze)
+                                    uiRenderRoutes(shortestRoutes, "shortest", shift)
+                                    uiRenderRoutes(playerRoutes, "player", shift)
+                                uiRenderControls(controls, gameSettings.pacemaker, gameSettings.amaze, shift)
                                 if gameSettings.pacemaker != 0 and pacemakerPath is not None and pacemakerPosition is not None:
                                     if pacemakerPosition == pacemakerPath[-1]:
-                                        uiAnimatePacemaker(pacemakerPosition, pacemakerAngle, 1.0, gameSettings.pacemaker, inTunnelPacemaker, True)
+                                        uiAnimatePacemaker(pacemakerPosition, pacemakerAngle, 1.0, gameSettings.pacemaker, inTunnelPacemaker, True, shift)
                                         pacemakerPrepareForShout = True
                                         pacemakerStep = -5
                                     elif pacemakerPosition == pacemakerPath[0]:
@@ -620,22 +620,22 @@ async def main():
                                         if pacemakerStep > 5:
                                             pacemakerStep = -5
 
-                                        uiAnimatePacemaker(pacemakerPosition, pacemakerAngle, 1.5 + abs(pacemakerStep) * 0.1, gameSettings.pacemaker, inTunnelPacemaker, True)
+                                        uiAnimatePacemaker(pacemakerPosition, pacemakerAngle, 1.5 + abs(pacemakerStep) * 0.1, gameSettings.pacemaker, inTunnelPacemaker, True, shift)
                                         if pacemakerPrepareForShout:
                                             pacemakerShoutEffect()
                                             pacemakerPrepareForShout = False
                                     else:
                                         pacemakerStep = -5
                                         pacemakerPrepareForShout = True
-                                        uiAnimatePacemaker(pacemakerPosition, pacemakerAngle, 1.0, gameSettings.pacemaker, inTunnelPacemaker, True)
+                                        uiAnimatePacemaker(pacemakerPosition, pacemakerAngle, 1.0, gameSettings.pacemaker, inTunnelPacemaker, True, shift)
                                 elif gameSettings.pacemaker != 0 and pacemakerPath == None:
                                     pacemakerStep = pacemakerStep + 1
                                     if pacemakerStep > 5:
                                         pacemakerStep = -5
                                     pacemakerPrepareForShout = True
-                                    uiAnimatePacemaker(controls[nextControl], pacemakerAngle, 1.5 + abs(pacemakerStep) * 0.1, gameSettings.pacemaker, inTunnelPacemaker, True)
+                                    uiAnimatePacemaker(controls[nextControl], pacemakerAngle, 1.5 + abs(pacemakerStep) * 0.1, gameSettings.pacemaker, inTunnelPacemaker, True, shift)
 
-                            uiCenterTurnZoomTheMap(position, zoom, angle, benchmark)
+                            uiCenterTurnZoomTheMap(position, zoom, angle, benchmark, shift)
 
                             # After that it is ok to draw to "big screen"
                             moveLegs = True if datetime.now() - startTime > timedelta(seconds=gameMovingStartThreshold) else False

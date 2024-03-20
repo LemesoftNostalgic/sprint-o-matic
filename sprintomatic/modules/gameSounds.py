@@ -30,6 +30,7 @@ stepsChannel = None
 effectChannel = None
 birdsChannel = None
 melodyChannel = None
+noSounds = False
 
 
 soundPath = "21608__ali_6868__gravel-footsteps"
@@ -93,7 +94,7 @@ stepSound = None
 
 left = False
 
-def initSounds(soundRoot):
+def initSounds(soundRoot, benchmark):
     global stepsChannel
     global birdsChannel
     global effectChannel
@@ -108,7 +109,11 @@ def initSounds(soundRoot):
     global startSound
     global stepSound
     global finishSound
+    global noSounds
 
+    if benchmark == "phone":
+        noSounds = True
+        return
 
     pygame.mixer.init()
     pygame.mixer.set_num_channels(4)
@@ -152,11 +157,17 @@ def initSounds(soundRoot):
 
 
 def stopSounds():
+    if noSounds:
+        return
+
     pygame.mixer.stop()
 
 
 def maintainRunningStepEffect():
     global left
+
+    if noSounds:
+        return
 
     if not stepsChannel.get_busy():
         maxInd = min(len(leftSounds), len(rightSounds)) - 1
@@ -172,39 +183,83 @@ def maintainRunningStepEffect():
 
 def startMelody():
     global melodyCtr
+
+    if noSounds:
+        return
+
     melodyCtr = melodyCtr + 1
     if melodyCtr >= len(melodySounds):
         melodyCtr = 0
     melodyChannel.play(melodySounds[melodyCtr], loops=-1, fade_ms=20000)
 
 def startElevatorMelody():
+
+    if noSounds:
+        return
+
     melodyChannel.play(melodySounds[-1], loops=-1, fade_ms=120000)
 
 def stopMelody():
+
+    if noSounds:
+        return
+
     melodyChannel.stop()
 
 def startBirds():
+
+    if noSounds:
+        return
+
     melodyChannel.play(birdsSound, loops=-1)
 
 def stopBirds():
     global melodyCtr
+
+    if noSounds:
+        return
+
     melodyCtr = len(melodySounds) - 1
     melodyChannel.stop()
 
 def shoutEffect():
+
+    if noSounds:
+        return
+
     effectChannel.play(shoutSound, maxtime=1000)
 
 def pacemakerShoutEffect():
+
+    if noSounds:
+        return
+
     effectChannel.play(pacemakerShoutSound)
 
 def startEffect():
+
+    if noSounds:
+        return
+
     effectChannel.play(startSound)
 
 def stopEffects():
+
+    if noSounds:
+        return
+
     effectChannel.stop()
 
 def stepEffect():
+
+    if noSounds:
+        return
+
     effectChannel.play(stepSound)
 
 def finishEffect():
+
+    if noSounds:
+        return
+
     effectChannel.play(finishSound)
