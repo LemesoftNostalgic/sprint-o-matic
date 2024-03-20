@@ -138,7 +138,7 @@ def getTimerStepSeconds(speedMode):
 
 def getEffectStepStart(benchmark):
     if benchmark == "phone":
-        return 12
+        return 64
     else:
         return 64
 

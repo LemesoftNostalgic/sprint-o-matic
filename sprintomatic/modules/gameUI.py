@@ -47,14 +47,14 @@ finishTextStr3 =     " m"
 finishTextStr4 =     "    Runner error: "
 finishTextStr5 =     " %"
 
-amazeStr1 =      "A MAZE BEGINS!   LEVEL: "
-amazeStr2 =      "   TURN TO RUNNING DIRECTION"
+amazeStr1 =      "          A MAZE BEGINS!   LEVEL: "
+amazeStr2 =      "   TURN TO RUNNING DIRECTION          "
 
-amazeTextStr =      "LEVEL: "
+amazeTextStr =      "          LEVEL: "
 amazeTextStr2 =     "    RESULT: "
 amazeTextStr3 =     "  "
 amazeTextStr4 =     "    ANGLE DIFFERENCE: "
-amazeTextStr5 =     "° "
+amazeTextStr5 =     "°           "
 
 pacemakerTextStr =    ["", "Pacemaker: Aino Inkeri (A.I.) Kiburtz", "Pacemaker: Pertti-Uolevi (P.A.) Keinonen, e.v.v.k.", "Pacemaker: Lex Martin Luthoer, Chem. Engr."]
 pacemakerInitTextStr =    "Prepare, a pacemaker waiting in 1st control!"
@@ -135,8 +135,8 @@ def uiShowFinishText(someSurface, finishTexts, amaze):
 def uiRenderAmazeText(amazeNum):
     if effectStep and effectControl < 1:
         middle = tuple(ti/2.0 for ti in getBigScreen().get_size())
-        pacemakerTextCenter = (middle[0], middle[1] * 0.1)
-        pacemakerText = pygame.font.Font(getMasterFont(), convertXCoordinate(40)).render(amazeStr1 + str(amazeNum) + amazeStr2, True, getPacemakerColor(2))
+        pacemakerTextCenter = (middle[0], middle[1] * 0.05)
+        pacemakerText = pygame.font.Font(getMasterFont(), convertXCoordinate(32)).render(amazeStr1 + str(amazeNum) + amazeStr2, True, getPacemakerColor(2))
         pacemakerTextRect = pacemakerText.get_rect()
         pacemakerTextRect.center = pacemakerTextCenter
         pygame.draw.rect(getBigScreen(), getWhiteColor(), pacemakerTextRect, 0)
@@ -406,7 +406,9 @@ def uiRenderControls(controls, usePacemaker, amaze, shift):
         if amaze:
             effectStep = effectStep - 0.5
         else:
-            effectStep = effectStep - 1            
+            effectStep = effectStep - 1
+        if effectStep <= 0:
+            getBigScreen().fill(getWhiteColor())
 
     previousControl = None
     for control in controls:
@@ -458,6 +460,8 @@ def uiClearCanvas(controls, shortestRoutesArray, reachedControl, benchmark):
     if benchmark == "phone" and reachedControl != prevReachedControl:
         prevReachedControl = reachedControl
         getBigScreen().fill(getWhiteColor())
+        if reachedControl >= len(shortestRoutesArray):
+            reachedControl = len(shortestRoutesArray) - 1
         points = shortestRoutesArray[reachedControl][0]
         tmpBBox = getBoundingBox([points[0], points[0]], points)
         bboxStartX = max(tmpBBox[0][0] - bboxThresh, 0)
@@ -498,7 +502,7 @@ def uiDrawControlCircles(theMap, controls):
             if control == controls[-1]:
                 uiDrawCircle(theMap, getTrackColor(), control, (circleRadius - circleSpacing)/metersPerPixel, max(2, int(2/metersPerPixel)))
     
-            
+
 def uiStoreAnalysis(shortestRoutesArray, playerRoutesArray, controls, finishTexts):
     theMap = oMap.copy()
     for shortestRoutes in shortestRoutesArray:
