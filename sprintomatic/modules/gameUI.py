@@ -201,15 +201,10 @@ def uiCenterTurnZoomTheMap(pos, zoom, angle, benchmark):
             zoom = zoom * controlApproachZoom
         surf.blit(pygame.transform.smoothscale_by(oMapCopy, zoom), tuple(map(lambda i, j: i - j * zoom, surfMe, pos)))
 
-    scx, scy = surf.get_size()
-    pygame.draw.rect(surf, getWhiteColor(), [0, 0, scx, surfThresh])
-    pygame.draw.rect(surf, getWhiteColor(), [0, scy - surfThresh, scx, surfThresh])
-    pygame.draw.rect(surf, getWhiteColor(), [0, surfThresh, surfThresh, scy - 2 * surfThresh])
-    pygame.draw.rect(surf, getWhiteColor(), [scx - surfThresh, surfThresh, surfThresh, scy - 2 * surfThresh])
-
     screen = pygame.transform.rotate(surf, fromRadiansToDegrees(math.pi - angle))
     screenCenter = surf.get_rect().center
     screen_rect = screen.get_rect(center = screenCenter)
+    getBigScreen().fill(getWhiteColor())
     perfAddStop("renTurnZoom")
 
 
@@ -416,10 +411,9 @@ def uiRenderControls(controls, usePacemaker, amaze):
 
 def uiClearCanvas(controls):
     global oMapCopy, oMapEarly, oMap
+    surf.fill(getWhiteColor())
     if oMap is None:
         oMap = oMapEarly.copy()
-        getBigScreen().fill(getWhiteColor())
-        surf.fill(getWhiteColor())
 
         previousControl = None
         for control in controls:

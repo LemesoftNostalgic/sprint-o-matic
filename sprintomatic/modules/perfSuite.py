@@ -1,7 +1,7 @@
 import time
 
 import pygame
-from .gameUIUtils import getBigScreen, getMasterFont, getTrackColor
+from .gameUIUtils import getBigScreen, getMasterFont, getTrackColor, getWhiteColor
 from .routeAI import slowAccurateCalculateShortestRouteAsync
 import asyncio
 
@@ -70,6 +70,7 @@ def perfShowResults(titleStr):
                 perfRect = perfText.get_rect()
                 perfRect.x = x
                 perfRect.y = y
+                pygame.draw.rect(getBigScreen(), getWhiteColor(), perfRect, 0)
                 getBigScreen().blit(perfText, perfRect)
 
 

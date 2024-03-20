@@ -76,7 +76,7 @@ async def setTheStageForNewRound(cfg):
     global phoneRenderSkipCtr
     global phoneRenderSkipMax
 
-    phoneRenderSkipMax = 2
+    phoneRenderSkipMax = 1
     phoneRenderSkipCtr = 0
 
     # Ensure we have a list of controls
