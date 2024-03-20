@@ -464,10 +464,22 @@ def uiClearCanvas(controls, shortestRoutesArray, reachedControl, benchmark):
             reachedControl = len(shortestRoutesArray) - 1
         points = shortestRoutesArray[reachedControl][0]
         tmpBBox = getBoundingBox([points[0], points[0]], points)
-        bboxStartX = max(tmpBBox[0][0] - bboxThresh, 0)
-        bboxStartY = max(tmpBBox[0][1] - bboxThresh, 0)
-        bboxEndX = min(tmpBBox[1][0] + bboxThresh, oMap.get_size()[0])
-        bboxEndY = min(tmpBBox[1][1] + bboxThresh, oMap.get_size()[1])
+        x1 = tmpBBox[0][0]
+        x2 = tmpBBox[1][0]
+        y1 = tmpBBox[0][1]
+        y2 = tmpBBox[1][1]
+        dx = x2 - x1
+        dy = y2 - y1
+        if dx < dy:
+            x1 = x1 - dy//2
+            x2 = x2 + dy//2
+        else:
+            y1 = y1 - dx//2
+            y2 = y2 + dx//2
+        bboxStartX = max(x1 - bboxThresh, 0)
+        bboxStartY = max(y1 - bboxThresh, 0)
+        bboxEndX = min(x2 + bboxThresh, oMap.get_size()[0])
+        bboxEndY = min(y2 + bboxThresh, oMap.get_size()[1])
         brect = pygame.Rect(bboxStartX, bboxStartY, bboxEndX - bboxStartX, bboxEndY - bboxStartY)
         oMapMid = pygame.Surface((bboxEndX - bboxStartX, bboxEndY - bboxStartY))
         oMapMid.blit(oMap, dest=(0,0), area=brect)

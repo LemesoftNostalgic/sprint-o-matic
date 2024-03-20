@@ -63,9 +63,9 @@ def showInitArrow(surf, spot, inScale):
     arrow2 = tuple(map(lambda i, j: i + j, spot, (0, 10 * scale)))
     arrow3 = tuple(map(lambda i, j: i + j, spot, (4 * scale, 5 * scale)))
     arrow4 = tuple(map(lambda i, j: i + j, spot, (-4 * scale, 5 * scale)))
-    uiDrawLine(surf, getPlayerColor(), arrow1, arrow2, scale)
-    uiDrawLine(surf, getPlayerColor(), arrow1, arrow3, scale)
-    uiDrawLine(surf, getPlayerColor(), arrow1, arrow4, scale)
+    uiDrawLine(surf, getPlayerColor(), arrow1, arrow2, scale*2)
+    uiDrawLine(surf, getPlayerColor(), arrow1, arrow3, scale*2)
+    uiDrawLine(surf, getPlayerColor(), arrow1, arrow4, scale*2)
 
 
 async def uiRenderImmediate(pos, textStr, fast):
