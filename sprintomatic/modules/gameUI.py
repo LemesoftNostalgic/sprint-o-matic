@@ -122,7 +122,7 @@ def uiShowFinishText(someSurface, finishTexts, amaze, portrait):
     if not portrait:
         fs = convertXCoordinateSpecificSurface(someSurface, 32)
     else:
-        fs = int(convertYCoordinateSpecificSurface(someSurface, 32) / 1.7)
+        fs = int(convertYCoordinateSpecificSurface(someSurface, 32) / 1.9)
 
     if timeConsumed and distance and error:
         middle = tuple(ti/2.0 for ti in someSurface.get_size())
@@ -141,7 +141,7 @@ def uiRenderAmazeText(amazeNum, portrait):
     if not portrait:
         fs = convertXCoordinate(32)
     else:
-        fs = int(convertYCoordinate(32) / 1.7)
+        fs = int(convertYCoordinate(32) / 1.9)
 
     if effectStep and effectControl < 1:
         middle = tuple(ti/2.0 for ti in getBigScreen().get_size())
@@ -159,7 +159,7 @@ def uiRenderPacemakerText(pacemakerInd, portrait):
         if not portrait:
             fs = convertXCoordinate(48)
         else:
-            fs = int(convertYCoordinate(48) / 1.7)
+            fs = int(convertYCoordinate(48) / 1.9)
         if effectControl == 1:
             warningStr = pacemakerTextStr[pacemakerInd]
         else:
@@ -177,7 +177,7 @@ def uiRenderAIText(portrait):
     if not portrait:
         fs = convertXCoordinate(32)
     else:
-        fs = int(convertYCoordinate(32) / 1.7)
+        fs = int(convertYCoordinate(32) / 1.9)
 
     middle = tuple(ti/2.0 for ti in getBigScreen().get_size())
     aiTextCenter = (middle[0], middle[1] * 0.05)
@@ -191,7 +191,7 @@ def uiRenderExternalMapInfo(mapInfoTextList, portrait):
     if not portrait:
         fs = convertXCoordinate(16)
     else:
-        fs = int(convertYCoordinate(16) / 1.4)
+        fs = int(convertYCoordinate(16) / 1.5)
 
     middle = tuple(ti/2.0 for ti in getBigScreen().get_size())
     for ind in range(len(mapInfoTextList)):
