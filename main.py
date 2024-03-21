@@ -372,7 +372,7 @@ async def main():
             await asyncio.sleep(0)
         if not quitting:
 #            perfAddStart("cfg")
-            config, controls, faLookup, saLookup, ssaLookup, vsaLookup, tunnelLookup, generatedOrDownloadedMap, tmpMetersPerPixel, externalZoom = await returnConfig(gameSettings, externalImageData, externalWorldCityMap, benchmark)
+            config, controls, faLookup, saLookup, ssaLookup, vsaLookup, tunnelLookup, generatedOrDownloadedMap, tmpMetersPerPixel, externalZoom = await returnConfig(gameSettings, externalImageData, externalWorldCityMap, benchmark, portrait)
 #            perfAddStop("cfg")
 #            perfAddStart("stage")
 

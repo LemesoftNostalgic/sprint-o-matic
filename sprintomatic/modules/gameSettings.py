@@ -161,7 +161,7 @@ def returnSettings():
     return gameSettings
 
 
-async def returnConfig(gameSettings, externalImageData, infiniteWorldCityMap, benchmark):
+async def returnConfig(gameSettings, externalImageData, infiniteWorldCityMap, benchmark, portrait):
 
     metersPerPixel = 0
     defaultZoom = 1.0
@@ -188,7 +188,7 @@ async def returnConfig(gameSettings, externalImageData, infiniteWorldCityMap, be
 
     elif gameSettings.infiniteWorld:
         perfAddStart("world")
-        png, pngMask = await getInfiniteWorldDefault(gameSettings.place, gameSettings.imageRoot, benchmark)
+        png, pngMask = await getInfiniteWorldDefault(gameSettings.place, gameSettings.imageRoot, benchmark, portrait)
         perfAddStop("world")
         perfAddStart("pngLookupMsk")
         faLookup, saLookup, ssaLookup, vsaLookup, tunnelLookup, config = await extractPngLookups(pngMask, benchmark)

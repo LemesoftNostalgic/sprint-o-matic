@@ -24,7 +24,7 @@ import asyncio
 from datetime import datetime
 from random import randrange
 
-from .gameUIUtils import getMasterFont, getStopKey, getLeftKey, getRightKey, getPlayerColor, getTrackColor, getShortestRouteColor, getCreditColor, getPacemakerColor, getPlayerRouteColor, getFinishTextColor, getWhiteColor, convertXCoordinate, convertXCoordinateSpecificSurface, convertYCoordinate, getBigScreen, getTimerStepSeconds, getAnalysisResultsFileBase, uiFlip, uiUnSubmitSlide, uiDrawLine, uiDrawCircle, getEffectStepStart
+from .gameUIUtils import getMasterFont, getStopKey, getLeftKey, getRightKey, getPlayerColor, getTrackColor, getShortestRouteColor, getCreditColor, getPacemakerColor, getPlayerRouteColor, getFinishTextColor, getWhiteColor, convertXCoordinate, convertXCoordinateSpecificSurface, convertYCoordinateSpecificSurface, convertYCoordinate, getBigScreen, getTimerStepSeconds, getAnalysisResultsFileBase, uiFlip, uiUnSubmitSlide, uiDrawLine, uiDrawCircle, getEffectStepStart
 from .mathUtils import rotatePoint, fromRadiansToDegrees, distanceBetweenPoints, triangleCreator, getBoundingBox
 from .infoBox import showInfoBoxTxt, updateInfoTxtByEvent
 from .perfSuite import perfShowResults, perfAddStart, perfAddStop
@@ -114,10 +114,15 @@ def uiInit(fileName, generatedMap, metersPerPixerInput, benchmark):
     return me
 
 
-def uiShowFinishText(someSurface, finishTexts, amaze):
+def uiShowFinishText(someSurface, finishTexts, amaze, portrait):
     timeConsumed = finishTexts[0]
     distance = finishTexts[1]
     error = finishTexts[2]
+
+    if not portrait:
+        fs = convertXCoordinateSpecificSurface(someSurface, 32)
+    else:
+        fs = int(convertYCoordinateSpecificSurface(someSurface, 32) / 1.7)
 
     if timeConsumed and distance and error:
         middle = tuple(ti/2.0 for ti in someSurface.get_size())
@@ -125,53 +130,68 @@ def uiShowFinishText(someSurface, finishTexts, amaze):
         textItself = finishTextStr + timeConsumed + finishTextStr2 + distance + finishTextStr3 + finishTextStr4 + error + finishTextStr5
         if amaze:
             textItself = amazeTextStr + timeConsumed + amazeTextStr2 + distance + amazeTextStr3 + amazeTextStr4 + error + amazeTextStr5
-        finishText = pygame.font.Font(getMasterFont(), convertXCoordinateSpecificSurface(someSurface, 32)).render(textItself, True, getFinishTextColor())
+        finishText = pygame.font.Font(getMasterFont(), fs).render(textItself, True, getFinishTextColor())
         finishTextRect = finishText.get_rect()
         finishTextRect.center = finishTextCenter
         pygame.draw.rect(someSurface, getWhiteColor(), finishTextRect, 0)
         someSurface.blit(finishText, finishTextRect)
 
 
-def uiRenderAmazeText(amazeNum):
+def uiRenderAmazeText(amazeNum, portrait):
+    if not portrait:
+        fs = convertXCoordinate(32)
+    else:
+        fs = int(convertYCoordinate(32) / 1.7)
+
     if effectStep and effectControl < 1:
         middle = tuple(ti/2.0 for ti in getBigScreen().get_size())
         pacemakerTextCenter = (middle[0], middle[1] * 0.05)
-        pacemakerText = pygame.font.Font(getMasterFont(), convertXCoordinate(32)).render(amazeStr1 + str(amazeNum) + amazeStr2, True, getPacemakerColor(2))
+        pacemakerText = pygame.font.Font(getMasterFont(), fs).render(amazeStr1 + str(amazeNum) + amazeStr2, True, getPacemakerColor(2))
         pacemakerTextRect = pacemakerText.get_rect()
         pacemakerTextRect.center = pacemakerTextCenter
         pygame.draw.rect(getBigScreen(), getWhiteColor(), pacemakerTextRect, 0)
         getBigScreen().blit(pacemakerText, pacemakerTextRect)
 
 
-def uiRenderPacemakerText(pacemakerInd):
+def uiRenderPacemakerText(pacemakerInd, portrait):
+
     if effectStep and effectControl <= 1:
+        if not portrait:
+            fs = convertXCoordinate(48)
+        else:
+            fs = int(convertYCoordinate(48) / 1.7)
         if effectControl == 1:
             warningStr = pacemakerTextStr[pacemakerInd]
         else:
             warningStr = pacemakerInitTextStr
         middle = tuple(ti/2.0 for ti in getBigScreen().get_size())
         pacemakerTextCenter = (middle[0], middle[1] * 0.1)
-        pacemakerText = pygame.font.Font(getMasterFont(), convertXCoordinate(48)).render(warningStr, True, getPacemakerColor(pacemakerInd))
+        pacemakerText = pygame.font.Font(getMasterFont(), fs).render(warningStr, True, getPacemakerColor(pacemakerInd))
         pacemakerTextRect = pacemakerText.get_rect()
         pacemakerTextRect.center = pacemakerTextCenter
         pygame.draw.rect(getBigScreen(), getWhiteColor(), pacemakerTextRect, 0)
         getBigScreen().blit(pacemakerText, pacemakerTextRect)
 
 
-def uiRenderAIText():    
+def uiRenderAIText(portrait):
+    if not portrait:
+        fs = convertXCoordinate(32)
+    else:
+        fs = int(convertYCoordinate(32) / 1.7)
+
     middle = tuple(ti/2.0 for ti in getBigScreen().get_size())
     aiTextCenter = (middle[0], middle[1] * 0.05)
-    aiText = pygame.font.Font(getMasterFont(), convertXCoordinate(32)).render(aiTextStr, True, getCreditColor())
+    aiText = pygame.font.Font(getMasterFont(), fs).render(aiTextStr, True, getCreditColor())
     aiTextRect = aiText.get_rect()
     aiTextRect.center = aiTextCenter
     getBigScreen().blit(aiText, aiTextRect)
 
 
 def uiRenderExternalMapInfo(mapInfoTextList, portrait):
-    if portrait:
-        fs = convertYCoordinate(16) // 2
-    else:
+    if not portrait:
         fs = convertXCoordinate(16)
+    else:
+        fs = int(convertYCoordinate(16) / 1.4)
 
     middle = tuple(ti/2.0 for ti in getBigScreen().get_size())
     for ind in range(len(mapInfoTextList)):
@@ -292,13 +312,13 @@ async def uiCompleteRender(finishTexts, mapInfoTextList, pacemakerInd, pacemaker
     uiAnimatePlayer(moveLegs, inTunnel, amaze, pos)
 
     if pacemakerTextNeeded:
-        uiRenderPacemakerText(pacemakerInd)
+        uiRenderPacemakerText(pacemakerInd, portrait)
     if amaze:
-        uiRenderAmazeText(amazeNumber)
+        uiRenderAmazeText(amazeNumber, portrait)
     if aiTextNeeded:
-        uiRenderAIText()
-        
-    uiShowFinishText(getBigScreen(), finishTexts, amaze)
+        uiRenderAIText(portrait)
+
+    uiShowFinishText(getBigScreen(), finishTexts, amaze, portrait)
     if mapInfoTextList:
         uiRenderExternalMapInfo(mapInfoTextList, portrait)
     showInfoBoxTxt(getBigScreen())

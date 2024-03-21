@@ -890,7 +890,7 @@ async def initWorldCreator(size, imagePath):
     return png, mask
 
 
-async def getInfiniteWorld(latlonMapOrigo, xyPictureSize, metersPerPixel, imagePath, benchmark):
+async def getInfiniteWorld(latlonMapOrigo, xyPictureSize, metersPerPixel, imagePath, benchmark, portrait):
     world, worldMask = await initWorldCreator(xyPictureSize, imagePath)
     if world == None:
         return None, None
@@ -905,7 +905,7 @@ async def getInfiniteWorld(latlonMapOrigo, xyPictureSize, metersPerPixel, imageP
 
     perfAddStart("wAreas")
     if mapName:
-        uiSubmitSlide("Creating map: " + mapName)
+        uiSubmitSlide("Creating map: " + mapName, portrait)
     await asyncio.sleep(0)
     if await uiFlushEvents():
         return None, None
@@ -1003,8 +1003,8 @@ def getInfiniteWorldPlace(city, citymap):
     return None, None
 
 
-async def getInfiniteWorldDefault(place, imagePath, benchmark):
+async def getInfiniteWorldDefault(place, imagePath, benchmark, portrait):
     latlonMapOrigo = tuple(place)
     metersPerPixel = (0.9 + 0.2 *random())
     xyPictureSize = (1024, 720)
-    return await getInfiniteWorld(latlonMapOrigo, xyPictureSize, metersPerPixel, imagePath, benchmark)
+    return await getInfiniteWorld(latlonMapOrigo, xyPictureSize, metersPerPixel, imagePath, benchmark, portrait)

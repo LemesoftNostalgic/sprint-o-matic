@@ -50,7 +50,7 @@ def showTextShadowed(surf, textCenter, fontSize, textStr, textColor, textShadowS
         if not portrait:
             fs = convertXCoordinate(fontSize)
         else:
-            fs = convertYCoordinate(fontSize) // 2
+            fs = int(convertYCoordinate(fontSize) / 1.7)
 
         textShadow = pygame.font.Font(getMasterFont(), fs).render(textStr, True, getGreyColor())
         textShadowRect = textShadow.get_rect()
@@ -91,12 +91,14 @@ def showInitSelectionConstantTexts(surf, positions, selections, inScale, texts, 
         xStart = convertXCoordinate(xStartOrig)
         yStart = convertYCoordinate(yStartOrig)
         scale = convertXCoordinate(inScale)
+        triangleShift = 0.8
     else:
         xStep = convertXCoordinate(xStepOrig*2)
         yStep = convertYCoordinate((yStepOrig*5)//11)
         xStart = convertXCoordinate((xStartOrig*3)//2)
         yStart = convertYCoordinate(yStartOrig//2)
         scale = (2*convertYCoordinate(inScale)) // 3
+        triangleShift = 0.8
 
     titleColorRandomElem = 60
     creditColor = getCreditColor()
@@ -113,7 +115,7 @@ def showInitSelectionConstantTexts(surf, positions, selections, inScale, texts, 
         controlShrinked = (positions[ind + 1][0]+lineDelta[0], positions[ind + 1][1]+lineDelta[1])
         uiDrawLine(surf, getTrackColor(), previousControlShrinked, controlShrinked, int(scale / 5))
     uiDrawLine(surf, getTrackColor(), (positions[0][0] - xStep + 3 * scale, positions[0][1]), (positions[0][0] - 2 * scale, positions[0][1]), int(scale / 5))
-    uiDrawTriangle(surf, 2 * scale, math.pi/2, (positions[0][0] - xStep * 0.8, positions[0][1]), int(scale / 5))
+    uiDrawTriangle(surf, 2 * scale, math.pi/2, (positions[0][0] - xStep * triangleShift, positions[0][1]), int(scale / 5))
     pos = (positions[len(positions) - 1][0], positions[len(positions) - 1][1])
     pygame.draw.circle(surf, getTrackColor(), pos, scale, width = int(scale / 5))
     pygame.draw.circle(surf, getTrackColor(), pos, scale * 1.6, width = int(scale / 5))
@@ -127,7 +129,7 @@ def showInitSelectionConstantTexts(surf, positions, selections, inScale, texts, 
     for ind in range(len(creditTextPositions)):
         showTextShadowed(surf, creditTextPositions[ind], 24, creditTexts[ind], getTrackColor(), 2, portrait)
     titleTextCenter = (surf.get_size()[0] / 2, yStart * 0.25)
-    showTextShadowed(surf, titleTextCenter, 128, getApplicationTitle(), titleColorRandom, 5, portrait)
+    showTextShadowed(surf, titleTextCenter, 96, getApplicationTitle(), titleColorRandom, 5, portrait)
     if news:
         showTextShadowed(surf, newsPosition, 24, "News: " + news, getPacemakerColor(2), 2, portrait)
     showTextShadowed(surf, (newsPosition[0], newsPosition[1] * 1.2), 24, "Homepage: tinyurl.com/sprint-o-matic", getPacemakerColor(2), 2, portrait)
@@ -247,7 +249,7 @@ async def initScreen(imagePath, gameSettings, externalImageData, externalWorldCi
             (xStart + 2.35 * xStep, yStart + 4.8 * yStep),
             (xStart + 3.35 * xStep, yStart + 5.4 * yStep)
             ]
-        externalExampleOverallPosition = (xStart + 3.6 * xStep, yStart + 7.16 * yStep)
+        externalExampleOverallPosition = (xStart + 3.7 * xStep, yStart + 7.16 * yStep)
         externalExampleTeamSelectionPosition = (xStart + 3.8 * xStep, yStart + 7.6 * yStep)
         externalExampleSelectionPosition = (xStart + 3.8 * xStep, yStart + 8.6 * yStep)
         loadingPosition = (xStart + 3 * xStep, yStart + 9.6 * yStep)
@@ -493,7 +495,7 @@ async def initScreen(imagePath, gameSettings, externalImageData, externalWorldCi
 
             if firstTime:
                 if veryFirstTime:
-                    uiSubmitTextListSlide(creditTextsEarly)
+                    uiSubmitTextListSlide(creditTextsEarly, portrait)
                     await uiFlip(False)
                     await asyncio.sleep(3)
                     veryFirstTime = False
@@ -548,7 +550,7 @@ async def initScreen(imagePath, gameSettings, externalImageData, externalWorldCi
             gameSettings.infiniteOulu = True
             gameSettings.infiniteWorld = False
             gameSettings.externalExample = ""
-            uiSubmitSlide(str(randrange(1000000,9999999)) + "th District of Infinite Oulu!")
+            uiSubmitSlide(str(randrange(1000000,9999999)) + "th District of Infinite Oulu!", portrait)
             await uiRenderImmediate(loadingPosition, loadingText, False, portrait)
         elif retSettings[3] == "infinite-world":
             gameSettings.infiniteOulu = False
@@ -557,16 +559,16 @@ async def initScreen(imagePath, gameSettings, externalImageData, externalWorldCi
             gameSettings.place, placeName = getInfiniteWorldPlace(worldExampleText, externalWorldCityMap)
             gameSettings.externalExample = ""
             if placeName:
-               uiSubmitSlide("Welcome to " + placeName + "...")
+               uiSubmitSlide("Welcome to " + placeName + "...", portrait)
             else:
-               uiSubmitSlide("Somewhere in " + worldExampleText + "...")
+               uiSubmitSlide("Somewhere in " + worldExampleText + "...", portrait)
             await uiRenderImmediate(loadingPosition, loadingText, False, portrait)
         elif retSettings[3] == "external-team" or retSettings[3] == "external-map":
             gameSettings.infiniteOulu = False
             gameSettings.infiniteWorld = False
             gameSettings.externalExample = externalExampleText
             gameSettings.externalExampleTeam = externalExampleTeamText
-            uiSubmitSlide("Welcome to " + externalExampleText)
+            uiSubmitSlide("Welcome to " + externalExampleText, portrait)
             await uiRenderImmediate(loadingPosition, loadingText, False, portrait)
 
     pygame.time.set_timer(TIMER_EVENT, 0)

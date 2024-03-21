@@ -122,6 +122,10 @@ def convertXCoordinateSpecificSurface(specificSurface, xCoord):
     xSpecificSurface, yDummy = specificSurface.get_size()
     return int((xCoord * xSpecificSurface) / xReference)
 
+def convertYCoordinateSpecificSurface(specificSurface, yCoord):
+    xDummy, ySpecificSurface = specificSurface.get_size()
+    return int((yCoord * ySpecificSurface) / yReference)
+
 def convertYCoordinate(yCoord):
     return int((yCoord * yCurrent) / yReference)
 
@@ -203,29 +207,37 @@ slideCtr = 0
 bigScreenCopy = None
 bigScreenNew = None
 bigScreenMul = None
-def uiSubmitSlide(textStr):
+def uiSubmitSlide(textStr, portrait):
     global slideCtr
     global bigScreenCopy
     global bigScreenNew
     global slideCtrStart
     if bigScreen:
+        if not portrait:
+            fs = convertXCoordinate(48)
+        else:
+            fs = int(convertYCoordinate(48) / 1.7)
         slideCtr = slideCtrStartUp
         sideCtrStart = slideCtrStartUp
         bigScreenCopy = bigScreen.copy()
         bigScreenNew = bigScreen.copy()
         bigScreenNew.fill(getBlackColor())
         middle = tuple(ti/2.0 for ti in bigScreenNew.get_size())
-        slideText = pygame.font.Font(getMasterFont(), convertXCoordinate(48)).render(textStr, True, getCreditColor())
+        slideText = pygame.font.Font(getMasterFont(), fs).render(textStr, True, getCreditColor())
         slideTextRect = slideText.get_rect()
         slideTextRect.center = middle
         bigScreenNew.blit(slideText, slideTextRect)
 
-def uiSubmitTextListSlide(textStrList):
+def uiSubmitTextListSlide(textStrList, portrait):
     global slideCtr
     global bigScreenCopy
     global bigScreenNew
     global slideCtrStart
     if bigScreen:
+        if not portrait:
+            fs = convertXCoordinate(32)
+        else:
+            fs = int(convertYCoordinate(32) / 1.7)
         slideCtr = slideCtrStartUp
         sideCtrStart = slideCtrStartUp
         bigScreenCopy = bigScreen.copy()
@@ -236,7 +248,7 @@ def uiSubmitTextListSlide(textStrList):
             ind = ind + 1
             middle = (bigScreenNew.get_size()[0]//2, (ind * bigScreenNew.get_size()[0])//(2*(len(textStrList) + 4)))
 
-            slideText = pygame.font.Font(getMasterFont(), convertXCoordinate(32)).render(textStr, True, getCreditColor())
+            slideText = pygame.font.Font(getMasterFont(), fs).render(textStr, True, getCreditColor())
             slideTextRect = slideText.get_rect()
             slideTextRect.center = middle
             bigScreenNew.blit(slideText, slideTextRect)
