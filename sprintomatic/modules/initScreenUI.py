@@ -38,6 +38,7 @@ selections = [
 arrowScale = 4
 initCircleRadius = 30
 veryFirstTime = True
+triangleShift = 0.8
 
 # these are for reference display screen of size (1920, 1080)
 xStepOrig = 160
@@ -91,14 +92,12 @@ def showInitSelectionConstantTexts(surf, positions, selections, inScale, texts, 
         xStart = convertXCoordinate(xStartOrig)
         yStart = convertYCoordinate(yStartOrig)
         scale = convertXCoordinate(inScale)
-        triangleShift = 0.8
     else:
         xStep = convertXCoordinate(xStepOrig*2)
         yStep = convertYCoordinate((yStepOrig*5)//11)
         xStart = convertXCoordinate((xStartOrig*3)//2)
         yStart = convertYCoordinate(yStartOrig//2)
         scale = (2*convertYCoordinate(inScale)) // 3
-        triangleShift = 0.8
 
     titleColorRandomElem = 60
     creditColor = getCreditColor()
@@ -174,6 +173,25 @@ def showInitSelections(surf, positions, selections, inScale, texts, titleTexts, 
     showTextShadowed(surf, externalPosition, extTextSize, externalText, getTrackColor(), 2, portrait)
     showTextShadowed(surf, ouluPosition, 32, ouluText, getTrackColor(), 2, portrait)
     showTextShadowed(surf, worldPosition, 32, worldText, getTrackColor(), 2, portrait)
+
+
+def getFingerIndex(fingerPos, positions, size, portrait, xStep):
+    pos = (fingerPos[0]*size[0], fingerPos[1]*size[1])
+    startpos = (positions[0][0] - xStep * triangleShift, positions[0][1])
+    if not portrait:
+        scale = convertXCoordinate(initCircleRadius)
+    else:
+        scale = convertYCoordinate(initCircleRadius) // 2
+
+    for ind in range(len(positions)):
+        place = positions[ind]
+        if distanceBetweenPoints(pos, place) < 1.3 * scale:
+            return ind
+
+    if distanceBetweenPoints(pos, startpos) < 1.3 * scale:
+        return -1
+
+    return None
 
 
 initScreenPos = 0
@@ -397,55 +415,47 @@ async def initScreen(imagePath, gameSettings, externalImageData, externalWorldCi
                 leftThreshold = 1 / 3
                 rightThreshold = 2 / 3
                 fingerPos = (event.x, event.y)
-                if event.x < leftThreshold:
-                    fingerDirection = "left"
-                elif event.x > rightThreshold:
-                    fingerDirection = "right"
-                else:
-                    fingerDirection = ""
-                    if initScreenPos == len(positions) - 1:
-                        running = False
-                    else:
-                        stepEffect()
-                        if not (initScreenPos == len(selections) - 1 and len(externalImageData) == 0):
-                            for subindexes in indexes:
-                                if initScreenPos in subindexes:
-                                    for ind in subindexes:
-                                        selections[ind] = False
-                            selections[initScreenPos] = True
-                            if initScreenPos == len(selections) - 2:
-                                externalExampleCtr = 0
-                                externalExampleTeamCtr = externalExampleTeamCtr + 1
-                                if externalExampleTeamCtr >= len(externalImageData):
-                                    externalExampleTeamCtr = 0
-                            if initScreenPos == len(selections) - 1:
-                                externalExampleCtr = externalExampleCtr + 1
-                                if externalExampleCtr >= len(externalImageData[externalExampleTeamCtr]["sub-listing"]):
-                                    externalExampleCtr = 0
-                            if initScreenPos == len(selections) - 4:
-                                worldExampleCtr = worldExampleCtr + 1
-                                if worldExampleCtr >= len(externalWorldCityMap):
-                                    worldExampleCtr = 0
+                fingerDirection = "pressed"
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 mousePressed = True
                 fingerDirection = ""
-
             elif event.type == pygame.QUIT:
                 quitting = True
                 running = False
 
-        if fingerDirection == "left":
+        if fingerDirection == "pressed":
             mousePressed = False
-            if initScreenPos > 0:
-                initScreenPos = initScreenPos - 1
+            initScreenPos = getFingerIndex(fingerPos, positions, getBigScreen().get_size(), portrait, xStep)
             fingerDirection = ""
             await asyncio.sleep(0.1)
-        elif fingerDirection == "right":
-            mousePressed = False
-            if initScreenPos < len(positions) - 1:
-                initScreenPos = initScreenPos + 1
-            fingerDirection = ""
-            await asyncio.sleep(0.1)
+            if initScreenPos is None:
+                pass
+            elif initScreenPos == -1:
+                quitting = True
+                running = False
+            elif initScreenPos == len(positions) - 1:
+                running = False
+            else:
+                stepEffect()
+                if not (initScreenPos == len(selections) - 1 and len(externalImageData) == 0):
+                    for subindexes in indexes:
+                        if initScreenPos in subindexes:
+                            for ind in subindexes:
+                                selections[ind] = False
+                    selections[initScreenPos] = True
+                    if initScreenPos == len(selections) - 2:
+                        externalExampleCtr = 0
+                        externalExampleTeamCtr = externalExampleTeamCtr + 1
+                        if externalExampleTeamCtr >= len(externalImageData):
+                            externalExampleTeamCtr = 0
+                    if initScreenPos == len(selections) - 1:
+                        externalExampleCtr = externalExampleCtr + 1
+                        if externalExampleCtr >= len(externalImageData[externalExampleTeamCtr]["sub-listing"]):
+                            externalExampleCtr = 0
+                    if initScreenPos == len(selections) - 4:
+                        worldExampleCtr = worldExampleCtr + 1
+                        if worldExampleCtr >= len(externalWorldCityMap):
+                            worldExampleCtr = 0
         elif mousePressed and not fingerInUse:
             fingerDirection = ""
             if pygame.mouse.get_pressed()[0]:
