@@ -29,7 +29,7 @@ from sprintomatic.modules.gameSettings import returnSettings, returnConfig
 from sprintomatic.modules.mathUtils import angleOfLine, angleOfPath, getRandomAngle, calculatePathDistance, angleDifference, fromRadiansToDegrees
 from sprintomatic.modules.trackCreator import createAutoControls, createAmazeControls
 from sprintomatic.modules.gameUIUtils import uiEarlyInit, uiLateQuit, uiFlushEvents
-from sprintomatic.modules.initScreenUI import initScreen
+from sprintomatic.modules.initScreenUI import initScreen, veryFirstTime
 from sprintomatic.modules.gameUI import uiInit, uiInitStartTriangle, uiStartControlEffect, uiControlEffectEnded, uiCenterTurnZoomTheMap, uiAnimatePlayer, uiAnimatePacemaker, uiRenderRoutes, uiRenderControls, uiCompleteRender, uiEvent, uiClearCanvas, raiseControlApproachZoom, lowerControlApproachZoom, uiRenderPacemakerText, uiRenderAIText, uiControlEffectRestart, uiRenderExternalMapInfo, uiStoreAnalysis, uiClearBuffers
 from sprintomatic.modules.gameEngine import startOverPlayerRoute, playerRoute, calculateNextStep, closeToControl, quiteCloseToControl, longLapEveryOther, generateAngleStep, normalizeAngleStep, defaultAngle, getPlayerRoute, getPacemakerThreshold, getPacemakerPos
 from sprintomatic.modules.pathPruning import calculatePathWeightedDistance
@@ -288,6 +288,7 @@ async def main():
         # start AI processes
         initializeAITables()
     portrait = uiEarlyInit(gameSettings.fullScreen, benchmark)
+    await veryFirstTime(portrait)
     externalImageData, offline = await downloadExternalImageData(gameSettings.ownMasterListing)
     if offline:
          gameSettings.offline = offline
@@ -362,7 +363,7 @@ async def main():
             else:
                 await asyncio.sleep(1)
                 await uiFlushEvents()
-                (quitting, gameSettings) = await initScreen(gameSettings.imageRoot, gameSettings, externalImageData, externalWorldCityMap, news, portrait)
+                (quitting, gameSettings, fingerInUse) = await initScreen(gameSettings.imageRoot, gameSettings, externalImageData, externalWorldCityMap, news, portrait)
             running = True
             if quitting:
                 running = False
@@ -399,7 +400,7 @@ async def main():
                 # Ok for init...
 
                 # generic default unless modified when setting the stage
-                position = uiInit(gameSettings.mapFileName, generatedOrDownloadedMap, gameSettings.metersPerPixel, benchmark)
+                position = uiInit(gameSettings.mapFileName, gameSettings.imageRoot, generatedOrDownloadedMap, gameSettings.metersPerPixel, benchmark)
 
                 trackLengthInPixels = gameSettings.trackLength / gameSettings.metersPerPixel
 
@@ -603,7 +604,7 @@ async def main():
                         if phoneRenderSkipCtr == 0:
                             if running:
                                 # Now enter the rendering phase
-                                shift = uiClearCanvas(controls, shortestRoutesArray, reachedControl, benchmark)
+                                shift = uiClearCanvas(controls, shortestRoutesArray, reachedControl, benchmark, fingerInUse)
 
                                 if gameSettings.pacemaker == 0:
                                     uiRenderRoutes(shortestRoutes, "shortest", shift)

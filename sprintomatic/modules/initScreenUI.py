@@ -175,6 +175,29 @@ def showInitSelections(surf, positions, selections, inScale, texts, titleTexts, 
     showTextShadowed(surf, worldPosition, 32, worldText, getTrackColor(), 2, portrait)
 
 
+async def veryFirstTime(portrait):
+    global veryFirstTime
+    creditTextsEarly = [
+        "Author: Jyrki Leskelä, Oulu",
+        "License: Apache-2.0.",
+        "",
+        "Credits for the 'World' map data: OpenStreetMap",
+        "",
+        "Credits for sound effects (freesound.org):",
+        "CC 1.0 DEED:",
+        "ali, craigsmith, crk365, frodo89, fupicat, jackslay, furbyguy",
+        "berdnikov2004, badoink, bronxio, cgoulao, fran_ky, iykqic0",
+        "johaynes, josefpres, nomiqbomi, seth, szymalix, the_loner",
+        "CC BY 3.0 DEED:",
+        "frodo89 for 84456__frodo89__standard-beep-pre-start.ogg"
+        ]
+    if veryFirstTime:
+        uiSubmitTextListSlide(creditTextsEarly, portrait)
+        await uiFlip(False)
+        await asyncio.sleep(1)
+        veryFirstTime = False
+
+
 def getFingerIndex(fingerPos, positions, size, portrait, xStep):
     pos = (fingerPos[0]*size[0], fingerPos[1]*size[1])
     startpos = (positions[0][0] - xStep * triangleShift, positions[0][1])
@@ -292,20 +315,6 @@ async def initScreen(imagePath, gameSettings, externalImageData, externalWorldCi
         "Author: Jyrki Leskelä, Oulu.",
         "Use mouse keys, touchscreen, or keyboard.",
         "move: arrows, select: SPACE/BACKSPACE, quit: ESC",
-        ]
-    creditTextsEarly = [
-        "Author: Jyrki Leskelä, Oulu",
-        "License: Apache-2.0.",
-        "",
-        "Credits for the 'World' map data: OpenStreetMap",
-        "",
-        "Credits for sound effects (freesound.org):",
-        "CC 1.0 DEED:",
-        "ali, craigsmith, crk365, frodo89, fupicat, jackslay, furbyguy",
-        "berdnikov2004, badoink, bronxio, cgoulao, fran_ky, iykqic0",
-        "johaynes, josefpres, nomiqbomi, seth, szymalix, the_loner",
-        "CC BY 3.0 DEED:",
-        "frodo89 for 84456__frodo89__standard-beep-pre-start.ogg"
         ]
     # "external" always last
     texts = [
@@ -504,12 +513,6 @@ async def initScreen(imagePath, gameSettings, externalImageData, externalWorldCi
                 selections[-4] = True
 
             if firstTime:
-                if veryFirstTime:
-                    uiSubmitTextListSlide(creditTextsEarly, portrait)
-                    await uiFlip(False)
-                    await asyncio.sleep(3)
-                    veryFirstTime = False
-
                 showInitSelectionConstantTexts(backgroundImage, positions, selections, initCircleRadius, texts, titleTexts, titleTextPositions, creditTexts, creditTextPositions, news, newsPosition, externalExampleOverallText, externalExampleOverallPosition, portrait)
             getBigScreen().blit(backgroundImage, backgroundImage.get_rect())
             showInitSelections(getBigScreen(), positions, selections, initCircleRadius, texts, titleTexts, titleTextPositions, externalExampleTeamText, externalExampleTeamSelectionPosition, externalExampleText, externalExampleSelectionPosition, ouluExampleText, ouluExampleSelectionPosition, worldExampleText, worldExampleSelectionPosition, portrait)
@@ -582,4 +585,4 @@ async def initScreen(imagePath, gameSettings, externalImageData, externalWorldCi
             await uiRenderImmediate(loadingPosition, loadingText, False, portrait)
 
     pygame.time.set_timer(TIMER_EVENT, 0)
-    return quitting, gameSettings
+    return quitting, gameSettings, fingerInUse

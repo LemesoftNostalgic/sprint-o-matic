@@ -64,6 +64,9 @@ mapInfoTextTitles = [ "map: ", "map license: ", "created by: ", "terrain png: ",
 
 # Intermediate surfaces for the gameplay
 oMapEarly = None
+leftImage = None
+rightImage = None
+stopImage = None
 oMap = None
 oMapMid = None
 oMapCopy = None
@@ -83,15 +86,22 @@ previousEffectStep = 0
 effectStepStart = 64
 
 
-def uiInit(fileName, generatedMap, metersPerPixerInput, benchmark):
+def uiInit(fileName, imagePath, generatedMap, metersPerPixerInput, benchmark):
     global effectStepStart
     global surfMe
+    global leftImage
+    global rightImage
+    global stopImage
     effectStepStart = getEffectStepStart(benchmark)
     global oMap, oMapEarly, surf, screen, bigScreen, me, metersPerPixel
     if generatedMap is not None:
         oMapEarly = generatedMap
     else:
         oMapEarly = pygame.image.load(fileName)
+    leftImage = pygame.image.load(imagePath + "lemesoftnostalgic/turnLeft.png")
+    rightImage = pygame.image.load(imagePath + "lemesoftnostalgic/turnRight.png")
+    stopImage = pygame.image.load(imagePath + "lemesoftnostalgic/stop.png")
+
     size = oMapEarly.get_size()
     surfSize = size
     if benchmark == "phone":
@@ -321,6 +331,7 @@ async def uiCompleteRender(finishTexts, mapInfoTextList, pacemakerInd, pacemaker
     uiShowFinishText(getBigScreen(), finishTexts, amaze, portrait)
     if mapInfoTextList:
         uiRenderExternalMapInfo(mapInfoTextList, portrait)
+    getBigScreen().blit(stopImage, dest=((getBigScreen().get_size()[0]-leftImage.get_size()[0])//2, getBigScreen().get_size()[1]-1.5*leftImage.get_size()[1]))
     showInfoBoxTxt(getBigScreen())
     if firstTime:
         uiUnSubmitSlide()
@@ -408,7 +419,7 @@ def uiClearBuffers():
     global oMap, oMapMid
     oMap = None
     oMapMid = None
-    
+
 
 def uiControlEffectRestart():
     global effectControl
@@ -453,7 +464,7 @@ def uiRenderControls(controls, usePacemaker, amaze, shift):
     perfAddStop("renCtrls")
 
 
-def uiClearCanvas(controls, shortestRoutesArray, reachedControl, benchmark):
+def uiClearCanvas(controls, shortestRoutesArray, reachedControl, benchmark, fingerInUse):
     global oMapCopy, oMapEarly, oMap, oMapMid, prevReachedControl, bboxStartX, bboxStartY
 
     surf.fill(getWhiteColor())
@@ -485,6 +496,9 @@ def uiClearCanvas(controls, shortestRoutesArray, reachedControl, benchmark):
     if benchmark == "phone" and reachedControl != prevReachedControl:
         prevReachedControl = reachedControl
         getBigScreen().fill(getWhiteColor())
+        if fingerInUse:
+            getBigScreen().blit(leftImage, dest=(leftImage.get_size()[0]//2, getBigScreen().get_size()[1]-1.5*leftImage.get_size()[1]))
+            getBigScreen().blit(rightImage, dest=(getBigScreen().get_size()[0]-1.5*leftImage.get_size()[0], getBigScreen().get_size()[1]-1.5*leftImage.get_size()[1]))
         if reachedControl >= len(shortestRoutesArray):
             reachedControl = len(shortestRoutesArray) - 1
         points = shortestRoutesArray[reachedControl][0]
