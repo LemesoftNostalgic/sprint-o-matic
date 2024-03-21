@@ -158,7 +158,7 @@ def uiRenderPacemakerText(pacemakerInd):
         getBigScreen().blit(pacemakerText, pacemakerTextRect)
 
 
-def uiRenderAIText():
+def uiRenderAIText():    
     middle = tuple(ti/2.0 for ti in getBigScreen().get_size())
     aiTextCenter = (middle[0], middle[1] * 0.05)
     aiText = pygame.font.Font(getMasterFont(), convertXCoordinate(32)).render(aiTextStr, True, getCreditColor())
@@ -167,12 +167,17 @@ def uiRenderAIText():
     getBigScreen().blit(aiText, aiTextRect)
 
 
-def uiRenderExternalMapInfo(mapInfoTextList):
+def uiRenderExternalMapInfo(mapInfoTextList, portrait):
+    if portrait:
+        fs = convertYCoordinate(16) // 2
+    else:
+        fs = convertXCoordinate(16)
+
     middle = tuple(ti/2.0 for ti in getBigScreen().get_size())
     for ind in range(len(mapInfoTextList)):
         mapTextStr = mapInfoTextTitles[ind] + mapInfoTextList[ind]
         mapTextCenter = (middle[0], middle[1] + middle[1] * (0.6 + 0.05 * ind))
-        mapText = pygame.font.Font(getMasterFont(), convertXCoordinate(16)).render(mapTextStr, True, getFinishTextColor())
+        mapText = pygame.font.Font(getMasterFont(), fs).render(mapTextStr, True, getFinishTextColor())
         mapTextRect = mapText.get_rect()
         mapTextRect.center = mapTextCenter
         pygame.draw.rect(getBigScreen(), getWhiteColor(), mapTextRect, 0)
@@ -273,7 +278,7 @@ def uiAnimatePacemaker(pos, angle, scale, pacemakerInd, inTunnel, background, sh
         feetPlusPacemaker = uiAnimateCharacter(oMapCopy, p, math.pi - angle, getPacemakerColor(pacemakerInd), 0.6 * scale / metersPerPixel, feetPlusPacemaker, inTunnel, background, False)
 
 
-async def uiCompleteRender(finishTexts, mapInfoTextList, pacemakerInd, pacemakerTextNeeded, aiTextNeeded, amaze, amazeNumber, firstTime, moveLegs, inTunnel):
+async def uiCompleteRender(finishTexts, mapInfoTextList, pacemakerInd, pacemakerTextNeeded, aiTextNeeded, amaze, amazeNumber, firstTime, moveLegs, inTunnel, portrait):
     global prevBigRect
     perfAddStart("renComlete")
     xShift = (getBigScreen().get_size()[0]//2 - surfMe[0])
@@ -295,7 +300,7 @@ async def uiCompleteRender(finishTexts, mapInfoTextList, pacemakerInd, pacemaker
         
     uiShowFinishText(getBigScreen(), finishTexts, amaze)
     if mapInfoTextList:
-        uiRenderExternalMapInfo(mapInfoTextList)
+        uiRenderExternalMapInfo(mapInfoTextList, portrait)
     showInfoBoxTxt(getBigScreen())
     if firstTime:
         uiUnSubmitSlide()

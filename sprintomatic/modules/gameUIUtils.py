@@ -158,6 +158,11 @@ def uiEarlyInit(fullScreen, benchmark):
     pygame.mouse.set_visible(False)
     xCurrent, yCurrent = bigScreen.get_size()
 
+    portrait = False
+    if xCurrent < yCurrent:
+        portrait = True
+    return portrait
+
     
 def uiDrawLine(surfa, color, start, end, width):
     angle = angleOfLine([start, end])
@@ -214,6 +219,27 @@ def uiSubmitSlide(textStr):
         slideTextRect = slideText.get_rect()
         slideTextRect.center = middle
         bigScreenNew.blit(slideText, slideTextRect)
+
+def uiSubmitTextListSlide(textStrList):
+    global slideCtr
+    global bigScreenCopy
+    global bigScreenNew
+    global slideCtrStart
+    if bigScreen:
+        slideCtr = slideCtrStartUp
+        sideCtrStart = slideCtrStartUp
+        bigScreenCopy = bigScreen.copy()
+        bigScreenNew = bigScreen.copy()
+        bigScreenNew.fill(getBlackColor())
+        ind = 2
+        for textStr in textStrList:
+            ind = ind + 1
+            middle = (bigScreenNew.get_size()[0]//2, (ind * bigScreenNew.get_size()[0])//(2*(len(textStrList) + 4)))
+
+            slideText = pygame.font.Font(getMasterFont(), convertXCoordinate(32)).render(textStr, True, getCreditColor())
+            slideTextRect = slideText.get_rect()
+            slideTextRect.center = middle
+            bigScreenNew.blit(slideText, slideTextRect)
 
 
 def uiFadeVisibleSlide():

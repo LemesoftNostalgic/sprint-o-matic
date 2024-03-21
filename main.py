@@ -276,7 +276,6 @@ async def main():
 
     benchmark = await perfBenchmark()
 
-    
     # all the initialization that happens only once at the startup
     perfClearSuite()
 
@@ -288,7 +287,7 @@ async def main():
     if gameSettings.accurate:
         # start AI processes
         initializeAITables()
-    uiEarlyInit(gameSettings.fullScreen, benchmark)
+    portrait = uiEarlyInit(gameSettings.fullScreen, benchmark)
     externalImageData, offline = await downloadExternalImageData(gameSettings.ownMasterListing)
     if offline:
          gameSettings.offline = offline
@@ -363,7 +362,7 @@ async def main():
             else:
                 await asyncio.sleep(1)
                 await uiFlushEvents()
-                (quitting, gameSettings) = await initScreen(gameSettings.imageRoot, gameSettings, externalImageData, externalWorldCityMap, news)
+                (quitting, gameSettings) = await initScreen(gameSettings.imageRoot, gameSettings, externalImageData, externalWorldCityMap, news, portrait)
             running = True
             if quitting:
                 running = False
@@ -657,7 +656,7 @@ async def main():
                                                 externalMapInfoTexts = [stripMapName(subitem["map-url"]), subitem["map-license"], subitem["map-credits"], stripMapName(subitem["lookup-png-url"]), subitem["lookup-png-license"], subitem["lookup-png-credits"]]
                                                 break
                             if gameSettings.noUiTest != "yes":
-                                await uiCompleteRender(finishTexts, externalMapInfoTexts, gameSettings.pacemaker, pacemakerTextNeeded, aiTextNeeded, gameSettings.amaze, difficulty, firstTime, moveLegs, inTunnel)
+                                await uiCompleteRender(finishTexts, externalMapInfoTexts, gameSettings.pacemaker, pacemakerTextNeeded, aiTextNeeded, gameSettings.amaze, difficulty, firstTime, moveLegs, inTunnel, portrait)
                             firstTime = False
 
                         if benchmark == "phone":
