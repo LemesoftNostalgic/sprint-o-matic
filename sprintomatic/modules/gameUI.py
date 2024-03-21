@@ -308,7 +308,7 @@ def uiAnimatePacemaker(pos, angle, scale, pacemakerInd, inTunnel, background, sh
         feetPlusPacemaker = uiAnimateCharacter(oMapCopy, p, math.pi - angle, getPacemakerColor(pacemakerInd), 0.6 * scale / metersPerPixel, feetPlusPacemaker, inTunnel, background, False)
 
 
-async def uiCompleteRender(finishTexts, mapInfoTextList, pacemakerInd, pacemakerTextNeeded, aiTextNeeded, amaze, amazeNumber, firstTime, moveLegs, inTunnel, portrait):
+async def uiCompleteRender(finishTexts, mapInfoTextList, pacemakerInd, pacemakerTextNeeded, aiTextNeeded, amaze, amazeNumber, firstTime, moveLegs, inTunnel, portrait, fingerInUse):
     global prevBigRect
     perfAddStart("renComlete")
     xShift = (getBigScreen().get_size()[0]//2 - surfMe[0])
@@ -318,6 +318,10 @@ async def uiCompleteRender(finishTexts, mapInfoTextList, pacemakerInd, pacemaker
     if prevBigRect:
         pygame.draw.rect(getBigScreen(), getWhiteColor(), prevBigRect)
     getBigScreen().blit(screen, bigRect)
+    if fingerInUse:
+        getBigScreen().blit(leftImage, dest=(leftImage.get_size()[0]*0.2, getBigScreen().get_size()[1]-1.2*leftImage.get_size()[1]))
+        getBigScreen().blit(rightImage, dest=(getBigScreen().get_size()[0]-1.2*leftImage.get_size()[0], getBigScreen().get_size()[1]-1.2*leftImage.get_size()[1]))
+        getBigScreen().blit(stopImage, dest=((getBigScreen().get_size()[0]-leftImage.get_size()[0])//2, getBigScreen().get_size()[1]-1.2*leftImage.get_size()[1]))
     prevBigRect = bigRect
     uiAnimatePlayer(moveLegs, inTunnel, amaze, pos)
 
@@ -463,7 +467,7 @@ def uiRenderControls(controls, usePacemaker, amaze, shift):
     perfAddStop("renCtrls")
 
 
-def uiClearCanvas(controls, shortestRoutesArray, reachedControl, benchmark, fingerInUse):
+def uiClearCanvas(controls, shortestRoutesArray, reachedControl, benchmark):
     global oMapCopy, oMapEarly, oMap, oMapMid, prevReachedControl, bboxStartX, bboxStartY
 
     surf.fill(getWhiteColor())
@@ -495,10 +499,6 @@ def uiClearCanvas(controls, shortestRoutesArray, reachedControl, benchmark, fing
     if benchmark == "phone" and reachedControl != prevReachedControl:
         prevReachedControl = reachedControl
         getBigScreen().fill(getWhiteColor())
-        if fingerInUse:
-            getBigScreen().blit(leftImage, dest=(leftImage.get_size()[0]*0.2, getBigScreen().get_size()[1]-1.2*leftImage.get_size()[1]))
-            getBigScreen().blit(rightImage, dest=(getBigScreen().get_size()[0]-1.2*leftImage.get_size()[0], getBigScreen().get_size()[1]-1.2*leftImage.get_size()[1]))
-            getBigScreen().blit(stopImage, dest=((getBigScreen().get_size()[0]-leftImage.get_size()[0])//2, getBigScreen().get_size()[1]-1.2*leftImage.get_size()[1]))
         if reachedControl >= len(shortestRoutesArray):
             reachedControl = len(shortestRoutesArray) - 1
         points = shortestRoutesArray[reachedControl][0]

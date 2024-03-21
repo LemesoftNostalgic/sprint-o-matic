@@ -604,7 +604,7 @@ async def main():
                         if phoneRenderSkipCtr == 0:
                             if running:
                                 # Now enter the rendering phase
-                                shift = uiClearCanvas(controls, shortestRoutesArray, reachedControl, benchmark, fingerInUse)
+                                shift = uiClearCanvas(controls, shortestRoutesArray, reachedControl, benchmark)
 
                                 if gameSettings.pacemaker == 0:
                                     uiRenderRoutes(shortestRoutes, "shortest", shift)
@@ -657,7 +657,7 @@ async def main():
                                                 externalMapInfoTexts = [stripMapName(subitem["map-url"]), subitem["map-license"], subitem["map-credits"], stripMapName(subitem["lookup-png-url"]), subitem["lookup-png-license"], subitem["lookup-png-credits"]]
                                                 break
                             if gameSettings.noUiTest != "yes":
-                                await uiCompleteRender(finishTexts, externalMapInfoTexts, gameSettings.pacemaker, pacemakerTextNeeded, aiTextNeeded, gameSettings.amaze, difficulty, firstTime, moveLegs, inTunnel, portrait)
+                                await uiCompleteRender(finishTexts, externalMapInfoTexts, gameSettings.pacemaker, pacemakerTextNeeded, aiTextNeeded, gameSettings.amaze, difficulty, firstTime, moveLegs, inTunnel, portrait, fingerInUse)
                             firstTime = False
 
                         if benchmark == "phone":
