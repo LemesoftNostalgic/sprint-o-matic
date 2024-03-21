@@ -331,7 +331,6 @@ async def uiCompleteRender(finishTexts, mapInfoTextList, pacemakerInd, pacemaker
     uiShowFinishText(getBigScreen(), finishTexts, amaze, portrait)
     if mapInfoTextList:
         uiRenderExternalMapInfo(mapInfoTextList, portrait)
-    getBigScreen().blit(stopImage, dest=((getBigScreen().get_size()[0]-leftImage.get_size()[0])//2, getBigScreen().get_size()[1]-1.5*leftImage.get_size()[1]))
     showInfoBoxTxt(getBigScreen())
     if firstTime:
         uiUnSubmitSlide()
@@ -497,8 +496,9 @@ def uiClearCanvas(controls, shortestRoutesArray, reachedControl, benchmark, fing
         prevReachedControl = reachedControl
         getBigScreen().fill(getWhiteColor())
         if fingerInUse:
-            getBigScreen().blit(leftImage, dest=(leftImage.get_size()[0]//2, getBigScreen().get_size()[1]-1.5*leftImage.get_size()[1]))
-            getBigScreen().blit(rightImage, dest=(getBigScreen().get_size()[0]-1.5*leftImage.get_size()[0], getBigScreen().get_size()[1]-1.5*leftImage.get_size()[1]))
+            getBigScreen().blit(leftImage, dest=(leftImage.get_size()[0]*0.2, getBigScreen().get_size()[1]-1.2*leftImage.get_size()[1]))
+            getBigScreen().blit(rightImage, dest=(getBigScreen().get_size()[0]-1.2*leftImage.get_size()[0], getBigScreen().get_size()[1]-1.2*leftImage.get_size()[1]))
+            getBigScreen().blit(stopImage, dest=((getBigScreen().get_size()[0]-leftImage.get_size()[0])//2, getBigScreen().get_size()[1]-1.2*leftImage.get_size()[1]))
         if reachedControl >= len(shortestRoutesArray):
             reachedControl = len(shortestRoutesArray) - 1
         points = shortestRoutesArray[reachedControl][0]
