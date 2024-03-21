@@ -434,17 +434,19 @@ async def initScreen(imagePath, gameSettings, externalImageData, externalWorldCi
 
         if fingerDirection == "pressed":
             mousePressed = False
-            initScreenPos = getFingerIndex(fingerPos, positions, getBigScreen().get_size(), portrait, xStep)
+            screenPos = getFingerIndex(fingerPos, positions, getBigScreen().get_size(), portrait, xStep)
             fingerDirection = ""
             await asyncio.sleep(0.1)
-            if initScreenPos is None:
+            if screenPos is None:
                 pass
-            elif initScreenPos == -1:
+            elif screenPos == -1:
                 quitting = True
                 running = False
-            elif initScreenPos == len(positions) - 1:
+            elif screenPos == len(positions) - 1:
                 running = False
+                initScreenPos = screenPos
             else:
+                initScreenPos = screenPos
                 stepEffect()
                 if not (initScreenPos == len(selections) - 1 and len(externalImageData) == 0):
                     for subindexes in indexes:
