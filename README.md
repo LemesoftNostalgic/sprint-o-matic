@@ -44,13 +44,13 @@ which have improved a little bit during this winter.
 
 ### Web application
 
-Use the web version if you want to just try the application quickly.
+Use the web version if you want to try the app immediately.
 The web application works quite ok with the modern browsers, except for
-the sound quality, that varies. However, the web version
+the sound quality, which varies. However, the web version
 is always up-to date.
 
-The web app can also be tried out with phones, at least Android,
-but the speed is not that good on an average smartphones.
+The web app can also be used with phones,
+but there is no sounds, and the graphics is not as good as with PC.
 
   * [Web application starts here](https://lemesoftnostalgic.github.io/sprint-o-matic/)
 
@@ -67,7 +67,8 @@ It is also a bit faster and nicer to play than the web application.
 
 The native application has been tested against Ubuntu 20.04 and
 Windows 10. The web version requires a relatively modern browser.
-Using the **--accurate** command-line parameter requires relatively modern
+
+Using the **--accurate** command-line parameter requires a powerful
 Linux PC due to
 its search algorithms that run in separate processes.
 
