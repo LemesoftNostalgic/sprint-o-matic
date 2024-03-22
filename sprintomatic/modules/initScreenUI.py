@@ -21,7 +21,7 @@ import asyncio
 import pygame
 import math
 
-from .gameUIUtils import getApplicationTitle, getMasterFont, getStopKey, getUpKey, getLeftKey, getRightKey, getDownKey, getEnterKey, getSpaceKey, getBackKey, getPlayerColor, getPacemakerColor, getTrackColor, getCreditColor, getGreyColor, convertXCoordinate, convertYCoordinate, getBigScreen, getTimerStep, uiDrawTriangle, checkAutoTestKey, uiFlip, uiSubmitSlide, uiSubmitTextListSlide, uiFlushEvents, uiFadeVisibleSlide, uiFadeUnVisibleSlide, uiDrawLine, uiDrawCircle
+from .gameUIUtils import getApplicationTitle, getMasterFont, getStopKey, getUpKey, getLeftKey, getRightKey, getDownKey, getEnterKey, getSpaceKey, getBackKey, getPlayerColor, getPacemakerColor, getTrackColor, getCreditColor, getGreyColor, convertXCoordinate, convertYCoordinate, getBigScreen, getTimerStep, uiDrawTriangle, uiFlip, uiSubmitSlide, uiSubmitTextListSlide, uiFlushEvents, uiFadeVisibleSlide, uiFadeUnVisibleSlide, uiDrawLine, uiDrawCircle
 
 from .infiniteWorld import getInfiniteWorldPlace
 from .mathUtils import distanceBetweenPoints
@@ -38,7 +38,7 @@ selections = [
 arrowScale = 4
 initCircleRadius = 30
 veryFirstTime = True
-triangleShift = 0.8
+triangleShift = 1.0
 
 # these are for reference display screen of size (1920, 1080)
 xStepOrig = 160
@@ -79,12 +79,15 @@ def showInitArrow(surf, spot, inScale, portrait):
     uiDrawLine(surf, getPlayerColor(), arrow1, arrow4, scale*2)
 
 
-async def uiRenderImmediate(pos, textStr, fast, portrait):
-    showTextShadowed(getBigScreen(), pos, 32, textStr, getTrackColor(), 2, portrait)
+async def uiRenderImmediate(pos, textStr, fast, benchmark, portrait):
+    shift = 2
+    if benchmark == "phone":
+        shift = 1
+    showTextShadowed(getBigScreen(), pos, 32, textStr, getTrackColor(), shift, portrait)
     await uiFlip(fast)
 
 
-def showInitSelectionConstantTexts(surf, positions, selections, inScale, texts, titleTexts, titleTextPositions, creditTexts, creditTextPositions, news, newsPosition, externalOverallText, externalOverallPos, portrait):
+def showInitSelectionConstantTexts(surf, positions, selections, inScale, texts, titleTexts, titleTextPositions, creditTexts, creditTextPositions, news, newsPosition, externalOverallText, externalOverallPos, benchmark, portrait):
     # scale for the current display
     if not portrait:
         xStep = convertXCoordinate(xStepOrig)
@@ -98,6 +101,9 @@ def showInitSelectionConstantTexts(surf, positions, selections, inScale, texts, 
         xStart = convertXCoordinate((xStartOrig*3)//2)
         yStart = convertYCoordinate(yStartOrig//2)
         scale = (2*convertYCoordinate(inScale)) // 3
+    shift = 2
+    if benchmark == "phone":
+        shift = 1
 
     titleColorRandomElem = 60
     creditColor = getCreditColor()
@@ -106,7 +112,7 @@ def showInitSelectionConstantTexts(surf, positions, selections, inScale, texts, 
         pos = (positions[ind][0], positions[ind][1])
         uiDrawCircle(surf, getTrackColor(), pos, (scale * 1.6), int(scale / 5))
         theTextCenter = (pos[0], pos[1] - scale * 2.0)
-        showTextShadowed(surf, theTextCenter, 32, texts[ind], getTrackColor(), 2, portrait)
+        showTextShadowed(surf, theTextCenter, 32, texts[ind], getTrackColor(), shift, portrait)
         lineItself = (pos[0] - positions[ind + 1][0], pos[1] - positions[ind + 1][1])
         fraction = 2 * scale / distanceBetweenPoints((0,0), lineItself)
         lineDelta = (lineItself[0]*fraction, lineItself[1]*fraction)
@@ -119,23 +125,23 @@ def showInitSelectionConstantTexts(surf, positions, selections, inScale, texts, 
     pygame.draw.circle(surf, getTrackColor(), pos, scale, width = int(scale / 5))
     pygame.draw.circle(surf, getTrackColor(), pos, scale * 1.6, width = int(scale / 5))
     theTextCenter = (positions[len(positions) - 1][0], positions[len(positions) - 1][1] - scale * 2.0)
-    showTextShadowed(surf, theTextCenter, 32, texts[len(positions) - 1], getTrackColor(), 2, portrait)
+    showTextShadowed(surf, theTextCenter, 32, texts[len(positions) - 1], getTrackColor(), shift, portrait)
 
     for ind in range(len(titleTextPositions)):
         pos = titleTextPositions[ind]
         theTextCenter = (pos[0], pos[1] - scale * 2.0)
-        showTextShadowed(surf, theTextCenter, 40, titleTexts[ind], getTrackColor(), 2, portrait)
+        showTextShadowed(surf, theTextCenter, 40, titleTexts[ind], getTrackColor(), shift, portrait)
     for ind in range(len(creditTextPositions)):
-        showTextShadowed(surf, creditTextPositions[ind], 24, creditTexts[ind], getTrackColor(), 2, portrait)
+        showTextShadowed(surf, creditTextPositions[ind], 28, creditTexts[ind], getTrackColor(), shift, portrait)
     titleTextCenter = (surf.get_size()[0] / 2, yStart * 0.25)
-    showTextShadowed(surf, titleTextCenter, 96, getApplicationTitle(), titleColorRandom, 5, portrait)
+    showTextShadowed(surf, titleTextCenter, 96, getApplicationTitle(), titleColorRandom, 3 * shift, portrait)
     if news:
-        showTextShadowed(surf, newsPosition, 24, "News: " + news, getPacemakerColor(2), 2, portrait)
-    showTextShadowed(surf, (newsPosition[0], newsPosition[1] * 1.2), 24, "Homepage: tinyurl.com/sprint-o-matic", getPacemakerColor(2), 2, portrait)
-    showTextShadowed(surf, externalOverallPos, 32, externalOverallText, getTrackColor(), 2, portrait)
+        showTextShadowed(surf, newsPosition, 28, "News: " + news, getPacemakerColor(2), shift, portrait)
+    showTextShadowed(surf, (newsPosition[0], newsPosition[1] * 1.2), 28, "Homepage: tinyurl.com/sprint-o-matic", getPacemakerColor(2), shift, portrait)
+    showTextShadowed(surf, externalOverallPos, 32, externalOverallText, getTrackColor(), shift, portrait)
 
 
-def showInitSelections(surf, positions, selections, inScale, texts, titleTexts, titleTextPositions, externalTeamText, externalTeamPosition, externalText, externalPosition, ouluText, ouluPosition, worldText, worldPosition, portrait):
+def showInitSelections(surf, positions, selections, inScale, texts, titleTexts, titleTextPositions, externalTeamText, externalTeamPosition, externalText, externalPosition, ouluText, ouluPosition, worldText, worldPosition, benchmark, portrait):
     # scale for the current display
     if not portrait:
         xStep = convertXCoordinate(xStepOrig)
@@ -149,6 +155,9 @@ def showInitSelections(surf, positions, selections, inScale, texts, titleTexts, 
         xStart = convertXCoordinate((xStartOrig*3)//2)
         yStart = convertYCoordinate(yStartOrig//2)
         scale = (2*convertYCoordinate(inScale)) // 3
+    shift = 2
+    if benchmark == "phone":
+        shift = 1
     titleColorRandomElem = randrange(56, 64)
     creditColor = getCreditColor()
     titleColorRandom = (creditColor[0] - titleColorRandomElem, creditColor[1] - titleColorRandomElem, creditColor[2])
@@ -164,15 +173,15 @@ def showInitSelections(surf, positions, selections, inScale, texts, titleTexts, 
             externalTeamText = externalTeamText[:extTextUpperThreshold] + ".."
     if len(externalTeamText) >= extTextThreshold:
         extTeamTextSize = (extTeamTextSize * extTextThreshold) // len(externalTeamText)
-    showTextShadowed(surf, externalTeamPosition, extTeamTextSize, externalTeamText, getTrackColor(), 2, portrait)
+    showTextShadowed(surf, externalTeamPosition, extTeamTextSize, externalTeamText, getTrackColor(), shift, portrait)
     extTextSize = 32
     if len(externalText) >= extTextUpperThreshold:
             externalText = externalText[:extTextUpperThreshold] + ".."
     if len(externalText) >= extTextThreshold:
         extTextSize = (extTextSize * extTextThreshold) // len(externalText)
-    showTextShadowed(surf, externalPosition, extTextSize, externalText, getTrackColor(), 2, portrait)
-    showTextShadowed(surf, ouluPosition, 32, ouluText, getTrackColor(), 2, portrait)
-    showTextShadowed(surf, worldPosition, 32, worldText, getTrackColor(), 2, portrait)
+    showTextShadowed(surf, externalPosition, extTextSize, externalText, getTrackColor(), shift, portrait)
+    showTextShadowed(surf, ouluPosition, 32, ouluText, getTrackColor(), shift, portrait)
+    showTextShadowed(surf, worldPosition, 32, worldText, getTrackColor(), shift, portrait)
 
 
 async def veryFirstTime(portrait):
@@ -182,7 +191,6 @@ async def veryFirstTime(portrait):
         "License: Apache-2.0.",
         "",
         "Credits for the 'World' map data: OpenStreetMap",
-        "",
         "Credits for sound effects (freesound.org):",
         "CC 1.0 DEED:",
         "ali, craigsmith, crk365, frodo89, fupicat, jackslay, furbyguy",
@@ -221,7 +229,7 @@ initScreenPos = 0
 externalExampleTeamCtr = 0
 externalExampleCtr = 0
 worldExampleCtr = 0
-async def initScreen(imagePath, gameSettings, externalImageData, externalWorldCityMap, news, portrait):
+async def initScreen(imagePath, gameSettings, externalImageData, externalWorldCityMap, news, benchmark, portrait):
     global selections
     global externalExampleTeamCtr
     global externalExampleCtr
@@ -239,7 +247,7 @@ async def initScreen(imagePath, gameSettings, externalImageData, externalWorldCi
         xStart = convertXCoordinate(xStartOrig)
         yStart = convertYCoordinate(yStartOrig)
 
-        newsPosition = (xStart + 7 * xStep, yStart - yStep * 2 / 3)
+        newsPosition = (xStart + 6.5 * xStep, yStart - yStep * 3 / 4)
         positions = [
             # first row 6
             (xStart, yStart), (xStart + xStep, yStart), (xStart + 2 * xStep, yStart), (xStart + 3 * xStep, yStart), (xStart + 4 * xStep, yStart), (xStart + 5 * xStep, yStart), 
@@ -255,16 +263,16 @@ async def initScreen(imagePath, gameSettings, externalImageData, externalWorldCi
             (xStart + 4 * xStep - xStep / 10, yStart + 2 * yStep + yStep/4),
             (xStart + 4.6 * xStep - xStep / 7, yStart + 3 * yStep + yStep/4)
             ]
-        externalExampleOverallPosition = (xStart + 8.1 * xStep, yStart + 2.55 * yStep)
+        externalExampleOverallPosition = (xStart + 8.1 * xStep, yStart + 2.50 * yStep)
         externalExampleTeamSelectionPosition = (xStart + 7.6 * xStep, yStart + 3.3 * yStep)
         externalExampleSelectionPosition = (xStart + 8.6 * xStep, yStart + 3.3 * yStep)
         loadingPosition = (xStart + 9.6 * xStep, yStart + 3.3 * yStep)
         ouluExampleSelectionPosition = (xStart + 6.6 * xStep, yStart + 3.3 * yStep)
         worldExampleSelectionPosition = (xStart + 5.6 * xStep, yStart + 3.3 * yStep)
         creditTextPositions = [
-            (xStart + xStep, yStart + 2.4 * yStep),
-            (xStart + xStep, yStart + 2.5 * yStep),
-            (xStart + xStep, yStart + 2.7 * yStep),
+            (xStart + xStep, yStart + 2.3 * yStep),
+            (xStart + xStep, yStart + 2.45 * yStep),
+            (xStart + xStep, yStart + 2.65 * yStep),
             (xStart + xStep, yStart + 2.8 * yStep),
             ]
 
@@ -283,26 +291,26 @@ async def initScreen(imagePath, gameSettings, externalImageData, externalWorldCi
             # third row 4
              (xStart + 2 * xStep, yStart + 5 * yStep),(xStart + 2 * xStep, yStart + 6 * yStep), (xStart + 2 * xStep, yStart + 7 * yStep), (xStart + 2 * xStep, yStart + 8 * yStep), (xStart + 2 * xStep, yStart + 9 * yStep),
             # fourth row 4
-            (xStart + 3 * xStep, yStart + 5.6 * yStep), (xStart + 3 * xStep, yStart + 6.6 * yStep), (xStart + 3 * xStep, yStart + 7.6 * yStep), (xStart + 3 * xStep, yStart + 8.6 * yStep), (xStart + 3 * xStep, yStart + 9.6 * yStep)]
+            (xStart + 3 * xStep, yStart + 6.6 * yStep), (xStart + 3 * xStep, yStart + 7.6 * yStep), (xStart + 3 * xStep, yStart + 8.6 * yStep), (xStart + 3 * xStep, yStart + 9.6 * yStep), (xStart + 4 * xStep, yStart + 9.6 * yStep)]
         titleTextPositions = [
             (xStart + 0.4 * xStep, yStart - 0.2 * yStep),
             (xStart + 1.30 * xStep, yStart + 1.8 * yStep),
             (xStart + 2.35 * xStep, yStart + 4.8 * yStep),
             (xStart + 3.35 * xStep, yStart + 5.4 * yStep)
             ]
-        externalExampleOverallPosition = (xStart + 3.7 * xStep, yStart + 7.16 * yStep)
-        externalExampleTeamSelectionPosition = (xStart + 3.8 * xStep, yStart + 7.6 * yStep)
-        externalExampleSelectionPosition = (xStart + 3.8 * xStep, yStart + 8.6 * yStep)
-        loadingPosition = (xStart + 3 * xStep, yStart + 9.6 * yStep)
-        ouluExampleSelectionPosition = (xStart + 3.6 * xStep, yStart + 6.6 * yStep)
-        worldExampleSelectionPosition = (xStart + 3.8 * xStep, yStart + 5.6 * yStep)
+        externalExampleOverallPosition = (xStart + 3.8 * xStep, yStart + 8.16 * yStep)
+        externalExampleTeamSelectionPosition = (xStart + 3.8 * xStep, yStart + 8.6 * yStep)
+        externalExampleSelectionPosition = (xStart + 3.8 * xStep, yStart + 9.6 * yStep)
+        loadingPosition = (xStart + 3 * xStep, yStart + 10.6 * yStep)
+        ouluExampleSelectionPosition = (xStart + 3.6 * xStep, yStart + 7.6 * yStep)
+        worldExampleSelectionPosition = (xStart + 3.8 * xStep, yStart + 6.6 * yStep)
         creditTextPositions = [
             (xStart + 2.8 * xStep, yStart + 0.35 * yStep),
             (xStart + 2.8 * xStep, yStart + 0.5 * yStep),
             (xStart + 2.8 * xStep, yStart + 0.7 * yStep),
             (xStart + 2.8 * xStep, yStart + 0.85 * yStep),
             ]
-        newsPosition = (xStart + 2.2 * xStep, yStart - 1.0 * yStep)
+        newsPosition = (xStart + 1.8 * xStep, yStart - 1.0 * yStep)
 
     titleTexts = [
         "track length:",
@@ -382,9 +390,6 @@ async def initScreen(imagePath, gameSettings, externalImageData, externalWorldCi
                 elif event.scancode == getRightKey() or event.scancode == getDownKey():
                     if initScreenPos < len(positions) - 1:
                         initScreenPos = initScreenPos + 1
-                elif checkAutoTestKey(event.scancode):
-                    gameSettings.autoTest = True
-                    running = False
                 elif event.scancode == getEnterKey() or event.scancode == getSpaceKey():
                     if initScreenPos == len(positions) - 1:
                         running = False
@@ -515,9 +520,9 @@ async def initScreen(imagePath, gameSettings, externalImageData, externalWorldCi
                 selections[-4] = True
 
             if firstTime:
-                showInitSelectionConstantTexts(backgroundImage, positions, selections, initCircleRadius, texts, titleTexts, titleTextPositions, creditTexts, creditTextPositions, news, newsPosition, externalExampleOverallText, externalExampleOverallPosition, portrait)
+                showInitSelectionConstantTexts(backgroundImage, positions, selections, initCircleRadius, texts, titleTexts, titleTextPositions, creditTexts, creditTextPositions, news, newsPosition, externalExampleOverallText, externalExampleOverallPosition, benchmark, portrait)
             getBigScreen().blit(backgroundImage, backgroundImage.get_rect())
-            showInitSelections(getBigScreen(), positions, selections, initCircleRadius, texts, titleTexts, titleTextPositions, externalExampleTeamText, externalExampleTeamSelectionPosition, externalExampleText, externalExampleSelectionPosition, ouluExampleText, ouluExampleSelectionPosition, worldExampleText, worldExampleSelectionPosition, portrait)
+            showInitSelections(getBigScreen(), positions, selections, initCircleRadius, texts, titleTexts, titleTextPositions, externalExampleTeamText, externalExampleTeamSelectionPosition, externalExampleText, externalExampleSelectionPosition, ouluExampleText, ouluExampleSelectionPosition, worldExampleText, worldExampleSelectionPosition, benchmark, portrait)
             showInitArrow(getBigScreen(), positions[initScreenPos], arrowScale, portrait)
             if gameSettings.infoBox:
                 showInfoBoxTxt(getBigScreen())
@@ -565,8 +570,8 @@ async def initScreen(imagePath, gameSettings, externalImageData, externalWorldCi
             gameSettings.infiniteOulu = True
             gameSettings.infiniteWorld = False
             gameSettings.externalExample = ""
-            uiSubmitSlide(str(randrange(1000000,9999999)) + "th District of Infinite Oulu!", portrait)
-            await uiRenderImmediate(loadingPosition, loadingText, False, portrait)
+            uiSubmitSlide(str(randrange(100000,999999)) + "th Street of Infinite Oulu!", portrait)
+            await uiRenderImmediate(loadingPosition, loadingText, False, benchmark, portrait)
         elif retSettings[3] == "infinite-world":
             gameSettings.infiniteOulu = False
             gameSettings.infiniteWorld = True
@@ -577,14 +582,14 @@ async def initScreen(imagePath, gameSettings, externalImageData, externalWorldCi
                uiSubmitSlide("Welcome to " + placeName + "...", portrait)
             else:
                uiSubmitSlide("Somewhere in " + worldExampleText + "...", portrait)
-            await uiRenderImmediate(loadingPosition, loadingText, False, portrait)
+            await uiRenderImmediate(loadingPosition, loadingText, False, benchmark, portrait)
         elif retSettings[3] == "external-team" or retSettings[3] == "external-map":
             gameSettings.infiniteOulu = False
             gameSettings.infiniteWorld = False
             gameSettings.externalExample = externalExampleText
             gameSettings.externalExampleTeam = externalExampleTeamText
             uiSubmitSlide("Welcome to " + externalExampleText, portrait)
-            await uiRenderImmediate(loadingPosition, loadingText, False, portrait)
+            await uiRenderImmediate(loadingPosition, loadingText, False, benchmark, portrait)
 
     pygame.time.set_timer(TIMER_EVENT, 0)
     return quitting, gameSettings, fingerInUse

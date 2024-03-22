@@ -36,8 +36,6 @@ from sprintomatic.modules.pathPruning import calculatePathWeightedDistance
 from sprintomatic.modules.gameSounds import initSounds, stopSounds, maintainRunningStepEffect, startMelody, startElevatorMelody, stopMelody, startBirds, stopBirds, shoutEffect, pacemakerShoutEffect, finishEffect, startEffect, stopEffects
 from sprintomatic.modules.imageDownloader import downloadExternalImageData, downloadExternalWorldCityMap, downloadNews
 
-from sprintomatic.modules.autoTest import fakeInitScreen, fakeCalculateNextStep, fakeUiEvent, fakeResetAgain
-
 from sprintomatic.modules.perfSuite import perfClearSuite, perfActivate, perfAddStart, perfAddStop, perfBenchmark
 
 
@@ -288,7 +286,7 @@ async def main():
         # start AI processes
         initializeAITables()
     portrait = uiEarlyInit(gameSettings.fullScreen, benchmark)
-    await veryFirstTime(portrait)
+    veryFirstT = await veryFirstTime(portrait)
     externalImageData, offline = await downloadExternalImageData(gameSettings.ownMasterListing)
     if offline:
          gameSettings.offline = offline
@@ -350,6 +348,7 @@ async def main():
     reachedControl = None
     quitting = False
     firstTime = True
+    preInitSleep = 0 # after first start, turn this to 1
 #    perfAddStop("ini")
 
     # This is the main loop
@@ -357,13 +356,10 @@ async def main():
         running = True
         if showInitScreen:
             startBirds()
-            await asyncio.sleep(0)
-            if gameSettings.autoTest:
-                (quitting, gameSettings) = fakeInitScreen(gameSettings.imageRoot, gameSettings, externalImageData)
-            else:
-                await asyncio.sleep(1)
-                await uiFlushEvents()
-                (quitting, gameSettings, fingerInUse) = await initScreen(gameSettings.imageRoot, gameSettings, externalImageData, externalWorldCityMap, news, portrait)
+            await asyncio.sleep(preInitSleep)
+            preInitSleep = 1
+            await uiFlushEvents()
+            (quitting, gameSettings, fingerInUse) = await initScreen(gameSettings.imageRoot, gameSettings, externalImageData, externalWorldCityMap, news, benchmark, portrait)
             running = True
             if quitting:
                 running = False
@@ -428,10 +424,7 @@ async def main():
             movement = False
 
             # Event handling
-            if gameSettings.autoTest:
-                events = fakeUiEvent()
-            else:
-                events = await uiEvent(gameSettings.infoBox, gameSettings.speed)
+            events = await uiEvent(gameSettings.infoBox, gameSettings.speed)
 
             for event in events:
                 if datetime.now() - startTime > timedelta(seconds=gameMovingStartThreshold) and not (gameSettings.amaze and datetime.now() - startTime > timedelta(seconds=amazeTimeThreshold)):
@@ -445,8 +438,6 @@ async def main():
                     normalizeAngleStep()
                 elif event == "quit":
                     running = False
-                    if gameSettings.autoTest:
-                        fakeResetAgain()
                     stopMelody()
                     await asyncio.sleep(0)
                     stopEffects()
@@ -456,9 +447,7 @@ async def main():
                 elif event == "tick":
                     if datetime.now() - startTime > timedelta(seconds=gameMovingStartThreshold):
                         # Progress the player position
-                        if gameSettings.autoTest:
-                            position, angle = fakeCalculateNextStep(controls)
-                        elif not gameSettings.amaze:
+                        if not gameSettings.amaze:
                             position, angle, inTunnel = calculateNextStep(faLookup, saLookup, ssaLookup, vsaLookup, tunnelLookup, position, angle, movement, gameSettings.speed, gameSettings.metersPerPixel)
 
                         # Progress the pacemaker position
@@ -467,7 +456,10 @@ async def main():
                             pacemakerAdvancement = 0
                             if pacemakerSteps > pacemakerStartThreshold:
                                 pacemakerAdvancement = pacemakerSteps - pacemakerStartThreshold
-                            pacemakerPosition, pacemakerAngle, inTunnelPacemaker = getPacemakerPos(saLookup, ssaLookup, vsaLookup, tunnelLookup, pacemakerPath, pacemakerAdvancement, gameSettings.speed, gameSettings.metersPerPixel, gameSettings.pacemaker)
+                            pacemakerSpeeder = 1.0
+                            if benchmark == "phone" and not portrait:
+                                pacemakerSpeeder = 2.0
+                            pacemakerPosition, pacemakerAngle, inTunnelPacemaker = getPacemakerPos(saLookup, ssaLookup, vsaLookup, tunnelLookup, pacemakerPath, pacemakerAdvancement, gameSettings.speed, gameSettings.metersPerPixel / pacemakerSpeeder, gameSettings.pacemaker)
 
                     # Flush the AI pools every now and then
                     aiCounter = aiCounter + 1
@@ -587,8 +579,6 @@ async def main():
 
                         # 3. the track is totally done
                         elif finishFanfareStarted(reachedControl, nextControl) and uiControlEffectEnded():
-                            if gameSettings.autoTest:
-                                fakeResetAgain()
                             if not autoControls or not gameSettings.continuous: # then run only once
                                 running = False
                             else:
@@ -610,9 +600,14 @@ async def main():
                                     uiRenderRoutes(shortestRoutes, "shortest", shift)
                                     uiRenderRoutes(playerRoutes, "player", shift)
                                 uiRenderControls(controls, gameSettings.pacemaker, gameSettings.amaze, shift)
+
+                                extraScale = 1.0
+                                if benchmark == "phone":
+                                    extraScale = 1.5
+
                                 if gameSettings.pacemaker != 0 and pacemakerPath is not None and pacemakerPosition is not None:
                                     if pacemakerPosition == pacemakerPath[-1]:
-                                        uiAnimatePacemaker(pacemakerPosition, pacemakerAngle, 1.0, gameSettings.pacemaker, inTunnelPacemaker, True, shift)
+                                        uiAnimatePacemaker(pacemakerPosition, pacemakerAngle, 1.0 * extraScale, gameSettings.pacemaker, inTunnelPacemaker, True, shift)
                                         pacemakerPrepareForShout = True
                                         pacemakerStep = -5
                                     elif pacemakerPosition == pacemakerPath[0]:
@@ -620,20 +615,20 @@ async def main():
                                         if pacemakerStep > 5:
                                             pacemakerStep = -5
 
-                                        uiAnimatePacemaker(pacemakerPosition, pacemakerAngle, 1.5 + abs(pacemakerStep) * 0.1, gameSettings.pacemaker, inTunnelPacemaker, True, shift)
+                                        uiAnimatePacemaker(pacemakerPosition, pacemakerAngle, extraScale * (1.5 + abs(pacemakerStep) * 0.1), gameSettings.pacemaker, inTunnelPacemaker, True, shift)
                                         if pacemakerPrepareForShout:
                                             pacemakerShoutEffect()
                                             pacemakerPrepareForShout = False
                                     else:
                                         pacemakerStep = -5
                                         pacemakerPrepareForShout = True
-                                        uiAnimatePacemaker(pacemakerPosition, pacemakerAngle, 1.0, gameSettings.pacemaker, inTunnelPacemaker, True, shift)
+                                        uiAnimatePacemaker(pacemakerPosition, pacemakerAngle, 1.0 * extraScale, gameSettings.pacemaker, inTunnelPacemaker, True, shift)
                                 elif gameSettings.pacemaker != 0 and pacemakerPath == None:
                                     pacemakerStep = pacemakerStep + 1
                                     if pacemakerStep > 5:
                                         pacemakerStep = -5
                                     pacemakerPrepareForShout = True
-                                    uiAnimatePacemaker(controls[nextControl], pacemakerAngle, 1.5 + abs(pacemakerStep) * 0.1, gameSettings.pacemaker, inTunnelPacemaker, True, shift)
+                                    uiAnimatePacemaker(controls[nextControl], pacemakerAngle, extraScale * (1.5 + abs(pacemakerStep) * 0.1), gameSettings.pacemaker, inTunnelPacemaker, True, shift)
 
                             uiCenterTurnZoomTheMap(position, zoom, angle, benchmark, shift)
 

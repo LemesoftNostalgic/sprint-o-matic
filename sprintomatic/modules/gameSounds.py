@@ -138,7 +138,7 @@ def initSounds(soundRoot, benchmark):
     if sys.platform == 'emscripten':
         birdsSound.set_volume(0.0)
     else:
-        birdsSound.set_volume(0.8)
+        birdsSound.set_volume(0.4)
     shoutSound = pygame.mixer.Sound(os.path.join(soundRoot, shoutPath))
     shoutSound.set_volume(0.3)
     pacemakerShoutSound = pygame.mixer.Sound(os.path.join(soundRoot, pacemakerShoutPath))

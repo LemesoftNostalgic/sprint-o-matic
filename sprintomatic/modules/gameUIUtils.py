@@ -56,17 +56,6 @@ def getPerfKey():
 def getBackKey():
     return 42
 
-# an easter egg to get the autotest running from UI
-autoTestCode = [23, 22, 8, 23, 18, 23, 24, 4]
-def checkAutoTestKey(key):
-    global autoTestCode
-    if autoTestCode and key == autoTestCode[-1]:
-        autoTestCode.pop()
-        if autoTestCode == []:
-            return True
-        return False
-    return False
-
 def getUpKey():
     return 82
 
@@ -216,7 +205,7 @@ def uiSubmitSlide(textStr, portrait):
         if not portrait:
             fs = convertXCoordinate(48)
         else:
-            fs = int(convertYCoordinate(48) / 1.7)
+            fs = int(convertYCoordinate(48) / 1.8)
         slideCtr = slideCtrStartUp
         sideCtrStart = slideCtrStartUp
         bigScreenCopy = bigScreen.copy()

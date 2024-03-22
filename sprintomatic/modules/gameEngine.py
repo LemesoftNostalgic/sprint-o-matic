@@ -163,7 +163,7 @@ def getPacemakerPos(saLookup, ssaLookup, vsaLookup, tunnelLookup, inputPath, ste
     dist = distanceBetweenPoints(path[index], path[index + 1])
     angle = angleOfLine([path[index], path[index + 1]])
     for step in range(steps):
-        pos = stepAdvancer(saLookup, ssaLookup, vsaLookup, pos, angle, speed, pacemakerFactors[pacemakerInd] / metersPerPixel)
+        pos = stepAdvancer(saLookup, ssaLookup, vsaLookup, pos, angle, 1.0, pacemakerFactors[pacemakerInd] / metersPerPixel)
         if distanceBetweenPoints(path[index], pos) >= dist:
             index = index + 1
             pos = path[index]

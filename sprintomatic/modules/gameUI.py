@@ -132,7 +132,7 @@ def uiShowFinishText(someSurface, finishTexts, amaze, portrait):
     if not portrait:
         fs = convertXCoordinateSpecificSurface(someSurface, 32)
     else:
-        fs = int(convertYCoordinateSpecificSurface(someSurface, 32) / 1.9)
+        fs = int(convertYCoordinateSpecificSurface(someSurface, 32) / 2.0)
 
     if timeConsumed and distance and error:
         middle = tuple(ti/2.0 for ti in someSurface.get_size())
@@ -151,7 +151,7 @@ def uiRenderAmazeText(amazeNum, portrait):
     if not portrait:
         fs = convertXCoordinate(32)
     else:
-        fs = int(convertYCoordinate(32) / 1.9)
+        fs = int(convertYCoordinate(32) / 2.0)
 
     if effectStep and effectControl < 1:
         middle = tuple(ti/2.0 for ti in getBigScreen().get_size())
@@ -197,16 +197,23 @@ def uiRenderAIText(portrait):
     getBigScreen().blit(aiText, aiTextRect)
 
 
-def uiRenderExternalMapInfo(mapInfoTextList, portrait):
+def uiRenderExternalMapInfo(mapInfoTextList, fingerInUse, portrait):
     if not portrait:
         fs = convertXCoordinate(16)
     else:
         fs = int(convertYCoordinate(16) / 1.5)
 
     middle = tuple(ti/2.0 for ti in getBigScreen().get_size())
+    xShift = 0.0
+    yShift = 0.0
+    if fingerInUse:
+        if portrait:
+            xShift = - middle[0] / 2
+        else:
+            yShift = - middle[1] / 3
     for ind in range(len(mapInfoTextList)):
         mapTextStr = mapInfoTextTitles[ind] + mapInfoTextList[ind]
-        mapTextCenter = (middle[0], middle[1] + middle[1] * (0.6 + 0.05 * ind))
+        mapTextCenter = (xShift + middle[0], yShift + middle[1] + middle[1] * (0.6 + 0.05 * ind))
         mapText = pygame.font.Font(getMasterFont(), fs).render(mapTextStr, True, getFinishTextColor())
         mapTextRect = mapText.get_rect()
         mapTextRect.center = mapTextCenter
@@ -334,7 +341,7 @@ async def uiCompleteRender(finishTexts, mapInfoTextList, pacemakerInd, pacemaker
 
     uiShowFinishText(getBigScreen(), finishTexts, amaze, portrait)
     if mapInfoTextList:
-        uiRenderExternalMapInfo(mapInfoTextList, portrait)
+        uiRenderExternalMapInfo(mapInfoTextList, fingerInUse, portrait)
     showInfoBoxTxt(getBigScreen())
     if firstTime:
         uiUnSubmitSlide()
@@ -350,7 +357,7 @@ async def uiEvent(showInfoTexts, speedMode):
     global fingerDirection
     events = []
     # regular events
-    perfAddStart("uiEvent")
+#    perfAddStart("uiEvent")
     for event in pygame.event.get():
         if showInfoTexts:
             updateInfoTxtByEvent(event, 2)
@@ -363,12 +370,14 @@ async def uiEvent(showInfoTexts, speedMode):
         elif event.type == pygame.FINGERDOWN:
             leftThreshold = 1 / 3
             rightThreshold = 2 / 3
-            if event.x < leftThreshold:
-                fingerDirection = "left"
-            elif event.x > rightThreshold:
-                fingerDirection = "right"
-            else:
-                events.append("quit")
+            downThreshold = 2 / 3
+            if event.y > downThreshold:
+                if event.x < leftThreshold:
+                    fingerDirection = "left"
+                elif event.x > rightThreshold:
+                    fingerDirection = "right"
+                else:
+                    events.append("quit")
         elif event.type == pygame.FINGERUP:
             fingerDirection = ""
 
@@ -396,7 +405,7 @@ async def uiEvent(showInfoTexts, speedMode):
                 mousePressed = False
         previousTime = time.time()
         events.append("tick")
-    perfAddStop("uiEvent")
+#    perfAddStop("uiEvent")
     return events
 
 
@@ -440,7 +449,7 @@ def uiRenderControls(controls, usePacemaker, amaze, shift):
     global effectStep
     global effectControl
 
-    perfAddStart("renCtrls")
+#    perfAddStart("renCtrls")
     if effectStep:
         if amaze:
             effectStep = effectStep - 0.5
@@ -464,7 +473,7 @@ def uiRenderControls(controls, usePacemaker, amaze, shift):
                 if control == controls[-1] and not amaze:
                     uiDrawCircle(oMapCopy, (255, tmpEffectStep * 3, tmpEffectStep * 2), c, (circleRadius - circleSpacing)/metersPerPixel, max(2, int(2/metersPerPixel)))
         previousControl = control
-    perfAddStop("renCtrls")
+#    perfAddStop("renCtrls")
 
 
 def uiClearCanvas(controls, shortestRoutesArray, reachedControl, benchmark):

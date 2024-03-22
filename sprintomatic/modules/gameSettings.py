@@ -60,7 +60,6 @@ def returnSettings():
             self.place=[0.0, 0.0]
             self.pacemaker=1
             self.metersPerPixel=0
-            self.autoTest="no"
             self.infoBox="no"
             self.noUiTest="no"
             self.fullScreen="no"
@@ -103,7 +102,6 @@ def returnSettings():
         parser.add_argument("--pacemaker", type=int,choices=range(0, 4), help="A pacemaker runner to compete against", default=defaultSettings.pacemaker)
         parser.add_argument("--amaze", type=int,choices=range(0, 4), help="A maze (yes or no)", default=defaultSettings.pacemaker)
         parser.add_argument("--metersPerPixel", type=numRestrict(0, 1.8), help="How many meters per map pixel. 0 for autodetect.", default=defaultSettings.metersPerPixel)
-        parser.add_argument("--autoTest", type=str, choices=["no", "yes"], help="An automatic test mode", default=defaultSettings.autoTest)
         parser.add_argument("--infoBox", type=str, choices=["no", "yes"], help="An info box feature", default=defaultSettings.infoBox)
         parser.add_argument("--noUiTest", type=str, choices=["no", "yes"], help="DO not show UI during automatic test mode", default=defaultSettings.noUiTest)
         parser.add_argument("--fullScreen", type=str, choices=["no", "yes"], help="Whether to use a full-screen mode or not", default=defaultSettings.fullScreen)
@@ -141,7 +139,6 @@ def returnSettings():
     gameSettings.fullScreen = True if gameSettings.fullScreen=="yes" else False
     gameSettings.infiniteOulu = True if gameSettings.infiniteOulu=="yes" else False
     gameSettings.infiniteWorld = True if gameSettings.infiniteWorld=="yes" else False
-    gameSettings.autoTest = True if gameSettings.autoTest=="yes" else False
     gameSettings.infoBox = True if gameSettings.infoBox=="yes" else False
     gameSettings.analysis = True if gameSettings.analysis=="yes" else False
 
