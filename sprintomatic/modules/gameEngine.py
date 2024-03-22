@@ -59,9 +59,16 @@ def stepAdvancer(saLookup, ssaLookup, vsaLookup, pos, angle, speed, speedupFacto
     return (pos[0] + xStep, pos[1] + yStep)
 
 
+momentum = 1.0
 # tries to behave naturally with buildings, bushes, etc.
 def calculateNextStep(faLookup, saLookup, ssaLookup, vsaLookup, tunnelLookup, pos, angle, movement, speed, metersPerPixel):
     global angleStep
+    global momentum
+    if movement and momentum > 0.55:
+        momentum = momentum - 0.1
+    if not movement and momentum < 0.95:
+        momentum = momentum + 0.1
+
     dangles = [0, -math.pi/16, math.pi/16, -math.pi/8, math.pi/8, -math.pi/8-math.pi/16, math.pi/8+math.pi/16, -math.pi/4, math.pi/4, -(math.pi/4 + math.pi/16), (math.pi/4 + math.pi/16)]
     safeToRun = True
     for da in dangles:
@@ -123,7 +130,7 @@ def calculateNextStep(faLookup, saLookup, ssaLookup, vsaLookup, tunnelLookup, po
             safetyFactor = 0.25
         elif not quarterSafeToRun:
             safetyFactor = 0.5
-        pos = stepAdvancer(saLookup, ssaLookup, vsaLookup, pos, angle, speed, safetyFactor / metersPerPixel)
+        pos = stepAdvancer(saLookup, ssaLookup, vsaLookup, pos, angle, speed, (momentum * safetyFactor) / metersPerPixel)
 
     playerRoute.append(pos)
 
