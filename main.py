@@ -206,6 +206,11 @@ async def updateRoutesAndDistances(amaze):
             if calculatePathWeightedDistance(shortestRoutesProposal, saLookup, ssaLookup, vsaLookup) < calculatePathWeightedDistance(shortestRoutes[0], saLookup, ssaLookup, vsaLookup):
                 shortestRoutes = [shortestRoutesProposal]
                 shortestRoutesArray[reachedControl - 1] = shortestRoutes
+        if reachedControl < len(shortestRoutesArrayAsync):
+            futureShortestRoutesProposal = shortestRoutesArrayAsync[reachedControl]
+            futureShortestRoutesProposal.reverse()
+            if futureShortestRoutesProposal:
+                futureShortestRoutes = [futureShortestRoutesProposal]
 
     await uiFlushEvents()
     if shortestRoutes:
@@ -467,6 +472,7 @@ async def main():
                         aiCounter = 0
                         if gameSettings.accurate:
                             shortestRoutesArray = getReadyShortestRoutes()
+                        shortestRoutesArrayAsync = await getReadyShortestRoutesAsync(reachedControl)
 
 
                     # this "state machine" is run only when there is controls
