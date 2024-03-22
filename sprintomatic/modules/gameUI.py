@@ -469,7 +469,8 @@ def uiRenderControls(controls, usePacemaker, amaze, shift):
             if c[0] > 0 and c[0] < oMapCopy.get_size()[0] and c[1] > 0 and c[1] < oMapCopy.get_size()[1]:
                 if controlApproachZoomUsed:
                     pygame.draw.circle(oMapCopy, getTrackColor(), c, int(2/metersPerPixel))
-
+                if control == controls[effectControl] and not amaze:
+                    uiDrawCircle(oMapCopy, (255, tmpEffectStep * 3, tmpEffectStep * 2), control, circleRadius/metersPerPixel, max(2, int(2/metersPerPixel)))
                 if control == controls[-1] and not amaze:
                     uiDrawCircle(oMapCopy, (255, tmpEffectStep * 3, tmpEffectStep * 2), c, (circleRadius - circleSpacing)/metersPerPixel, max(2, int(2/metersPerPixel)))
         previousControl = control
