@@ -165,7 +165,7 @@ async def returnConfig(gameSettings, externalImageData, infiniteWorldCityMap, be
     png = None
 
     if gameSettings.infiniteOulu:
-        perfAddStart("oulu")
+#        perfAddStart("oulu")
         gridSize = (4, 5)
         wid = 160
         strt = 40
@@ -178,15 +178,15 @@ async def returnConfig(gameSettings, externalImageData, infiniteWorldCityMap, be
             wid = 120
             strt = 30
         png, pngMask = await getInfiniteOulu((wid, wid), gridSize, strt + randrange(0, strt // 2))
-        perfAddStop("oulu")
+#        perfAddStop("oulu")
         perfAddStart("pngLookupMsk")
         faLookup, saLookup, ssaLookup, vsaLookup, tunnelLookup, config = await extractPngLookups(pngMask, benchmark)
         perfAddStop("pngLookupMsk")
 
     elif gameSettings.infiniteWorld:
-        perfAddStart("world")
+#        perfAddStart("world")
         png, pngMask = await getInfiniteWorldDefault(gameSettings.place, gameSettings.imageRoot, benchmark, portrait)
-        perfAddStop("world")
+#        perfAddStop("world")
         perfAddStart("pngLookupMsk")
         faLookup, saLookup, ssaLookup, vsaLookup, tunnelLookup, config = await extractPngLookups(pngMask, benchmark)
         perfAddStop("pngLookupMsk")
@@ -211,10 +211,10 @@ async def returnConfig(gameSettings, externalImageData, infiniteWorldCityMap, be
         perfAddStop("pngLookupMsk")
 
     elif gameSettings.lookupPngName: # map given at command line
-        perfAddStart("pngLookupFil")
+#        perfAddStart("pngLookupFil")
         faLookup, saLookup, ssaLookup, vsaLookup, tunnelLookup, config = await extractPngLookupsFromFile(gameSettings.lookupPngName)
         metersPerPixel = gameSettings.metersPerPixel
-        perfAddStop("pngLookupFil")
+#        perfAddStop("pngLookupFil")
 
     controls = []
     if gameSettings.routeFileName:

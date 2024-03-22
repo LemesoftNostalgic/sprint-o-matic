@@ -895,10 +895,10 @@ async def getInfiniteWorld(latlonMapOrigo, xyPictureSize, metersPerPixel, imageP
     if world == None:
         return None, None
 
-    perfAddStart("wDB")
+#    perfAddStart("wDB")
     await asyncio.sleep(0)
     db, mapName = await constructWayDb(latlonMapOrigo, xyPictureSize, metersPerPixel)
-    perfAddStop("wDB")
+#    perfAddStop("wDB")
 
     if db == None:
         return None, None
