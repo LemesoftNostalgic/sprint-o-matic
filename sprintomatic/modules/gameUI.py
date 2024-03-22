@@ -169,7 +169,7 @@ def uiRenderPacemakerText(pacemakerInd, portrait):
         if not portrait:
             fs = convertXCoordinate(48)
         else:
-            fs = int(convertYCoordinate(48) / 1.9)
+            fs = int(convertYCoordinate(48) / 2.2)
         if effectControl == 1:
             warningStr = pacemakerTextStr[pacemakerInd]
         else:

@@ -136,7 +136,7 @@ def showInitSelectionConstantTexts(surf, positions, selections, inScale, texts, 
     titleTextCenter = (surf.get_size()[0] / 2, yStart * 0.25)
     showTextShadowed(surf, titleTextCenter, 96, getApplicationTitle(), titleColorRandom, 3 * shift, portrait)
     if news:
-        showTextShadowed(surf, newsPosition, 28, "News: " + news, getPacemakerColor(2), shift, portrait)
+        showTextShadowed(surf, newsPosition, 28, news, getPacemakerColor(2), shift, portrait)
     showTextShadowed(surf, (newsPosition[0], newsPosition[1] * 1.2), 28, "Homepage: tinyurl.com/sprint-o-matic", getPacemakerColor(2), shift, portrait)
     showTextShadowed(surf, externalOverallPos, 32, externalOverallText, getTrackColor(), shift, portrait)
 
@@ -189,7 +189,6 @@ async def veryFirstTime(portrait):
     creditTextsEarly = [
         "Author: Jyrki Leskelä, Oulu",
         "License: Apache-2.0.",
-        "",
         "Credits for the 'World' map data: OpenStreetMap",
         "Credits for sound effects (freesound.org):",
         "CC 1.0 DEED:",
@@ -298,17 +297,17 @@ async def initScreen(imagePath, gameSettings, externalImageData, externalWorldCi
             (xStart + 2.35 * xStep, yStart + 4.8 * yStep),
             (xStart + 3.35 * xStep, yStart + 5.4 * yStep)
             ]
-        externalExampleOverallPosition = (xStart + 3.8 * xStep, yStart + 8.16 * yStep)
-        externalExampleTeamSelectionPosition = (xStart + 3.8 * xStep, yStart + 8.6 * yStep)
-        externalExampleSelectionPosition = (xStart + 3 * xStep, yStart + 10.6 * yStep)
-        loadingPosition = (xStart + 4 * xStep, yStart + 10.6 * yStep)
-        ouluExampleSelectionPosition = (xStart + 3.6 * xStep, yStart + 7.6 * yStep)
-        worldExampleSelectionPosition = (xStart + 3.8 * xStep, yStart + 6.6 * yStep)
+        externalExampleOverallPosition = (xStart + 3.9 * xStep, yStart + 8.16 * yStep)
+        externalExampleTeamSelectionPosition = (xStart + 3.9 * xStep, yStart + 8.6 * yStep)
+        externalExampleSelectionPosition = (xStart + 3 * xStep, yStart + 10.05 * yStep)
+        loadingPosition = (xStart + 4 * xStep, yStart + 10.05 * yStep)
+        ouluExampleSelectionPosition = (xStart + 3.7 * xStep, yStart + 7.6 * yStep)
+        worldExampleSelectionPosition = (xStart + 3.9 * xStep, yStart + 6.6 * yStep)
         creditTextPositions = [
+            (xStart + 2.8 * xStep, yStart - 0.15 * yStep),
+            (xStart + 2.8 * xStep, yStart + 0.0 * yStep),
+            (xStart + 2.8 * xStep, yStart + 0.2 * yStep),
             (xStart + 2.8 * xStep, yStart + 0.35 * yStep),
-            (xStart + 2.8 * xStep, yStart + 0.5 * yStep),
-            (xStart + 2.8 * xStep, yStart + 0.7 * yStep),
-            (xStart + 2.8 * xStep, yStart + 0.85 * yStep),
             ]
         newsPosition = (xStart + 1.8 * xStep, yStart - 1.0 * yStep)
 

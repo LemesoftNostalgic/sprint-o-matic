@@ -226,7 +226,7 @@ def uiSubmitTextListSlide(textStrList, portrait):
         if not portrait:
             fs = convertXCoordinate(32)
         else:
-            fs = int(convertYCoordinate(32) / 1.8)
+            fs = int(convertYCoordinate(32) / 2.0)
         slideCtr = slideCtrStartUp
         sideCtrStart = slideCtrStartUp
         bigScreenCopy = bigScreen.copy()
