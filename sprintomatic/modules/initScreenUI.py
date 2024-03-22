@@ -300,8 +300,8 @@ async def initScreen(imagePath, gameSettings, externalImageData, externalWorldCi
             ]
         externalExampleOverallPosition = (xStart + 3.8 * xStep, yStart + 8.16 * yStep)
         externalExampleTeamSelectionPosition = (xStart + 3.8 * xStep, yStart + 8.6 * yStep)
-        externalExampleSelectionPosition = (xStart + 3.8 * xStep, yStart + 9.6 * yStep)
-        loadingPosition = (xStart + 3 * xStep, yStart + 10.6 * yStep)
+        externalExampleSelectionPosition = (xStart + 3 * xStep, yStart + 10.6 * yStep)
+        loadingPosition = (xStart + 4 * xStep, yStart + 10.6 * yStep)
         ouluExampleSelectionPosition = (xStart + 3.6 * xStep, yStart + 7.6 * yStep)
         worldExampleSelectionPosition = (xStart + 3.8 * xStep, yStart + 6.6 * yStep)
         creditTextPositions = [

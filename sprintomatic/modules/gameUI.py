@@ -207,7 +207,7 @@ def uiRenderExternalMapInfo(mapInfoTextList, fingerInUse, portrait):
     xShift = 0.0
     yShift = 0.0
     if fingerInUse:
-        if portrait:
+        if not portrait:
             xShift = - middle[0] / 2
         else:
             yShift = - middle[1] / 3
