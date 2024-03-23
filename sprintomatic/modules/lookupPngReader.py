@@ -89,15 +89,15 @@ async def extractPngLookups(oMapMask):
 
     for tf in tfsShort[1:]:
         for item in faLookup[1]:
-            faLookup[tf] = (item[0]//tf, item[1]//tf)
+            faLookup[tf][(item[0]//tf, item[1]//tf)] = True
         for item in saLookup[1]:
-            saLookup[tf] = (item[0]//tf, item[1]//tf)
+            saLookup[tf][(item[0]//tf, item[1]//tf)] = True
         for item in ssaLookup[1]:
-            ssaLookup[tf] = (item[0]//tf, item[1]//tf)
+            ssaLookup[tf][(item[0]//tf, item[1]//tf)] = True
         for item in vsaLookup[1]:
-            vsaLookup[tf] = (item[0]//tf, item[1]//tf)
+            vsaLookup[tf][(item[0]//tf, item[1]//tf)] = True
         for item in tunnelLookup[1]:
-            tunnelLookup[tf] = (item[0]//tf, item[1]//tf)
+            tunnelLookup[tf][(item[0]//tf, item[1]//tf)] = True
 
     prunedControls = []
     steps = len(controls) // 500
