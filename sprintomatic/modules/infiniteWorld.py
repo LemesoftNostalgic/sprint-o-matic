@@ -905,7 +905,7 @@ def drawRoads(png, mask, waydb, metersPerPixel):
                 for way in subwayarray:
                     drawPolylineWithWidthTmp(png, mask, tmpMask, way, colors[TMPASPHALT], getNoMask(), smallWayWidthMeters / metersPerPixel, False)
     png = boundarize(png,  colors[TMPASPHALT], colors[ASPHALT], colors[SOLIDBLACK])
-    updateFullMask(mask, tmpMask, colors[TMPASPHALT])
+    updateFullMask(mask, tmpMask, getNoMask())
     return png, mask
 
 
