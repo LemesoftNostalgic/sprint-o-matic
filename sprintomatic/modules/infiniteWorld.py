@@ -7,7 +7,7 @@ from random import randrange, random, uniform
 import time
 
 from .utils import getSlowAreaMask, getSemiSlowAreaMask, getVerySlowAreaMask, getForbiddenAreaMask, getControlMask, getNoMask, getPackagePath
-from .mathUtils import calculatePathDistance, distanceBetweenPoints, getBoundingBox
+from .mathUtils import calculatePathDistance, distanceBetweenPoints
 from .gameUIUtils import uiFlushEvents, uiFlip, uiDrawLine, uiSubmitSlide
 from .imageDownloader import downloadOsmData
 from .perfSuite import perfAddStart, perfAddStop
@@ -41,7 +41,6 @@ MARSH = '='
 GREENCIRCLE = 'O'
 PATHBLACK = '('
 PATHWHITE = ')'
-PATTERN = 'P'
 
 colors = {
     FOREST:          (255,255,255),
@@ -50,7 +49,6 @@ colors = {
     OPENAREA:        (255,190,70),
     SOLIDBLACK:      (40,45,50),
     PATHBLACK:       (40,45,50),
-    PATTERN:         (255,241,216),
     PATHWHITE:       (255,255,255),
     NARROWBLACK:     (45,50,55),
     SOLIDGREEN:      (35,180,90),
@@ -361,17 +359,14 @@ def checkIfWaydbInLocalCache(latlonMapOrigo):
     return waydb
 
 
-async def constructWayDb(latlonMapOrigo, xyPictureSize, metersPerPixel):
-
-    xRand = randrange(xyPictureSize[0]//2)
-    yRand = randrange(xyPictureSize[1]//2)
-    midPoint = (xyPictureSize[0]//4 + xRand, xyPictureSize[1]//4 + yRand)
+async def constructWayDb(latlonMapOrigo, xyPictureSize, metersPerPixel, xyShift):
     middlestName = ""
     waydb = {}
-    latlonMapOppositeCorner = oppositeToLatLonCoordinates(latlonMapOrigo, xyPictureSize, metersPerPixel)
+    latlonMapThisCorner = oppositeToLatLonCoordinates(latlonMapOrigo, xyShift, metersPerPixel)
+    latlonMapOppositeCorner = oppositeToLatLonCoordinates(latlonMapOrigo, (xyPictureSize[0]+xyShift[0],xyPictureSize[1]+xyShift[1]), metersPerPixel)
     perfAddStart("wDBLoad")
     
-    result = await downloadOsmData(latlonMapOrigo, latlonMapOppositeCorner, waytypes)
+    result = await downloadOsmData(latlonMapThisCorner, latlonMapOppositeCorner, waytypes)
     perfAddStop("wDBLoad")
     perfAddStart("wDBHandle1")
     nodes = {}
@@ -406,7 +401,7 @@ async def constructWayDb(latlonMapOrigo, xyPictureSize, metersPerPixel):
                 waydb[waytype][subway] = []
             poslistToAppend = []
             for node in nodeList:
-                xyPos = toPictureCoordinates(latlonMapOrigo, node, xyPictureSize, metersPerPixel)
+                xyPos = toPictureCoordinates(latlonMapThisCorner, node, xyPictureSize, metersPerPixel)
                 poslistToAppend.append(xyPos)
             waydb[waytype][subway].append(poslistToAppend)
             if not nameFound:
@@ -418,44 +413,26 @@ async def constructWayDb(latlonMapOrigo, xyPictureSize, metersPerPixel):
                         middlestName = name
     perfAddStop("wDBHandle2")
 
-    if not waydb:
-        waydb = checkIfWaydbInLocalCache(latlonMapOrigo)
-
     return waydb, middlestName
 
 
-def updateMask(mask, maskColor, pt):
-    if maskColor == getForbiddenAreaMask():
-        mask["faLookup"][pt] = True
-    else:
-        if maskColor == getNoMask():
-            mask["saLookup"].pop(pt, None)
-            mask["ssaLookup"].pop(pt, None)
-            mask["vsaLookup"].pop(pt, None)
-        elif maskColor == getSlowAreaMask():
-            mask["saLookup"][pt] = True
-        elif maskColor == getSemiSlowAreaMask():
-            mask["ssaLookup"][pt] = True
-        elif maskColor == getVerySlowAreaMask():
-            mask["vsaLookup"][pt] = True
-        mask["faLookup"].pop(pt, None)
-
-
 def queryForbiddenSpot(mask, x, y):
-    pt = (int(x), int(y))
-    if pt in mask["faLookup"]:
+    rect = mask.get_rect()
+    if x <= rect[0]+1 or x >= rect[0] + rect[2] -1 or y <= rect[1]+1 or y >= rect[1] + rect[3] -1:
+        return False
+    currentMask = mask.get_at((int(x), int(y)))
+    if currentMask == getForbiddenAreaMask():
         return True
     return False
 
 
 def markControlSpot(mask, x, y):
     if not queryForbiddenSpot(mask, x, y):
-        mask["controls"].append((int(x), int(y)))
+        mask.fill(getControlMask(), ((int(x),int(y)), (1, 1)))
     else:
        for shift in [(0, 4), (4,0), (-4, 0), (0, -4)]:
-           shiftPt = int(x + shift[0]), int(y + shift[1])
-           if not queryForbiddenSpot(mask, shiftPt[0], shiftPt[1]):
-                mask["controls"].append(shiftPt)
+           if not queryForbiddenSpot(mask, int(x + shift[0]), int(y + shift[1])):
+               mask.fill(getControlMask(), ((int(x + shift[0]), int(y + shift[1])), (1, 1)))
 
 
 def uiDrawLines(surf, color, pointlist, width):
@@ -463,7 +440,7 @@ def uiDrawLines(surf, color, pointlist, width):
         uiDrawLine(surf, color, pointlist[ind], pointlist[ind+1], width)
 
 
-def drawPolylineWithWidthTmp(png, trueMask, mask, pointlist, polylineColor, polylineMaskColor,polylineWidth, accurate):
+def drawPolylineWithWidth(png, mask, pointlist, polylineColor, polylineMaskColor,polylineWidth, accurate):
     if len(pointlist) > 1:
         if accurate:
             uiDrawLines(png, polylineColor, pointlist, int(polylineWidth))
@@ -471,66 +448,14 @@ def drawPolylineWithWidthTmp(png, trueMask, mask, pointlist, polylineColor, poly
             pygame.draw.lines(png, polylineColor, False, pointlist, width=int(polylineWidth))
         pygame.draw.lines(mask, polylineMaskColor, False, pointlist, width=int(polylineWidth))
         if pointlist:
-            markControlSpot(trueMask, pointlist[0][0], pointlist[0][1])
-            markControlSpot(trueMask, pointlist[-1][0], pointlist[-1][1])
-
-
-def updateFullMask(mask, tmpMask, maskColor):
-    for yy in range(0, tmpMask.get_size()[1]):
-        for xx in range(0, tmpMask.get_size()[0]):
-            if tmpMask.get_at((xx, yy)) == maskColor:
-                updateMask(mask, maskColor, (xx, yy))
-
-
-def drawPolylineWithWidth(png, mask, pointlist, polylineColor, polylineMaskColor,polylineWidth, accurate):
-    if len(pointlist) > 1:
-        w = int(polylineWidth)
-        xMax, yMax = png.get_size()
-        pygame.draw.lines(png, polylineColor, False, pointlist, width=w)
-        for ind in range(len(pointlist) - 1):
-            bbox = getBoundingBox([pointlist[ind],pointlist[ind]], [pointlist[ind],pointlist[ind + 1]])
-            xStart = int(bbox[0][0] - w)
-            xEnd = int(bbox[1][0] + w)
-            yStart = int(bbox[0][1] - w)
-            yEnd = int(bbox[1][1] + w)
-            if xStart < 0:
-                xStart = 0
-            if yStart < 0:
-                yStart = 0
-            if xEnd > xMax:
-                xEnd = xMax
-            if yEnd > yMax:
-                yEnd = yMax
-            for yy in range(yStart, yEnd):
-                for xx in range(xStart, xEnd):
-                    if png.get_at((xx, yy)) == polylineColor:
-                        updateMask(mask, polylineMaskColor, (xx, yy))
-        if pointlist:
             markControlSpot(mask, pointlist[0][0], pointlist[0][1])
             markControlSpot(mask, pointlist[-1][0], pointlist[-1][1])
 
 
 def drawPolygonWithBounds(png, mask, pointlist, polyInternalColor, polyBoundaryColor, polyMaskColor):
     if len(pointlist) > 2:
+        pygame.draw.polygon(mask, polyMaskColor, pointlist)
         pygame.draw.polygon(png, polyInternalColor, pointlist)
-        bbox = getBoundingBox([pointlist[0],pointlist[0]], pointlist)
-        xMax, yMax = png.get_size()
-        xStart = int(bbox[0][0])
-        xEnd = int(bbox[1][0])
-        yStart = int(bbox[0][1])
-        yEnd = int(bbox[1][1])
-        if xStart < 0:
-            xStart = 0
-        if yStart < 0:
-            yStart = 0
-        if xEnd > xMax:
-            xEnd = xMax
-        if yEnd > yMax:
-            yEnd = yMax        
-        for xx in range(xStart, xEnd):
-            for yy in range(yStart, yEnd):
-                if png.get_at((xx, yy)) == polyInternalColor:
-                    updateMask(mask, polyMaskColor, (xx, yy))
         uiDrawLines(png, polyBoundaryColor, pointlist + [pointlist[0]], 1)
         for point in pointlist:
             markControlSpot(mask, point[0], point[1])
@@ -867,7 +792,6 @@ def drawRailway(png, mask, waydb, metersPerPixel):
 
 
 def drawRoads(png, mask, waydb, metersPerPixel):
-    tmpMask = png.copy()
     for waytypelist in wideWay:
         waytype = waytypelist[0]
         subwaylist = waytypelist[1]
@@ -876,7 +800,7 @@ def drawRoads(png, mask, waydb, metersPerPixel):
                 subwayarray = waydb[waytype][subway]
                 waydb[waytype].pop(subway)
                 for way in subwayarray:
-                    drawPolylineWithWidthTmp(png, mask, tmpMask, way, colors[TMPASPHALT], getNoMask(), wideWayWidthMeters / metersPerPixel, False)
+                    drawPolylineWithWidth(png, mask, way, colors[TMPASPHALT], getNoMask(), wideWayWidthMeters / metersPerPixel, False)
     for waytypelist in midWay:
         waytype = waytypelist[0]
         subwaylist = waytypelist[1]
@@ -885,7 +809,7 @@ def drawRoads(png, mask, waydb, metersPerPixel):
                 subwayarray = waydb[waytype][subway]
                 waydb[waytype].pop(subway)
                 for way in subwayarray:
-                    drawPolylineWithWidthTmp(png, mask, tmpMask, way, colors[TMPASPHALT], getNoMask(), midWayWidthMeters / metersPerPixel, False)
+                    drawPolylineWithWidth(png, mask, way, colors[TMPASPHALT], getNoMask(), midWayWidthMeters / metersPerPixel, False)
     for waytypelist in unclassifiedWay:
         waytype = waytypelist[0]
         subwaylist = waytypelist[1]
@@ -894,7 +818,7 @@ def drawRoads(png, mask, waydb, metersPerPixel):
                 subwayarray = waydb[waytype][subway]
                 waydb[waytype].pop(subway)
                 for way in subwayarray:
-                    drawPolylineWithWidthTmp(png, mask, tmpMask, way, colors[TMPASPHALT], getNoMask(), unclassifiedWayWidthMeters / metersPerPixel, False)
+                    drawPolylineWithWidth(png, mask, way, colors[TMPASPHALT], getNoMask(), unclassifiedWayWidthMeters / metersPerPixel, False)
     for waytypelist in smallWay:
         waytype = waytypelist[0]
         subwaylist = waytypelist[1]
@@ -903,9 +827,8 @@ def drawRoads(png, mask, waydb, metersPerPixel):
                 subwayarray = waydb[waytype][subway]
                 waydb[waytype].pop(subway)
                 for way in subwayarray:
-                    drawPolylineWithWidthTmp(png, mask, tmpMask, way, colors[TMPASPHALT], getNoMask(), smallWayWidthMeters / metersPerPixel, False)
+                    drawPolylineWithWidth(png, mask, way, colors[TMPASPHALT], getNoMask(), smallWayWidthMeters / metersPerPixel, False)
     png = boundarize(png,  colors[TMPASPHALT], colors[ASPHALT], colors[SOLIDBLACK])
-    updateFullMask(mask, tmpMask, getNoMask())
     return png, mask
 
 
@@ -951,19 +874,33 @@ def drawArtificialSpots(png, mask):
 
 async def initWorldCreator(size, imagePath):
     png = pygame.Surface(size)
-    mask = { "faLookup": {}, "saLookup": {}, "ssaLookup": {}, "tunnelLookup": {}, "vsaLookup": {}, "controls": [], "size": size}
-    png.fill(colors[PATTERN])
+    mask = pygame.Surface(size)
+    pattern = pygame.image.load(os.path.join(imagePath, "lemesoftnostalgic/OpenPattern.png"))
+    psize = pattern.get_size()
+    for x in range(size[0]//psize[0]):
+        for y in range(size[1]//psize[1]):
+            png.blit(pattern, (x * psize[0], y * psize[1]))
+    mask.fill(getSlowAreaMask())
     return png, mask
 
 
 async def getInfiniteWorld(latlonMapOrigo, xyPictureSize, metersPerPixel, imagePath, benchmark, portrait):
-    world, worldMask = await initWorldCreator(xyPictureSize, imagePath)
+
+    xyShift = (0, 0)
+    xyPictureSizeTrue = xyPictureSize
+    if benchmark == "phone":
+        xyPictureSizeTrue = (xyPictureSize[0]//2, xyPictureSize[0]//2)
+        xyShift = (randrange(xyPictureSize[0]//2), randrange(xyPictureSize[0]//2))
+    elif benchmark == "web":
+        xyPictureSizeTrue = (2*xyPictureSize[0]//3, 2*xyPictureSize[0]//3)
+        xyShift = (randrange(xyPictureSize[0]//3), randrange(xyPictureSize[0]//3))    
+    world, worldMask = await initWorldCreator(xyPictureSizeTrue, imagePath)
     if world == None:
         return None, None
 
 #    perfAddStart("wDB")
     await asyncio.sleep(0)
-    db, mapName = await constructWayDb(latlonMapOrigo, xyPictureSize, metersPerPixel)
+    db, mapName = await constructWayDb(latlonMapOrigo, xyPictureSizeTrue, metersPerPixel, xyShift)
 #    perfAddStop("wDB")
 
     if db == None:
@@ -1059,21 +996,8 @@ async def getInfiniteWorld(latlonMapOrigo, xyPictureSize, metersPerPixel, imageP
         return None, None
     perfAddStart("spotsetc")
     world, worldMask = drawSpots(world, worldMask, db)
-
-    x, y = world.get_size()
-    for xx in range(2, x-2):
-        worldMask["faLookup"][(xx, y-2)] = True
-        worldMask["faLookup"][(xx, y-1)] = True
-    for yy in range(2, y-2):
-        worldMask["faLookup"][(x-2, yy)] = True
-        worldMask["faLookup"][(x-1, yy)] = True
-
-    if benchmark != "phone":
-        for xx in range(0, x):
-            for yy in range(0, y):
-                pt = (xx, yy)
-                if world.get_at(pt) == colors[PATTERN]:
-                    worldMask["saLookup"][pt] = True
+    x, y = worldMask.get_size()
+    pygame.draw.rect(worldMask, getForbiddenAreaMask(), [(2,2), ((x-2, y-2))], width=2)
     perfAddStop("spotsetc")
 
     perfAddStop("wAreas")

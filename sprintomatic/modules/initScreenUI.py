@@ -184,7 +184,7 @@ def showInitSelections(surf, positions, selections, inScale, texts, titleTexts, 
     showTextShadowed(surf, worldPosition, 32, worldText, getTrackColor(), shift, portrait)
 
 
-async def veryFirstTime(portrait):
+async def veryFirstTime(benchmark, portrait):
     global veryFirstTime
     creditTextsEarly = [
         "Author: Jyrki Leskelä, Oulu",
@@ -201,7 +201,12 @@ async def veryFirstTime(portrait):
     if veryFirstTime:
         uiSubmitTextListSlide(creditTextsEarly, portrait)
         await uiFlip(False)
-        await asyncio.sleep(1)
+        if benchmark == "phone":
+            await asyncio.sleep(0)
+        elif benchmark == "web":
+            await asyncio.sleep(0.5)
+        else:
+            await asyncio.sleep(1.0)
         veryFirstTime = False
 
 

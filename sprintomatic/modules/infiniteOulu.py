@@ -242,6 +242,15 @@ def copyArea(area, png, mask):
     return new, png, mask
 
 
+def makeForest(area, png, mask):
+    for y in range(len(area)):
+        for x in range(len(area[0])):
+            area[y][x] = FOREST
+            mask["saLookup"][(x, y)] = True
+    png.fill(colors[FOREST])
+    return area, png, mask
+
+
 # just a wrapper due to speed optimization
 def copyAreaShallow(area, png, mask):
     return area, png, mask
@@ -1269,6 +1278,7 @@ async def addBlock(dim, bigBlock):
         if dim[0] > 100:
             area, png, mask = addSpots(area, png, mask, False)
     else:
+        area, png, mask = makeForest(area, png, mask)
         area, png, mask = addDifficultForest(area, png, mask)
         if await uiFlushEvents():
             return None, None, None

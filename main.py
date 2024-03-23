@@ -291,7 +291,7 @@ async def main():
         # start AI processes
         initializeAITables()
     portrait = uiEarlyInit(gameSettings.fullScreen, benchmark)
-    veryFirstT = await veryFirstTime(portrait)
+    veryFirstT = await veryFirstTime(benchmark, portrait)
     externalImageData, offline = await downloadExternalImageData(gameSettings.ownMasterListing)
     if offline:
          gameSettings.offline = offline
