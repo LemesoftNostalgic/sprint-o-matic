@@ -614,17 +614,17 @@ async def main():
                                 if gameSettings.pacemaker != 0 and pacemakerPath is not None and pacemakerPosition is not None:
                                     if pacemakerPosition == pacemakerPath[-1]:
                                         uiAnimatePacemaker(pacemakerPosition, pacemakerAngle, 1.0 * extraScale, gameSettings.pacemaker, inTunnelPacemaker, True, shift)
-                                        pacemakerPrepareForShout = True
                                         pacemakerStep = -5
+                                        if pacemakerPrepareForShout:
+                                            pacemakerShoutEffect()
+                                            pacemakerPrepareForShout = False
                                     elif pacemakerPosition == pacemakerPath[0]:
                                         pacemakerStep = pacemakerStep + 1
                                         if pacemakerStep > 5:
                                             pacemakerStep = -5
 
                                         uiAnimatePacemaker(pacemakerPosition, pacemakerAngle, extraScale * (1.5 + abs(pacemakerStep) * 0.1), gameSettings.pacemaker, inTunnelPacemaker, True, shift)
-                                        if pacemakerPrepareForShout:
-                                            pacemakerShoutEffect()
-                                            pacemakerPrepareForShout = False
+                                        pacemakerPrepareForShout = True
                                     else:
                                         pacemakerStep = -5
                                         pacemakerPrepareForShout = True
