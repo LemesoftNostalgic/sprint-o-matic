@@ -39,7 +39,8 @@ alustavan kuvan siitä miten peli toimii:
 
 Käytä web-versiota, jos haluat testata sovellusta heti.
 Web-sovellus toimii melko hyvin nykyaikaisessa selaimessa, paitsi
-äänen laatu, joka vaihtelee. Toisaalta web-versio on aina ajan tasalla.
+äänen laatu, joka vaihtelee. Suosittelen silti web-versiota koska se
+on aina ajan tasalla.
 
 Web-sovellusta voi käyttää myös puhelimessa,
 mutta silloin äänet eivät ole päällä, eikä grafiikka ole yhtä hyvä kuin

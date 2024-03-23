@@ -46,7 +46,7 @@ which have improved a little bit during this winter.
 
 Use the web version if you want to try the app immediately.
 The web application works quite ok with the modern browsers, except for
-the sound quality, which varies. However, the web version
+the sound quality, which varies. However, the web version is recommended because
 is always up-to date.
 
 The web app can also be used with phones,
