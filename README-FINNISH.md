@@ -17,6 +17,7 @@ Se sisältää äärettömän määrän sprinttisuunnistuksen reitinvalintahaast
 hauskan 2D-pelin muodossa. Katso seuraavat esittelyvideot saadaksesi
 alustavan kuvan siitä miten peli toimii:
 
+* [Sprint-O-Matic 7.0: web sovellus, toimii selaimessa ja puhelimessa](https://youtu.be/cxk0ZU6YtcE)
 * [Sprint-O-Matic 5.0: parempi grafiikka ja enemmän karttoja](https://youtu.be/86cpFzc_-78)
 * [Sprint-O-Matic 4.0: uusi "AMaze"-toiminto ensimmäisen rastivälin harjoitteluun](https://youtu.be/nepM0oAiFn8)
 * [Sprint-O-Matic 3.0: nopeampi, satoja sprinttisuunnistukseen soveltuvia karttoja ympäri maailmaa, sisältää myös web-sovelluksen](https://youtu.be/lmbBzbUQUbc)
