@@ -300,14 +300,14 @@ async def initScreen(imagePath, gameSettings, externalImageData, externalWorldCi
             (xStart + 0.4 * xStep, yStart - 0.2 * yStep),
             (xStart + 1.30 * xStep, yStart + 1.8 * yStep),
             (xStart + 2.35 * xStep, yStart + 4.8 * yStep),
-            (xStart + 3.35 * xStep, yStart + 5.4 * yStep)
+            (xStart + 3.35 * xStep, yStart + 6.3 * yStep)
             ]
-        externalExampleOverallPosition = (xStart + 3.9 * xStep, yStart + 8.16 * yStep)
+        externalExampleOverallPosition = (xStart + 3.8 * xStep, yStart + 8.18 * yStep)
         externalExampleTeamSelectionPosition = (xStart + 3.9 * xStep, yStart + 8.6 * yStep)
         externalExampleSelectionPosition = (xStart + 3 * xStep, yStart + 10.05 * yStep)
         loadingPosition = (xStart + 4 * xStep, yStart + 10.05 * yStep)
-        ouluExampleSelectionPosition = (xStart + 3.7 * xStep, yStart + 7.6 * yStep)
-        worldExampleSelectionPosition = (xStart + 3.9 * xStep, yStart + 6.6 * yStep)
+        ouluExampleSelectionPosition = (xStart + 3.8 * xStep, yStart + 7.6 * yStep)
+        worldExampleSelectionPosition = (xStart + 4.0 * xStep, yStart + 6.6 * yStep)
         creditTextPositions = [
             (xStart + 2.8 * xStep, yStart - 0.15 * yStep),
             (xStart + 2.8 * xStep, yStart + 0.0 * yStep),
@@ -326,7 +326,9 @@ async def initScreen(imagePath, gameSettings, externalImageData, externalWorldCi
         "A trainer app for sprint orienteering,",
         "Author: Jyrki Leskelä, Oulu.",
         "Use mouse keys, touchscreen, or keyboard.",
-        "move: arrows, select: SPACE/BACKSPACE, quit: ESC",
+        "move: arrow keys,",
+        "select: SPACE/BACK keys",
+        "quit: ESC key",
         ]
     # "external" always last
     texts = [

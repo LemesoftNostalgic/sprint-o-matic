@@ -8,7 +8,7 @@ import time
 
 from .utils import getSlowAreaMask, getSemiSlowAreaMask, getVerySlowAreaMask, getForbiddenAreaMask, getControlMask, getNoMask, getPackagePath
 from .mathUtils import calculatePathDistance, distanceBetweenPoints
-from .gameUIUtils import uiFlushEvents, uiFlip, uiDrawLine, uiSubmitSlide
+from .gameUIUtils import uiFlushEvents, uiFlip, uiDrawLine, uiSubmitSlide, uiSubmitTwoSlides
 from .imageDownloader import downloadOsmData
 from .perfSuite import perfAddStart, perfAddStop
 
@@ -907,7 +907,7 @@ async def getInfiniteWorld(latlonMapOrigo, xyPictureSize, metersPerPixel, imageP
         return None, None
 
     if mapName:
-        uiSubmitSlide("Creating map: " + mapName, portrait)
+        uiSubmitTwoSlides("Creating map:", mapName, portrait)
     await uiFlip(False)
     if await uiFlushEvents():
         return None, None
