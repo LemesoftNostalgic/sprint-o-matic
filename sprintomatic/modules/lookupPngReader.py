@@ -46,6 +46,13 @@ async def extractPngLookups(oMapMask):
     if oMapMask == None:
         return faLookup, saLookup, ssaLookup, vsaLookup, tunnelLookup, controls
 
+    for tf in getTfs():
+        faLookup[tf] = {}
+        saLookup[tf] = {}
+        ssaLookup[tf] = {}
+        vsaLookup[tf] = {}
+        tunnelLookup[tf] = {}
+
     if type(oMapMask) == dict:
         faLookup[1] = oMapMask["faLookup"]
         saLookup[1] = oMapMask["saLookup"]
@@ -56,12 +63,6 @@ async def extractPngLookups(oMapMask):
         size = oMapMask["size"]
     else:
         size = oMapMask.get_size()
-        for tf in getTfs():
-            faLookup[tf] = {}
-            saLookup[tf] = {}
-            ssaLookup[tf] = {}
-            vsaLookup[tf] = {}
-            tunnelLookup[tf] = {}
         
         fam = getForbiddenAreaMask()
         tm = getTunnelMask()
