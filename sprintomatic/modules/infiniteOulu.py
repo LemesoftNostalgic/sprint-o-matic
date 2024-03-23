@@ -23,8 +23,6 @@ import asyncio
 import math
 
 from .mathUtils import rotateVector, rotatePoint, getBoundingBox, polygonCreate, polygonContainsWithLookup
-from .lookupPngReader import getTfs
-from .utils import getSlowAreaMask, getSemiSlowAreaMask, getVerySlowAreaMask, getForbiddenAreaMask, getControlMask, getNoMask, getAiPoolMaxTimeLimit, getTunnelMask
 from .gameUIUtils  import uiFlushEvents
 from .perfSuite import perfAddStart, perfAddStop
 
@@ -209,18 +207,30 @@ def createArea(dim):
     for y in range(dim[1]):
         subArea = []
         for x in range(dim[0]):
-            subArea.append(FOREST)
+            subArea.append(ASPHALT)
         area.append(subArea)
     png = pygame.Surface(dim)
-    mask = pygame.Surface(dim)
-    png.fill(colors[FOREST])
-    mask.fill(getSemiSlowAreaMask())
+    png.fill(colors[ASPHALT])
+    mask = { "faLookup": {}, "saLookup": {}, "ssaLookup": {}, "vsaLookup": {}, "tunnelLookup": {}, "controls": []}
     return area, png, mask
 
 
 def installOuluBlock(ouluPng, png, ouluMask, mask, position, blockSize, boundary):
     ouluPng.blit(png, (boundary + position[1] * (blockSize[1] + boundary), boundary + position[0] * (blockSize[0] + boundary)))
-    ouluMask.blit(mask, (boundary + position[1] * (blockSize[1] + boundary), boundary + position[0] * (blockSize[0] + boundary)))
+    xShift = boundary + position[1] * (blockSize[1] + boundary)
+    yShift = boundary + position[0] * (blockSize[0] + boundary)
+    for key in mask["faLookup"]:
+        ouluMask["faLookup"][(xShift + key[0], yShift + key[1])] = True
+    for key in mask["saLookup"]:
+        ouluMask["saLookup"][(xShift + key[0], yShift + key[1])] = True
+    for key in mask["ssaLookup"]:
+        ouluMask["ssaLookup"][(xShift + key[0], yShift + key[1])] = True
+    for key in mask["vsaLookup"]:
+        ouluMask["vsaLookup"][(xShift + key[0], yShift + key[1])] = True
+    for key in mask["tunnelLookup"]:
+        ouluMask["tunnelLookup"][(xShift + key[0], yShift + key[1])] = True
+    for control in mask["controls"]:
+        ouluMask["controls"].append((xShift + control[0], yShift + control[1]))
     return ouluPng, ouluMask
 
 
@@ -247,58 +257,56 @@ def dumpArea(area, title):
 
 def areaSetAt(area, png, mask, y, x, filltype):
     area[int(y)][int(x)] = filltype
-    png.fill(colors[filltype], ((x, y), (1, 1)))
-    if filltype in SHELTERINTERNAL:
-        mask.fill(getTunnelMask(), ((x, y), (1, 1)))
-    elif filltype in forbidden:
-        mask.fill(getForbiddenAreaMask(), ((x, y), (1, 1)))
+    pt = (int(x), int(y))
+    png.fill(colors[filltype], (pt, (1, 1)))
+    if filltype in forbidden:
+        mask["faLookup"][pt] = True
     elif filltype in slowing:
-        mask.fill(getSlowAreaMask(), ((x, y), (1, 1)))
+        mask["saLookup"][pt] = True
     elif filltype in semislowing:
-        mask.fill(getSemiSlowAreaMask(), ((x, y), (1, 1)))
+        mask["ssaLookup"][pt] = True
     elif filltype in veryslowing:
-        mask.fill(getVerySlowAreaMask(), ((x, y), (1, 1)))
-    else:
-        mask.fill(getNoMask(), ((x, y), (1, 1)))
+        mask["vsaLookup"][pt] = True
+    elif filltype in SHELTERINTERNAL:
+        mask["tunnelLookup"][pt] = True
 
 
 def areaSetAtVisualOnly(png, mask, y, x, filltype):
-    intx = int(x)
-    inty = int(y)
-    if intx > 0 and inty > 0 and intx < mask.get_size()[0] and inty < mask.get_size()[1]:
-        if mask.get_at((intx, inty)) != getForbiddenAreaMask():
-            png.fill(colors[filltype], ((x, y), (1, 1)))
+    pt = (int(x), int(y))
+    if pt not in mask["faLookup"]:
+        png.fill(colors[filltype], ((x, y), (1, 1)))
 
 
 def queryForbiddenSpot(mask, y, x):
-    rect = mask.get_rect()
-    if x < rect[0] or x > rect[0] + rect[2] or y < rect[1] or y > rect[1] + rect[3]:
-        return False
-    currentMask = mask.get_at((int(x), int(y)))
-    if currentMask == getForbiddenAreaMask():
+    pt = (int(x), int(y))
+    if pt in mask["faLookup"]:
         return True
     return False
 
 
 def markControlSpot(mask, y, x):
     if not queryForbiddenSpot(mask, y, x):
-        mask.fill(getControlMask(), ((int(x),int(y)), (1, 1)))
+        pt = (int(x), int(y))
+        if pt not in mask["controls"]:
+            mask["controls"].append(pt)
 
 
 def queryControlSpot(mask, y, x):
-    rect = mask.get_rect()
-    if x < rect[0] or x > rect[0] + rect[2] or y < rect[1] or y > rect[0] + rect[2]:
-        return False
-    currentMask = mask.get_at((x, y))
-    if currentMask == getControlMask():
+    pt = (int(x), int(y))
+    if pt in mask["controls"]:
         return True
     return False
 
 
 def removeControlSpot(mask, y, x):
-    mask.fill(getNoMask(), ((x, y), (1, 1)))
-    
-        
+    pt = (int(x), int(y))
+    try:
+        while True:
+            mask["controls"].remove(pt)
+    except ValueError:
+        pass
+
+
 def areaDrawSpot(area, png, mask, y, x, filltype):
     if area is not None:
         area[y][x] = filltype
@@ -322,9 +330,20 @@ def rotateArea(area, png, mask):
     rotated, pngCopy, maskCopy = createArea((len(area[0]), len(area)))
     for y in range(len(area)):
         for x in range(len(area[0])):
-            rotated[y][x] = area[len(area[0])-x-1][y]
+            rotated[y][x] = area[(len(area[0])-1) - x][y]
     pngCopy = pygame.transform.rotate(png, -90)
-    maskCopy= pygame.transform.rotate(mask, -90)
+    for key in mask["faLookup"]:
+        maskCopy["faLookup"][((len(area[0])-1) - key[1], key[0])] = True
+    for key in mask["saLookup"]:
+        maskCopy["saLookup"][((len(area[0])-1) - key[1], key[0])] = True
+    for key in mask["ssaLookup"]:
+        maskCopy["ssaLookup"][((len(area[0])-1) - key[1], key[0])] = True
+    for key in mask["vsaLookup"]:
+        maskCopy["vsaLookup"][((len(area[0])-1) - key[1], key[0])] = True
+    for key in mask["tunnelLookup"]:
+        maskCopy["tunnelLookup"][((len(area[0])-1) - key[1], key[0])] = True
+    for control in mask["controls"]:
+        maskCopy["controls"].append(((len(area[0])-1) - control[1], control[0]))
     return rotated, pngCopy, maskCopy
 
 
@@ -1289,9 +1308,8 @@ def initOuluCreator(blockSize, gridSize, boundary):
     x = gridSize[0] * (blockSize[0] + boundary) + boundary
     y = gridSize[1] * (blockSize[1] + boundary) + boundary
     png = pygame.Surface((y, x))
-    mask = pygame.Surface((y, x))
     png.fill(colors[ASPHALT])
-    mask.fill(getNoMask())
+    mask = { "faLookup": {}, "saLookup": {}, "ssaLookup": {}, "tunnelLookup": {}, "vsaLookup": {}, "controls": [], "size": (y, x)}
 
     # city blocks
     for dx in range(gridSize[1]):
@@ -1312,7 +1330,11 @@ def initOuluCreator(blockSize, gridSize, boundary):
                     whatInCircle = randrange(forbiddenCircleProb)
                     if whatInCircle == 0:
                         pygame.draw.circle(png, colors[OLIVEGREEN], (xShift, yShift), shortdist, width=0)
-                        pygame.draw.circle(mask, getForbiddenAreaMask(), (xShift, yShift), shortdist, width=0)
+                        for xx in range(int(xShift - shortdist), int(xShift + shortdist)):
+                            for yy in range(int(yShift - shortdist), int(yShift + shortdist)):
+                                pt = (xx, yy)
+                                if png.get_at(pt) == colors[OLIVEGREEN]:
+                                    mask["faLookup"][pt] = True
                     elif whatInCircle == 1:
                         pygame.draw.circle(png, colors[OPENAREA], (xShift, yShift), shortdist, width=0)
                     pygame.draw.circle(png, colors[SOLIDBLACK], (xShift, yShift), shortdist, width=1)
@@ -1342,23 +1364,26 @@ def initOuluCreator(blockSize, gridSize, boundary):
                 y2 = y1 + h1/(numCrosses*3) + fenceInd * h1/numCrosses
                 w2 = w1 + 3*walkwayWidth
 
-
-# Is this a bad idea? Does not look too good...
-#                if randrange(pedestrianFenceProb) == 0:
-#                    pygame.draw.line(png, colors[SOLIDBLACK], (x2, y2), (x2+w2, y2), width = 2)
-#                    pygame.draw.line(mask, getForbiddenAreaMask(), (x2, y2), (x2+w2, y2), width = 2)
-
                 pygame.draw.line(png, colors[WATER], (x2, y2 - 1), (x2-2, y2 + 1), width=4)
                 pygame.draw.line(png, colors[WATER], (x2+w2+2, y2 - 1), (x2+w2+2, y2 + 1), width=4)
 
     # do not allow escape
-    pygame.draw.rect(mask, getForbiddenAreaMask(), [(2,2), ((y-2, x-2))], width=2)
+    for xx in range(2, y-2):
+        mask["faLookup"][(xx, x-2)] = True
+        mask["faLookup"][(xx, x-1)] = True
+    for yy in range(2, x-2):
+        mask["faLookup"][(y-2, yy)] = True
+        mask["faLookup"][(y-1, yy)] = True
 
     # sealine
     pygame.draw.rect(png, colors[WATER], [y-boundary//2, 0, boundary//2, x], width = 0)
-    pygame.draw.rect(mask, getForbiddenAreaMask(), [y-boundary//2, 0, boundary//2, x], width = 0)
     pygame.draw.line(png, colors[SOLIDBLACK], (y-boundary//2, 0), (y-boundary//2, x), width=1)
-                
+
+    for xx in range(y-boundary//2, y):
+        for yy in range(0, x):
+            pt = (xx, yy)
+            mask["faLookup"][pt] = True
+    
     return png, mask
 
 
@@ -1382,25 +1407,4 @@ async def getInfiniteOulu(blockSize, gridSize, boundary):
             perfAddStop("oInstal")    
             await asyncio.sleep(0)
 
-    # Leaving out due to slow speed in the web application
-    # dummy_heightmap, oulu = addContours(randrange(countoursMinKernelWidth, countoursMaxKernelWidth), oulu, randrange(countoursMinOutOf, countoursMaxOutOf))
-
     return oulu, ouluMask
-
-
-# Background AI setup
-preGenerated = []
-kBlockSizeSlot = 0
-kGridSizeSlot = 1
-kBoundarySlot = 2
-kAiPoolSlot =  3
-kAiResultDescSlot = 4
-kAiResultArraySlot = 5
-
-async def getInfiniteOuluArray(setupArray):
-
-    oulu, ouluMask = await getInfiniteOulu(setupArray[0], setupArray[1], setupArray[2])
-    ouluStr = pygame.image.tostring(oulu, 'RGBA')
-    ouluMaskStr = pygame.image.tostring(ouluMask, 'RGBA')
-    ouluSize = oulu.get_size()
-    return [ouluStr, ouluMaskStr, ouluSize]

@@ -180,7 +180,7 @@ async def returnConfig(gameSettings, externalImageData, infiniteWorldCityMap, be
         png, pngMask = await getInfiniteOulu((wid, wid), gridSize, strt + randrange(0, strt // 2))
 #        perfAddStop("oulu")
         perfAddStart("pngLookupMsk")
-        faLookup, saLookup, ssaLookup, vsaLookup, tunnelLookup, config = await extractPngLookups(pngMask, benchmark)
+        faLookup, saLookup, ssaLookup, vsaLookup, tunnelLookup, config = await extractPngLookups(pngMask)
         perfAddStop("pngLookupMsk")
 
     elif gameSettings.infiniteWorld:
@@ -188,7 +188,7 @@ async def returnConfig(gameSettings, externalImageData, infiniteWorldCityMap, be
         png, pngMask = await getInfiniteWorldDefault(gameSettings.place, gameSettings.imageRoot, benchmark, portrait)
 #        perfAddStop("world")
         perfAddStart("pngLookupMsk")
-        faLookup, saLookup, ssaLookup, vsaLookup, tunnelLookup, config = await extractPngLookups(pngMask, benchmark)
+        faLookup, saLookup, ssaLookup, vsaLookup, tunnelLookup, config = await extractPngLookups(pngMask)
         perfAddStop("pngLookupMsk")
 
     elif not gameSettings.lookupPngName and (gameSettings.externalExampleTeam and gameSettings.externalExample):
@@ -207,7 +207,7 @@ async def returnConfig(gameSettings, externalImageData, infiniteWorldCityMap, be
         #png = None
         #pngMask = None
         perfAddStart("pngLookupMsk")
-        faLookup, saLookup, ssaLookup, vsaLookup, tunnelLookup, config = await extractPngLookups(pngMask, benchmark)
+        faLookup, saLookup, ssaLookup, vsaLookup, tunnelLookup, config = await extractPngLookups(pngMask)
         perfAddStop("pngLookupMsk")
 
     elif gameSettings.lookupPngName: # map given at command line

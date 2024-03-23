@@ -36,7 +36,7 @@ def getTfs():
 tfsShort = [1, 2, 4]
 
 
-async def extractPngLookups(oMapMask, benchmark):
+async def extractPngLookups(oMapMask):
     faLookup = {}
     saLookup = {}
     ssaLookup = {}
@@ -46,44 +46,59 @@ async def extractPngLookups(oMapMask, benchmark):
     if oMapMask == None:
         return faLookup, saLookup, ssaLookup, vsaLookup, tunnelLookup, controls
 
-    size = oMapMask.get_size()
+    if type(oMapMask) == dict:
+        faLookup[1] = oMapMask["faLookup"]
+        saLookup[1] = oMapMask["saLookup"]
+        ssaLookup[1] = oMapMask["ssaLookup"]
+        vsaLookup[1] = oMapMask["vsaLookup"]
+        tunnelLookup[1] = oMapMask["tunnelLookup"]
+        controls = oMapMask["controls"]
+        size = oMapMask["size"]
+    else:
+        size = oMapMask.get_size()
+        for tf in getTfs():
+            faLookup[tf] = {}
+            saLookup[tf] = {}
+            ssaLookup[tf] = {}
+            vsaLookup[tf] = {}
+            tunnelLookup[tf] = {}
+        
+        fam = getForbiddenAreaMask()
+        tm = getTunnelMask()
+        cm = getControlMask()
+        sm = getSlowAreaMask()
+        ssm = getSemiSlowAreaMask()
+        vsm = getVerySlowAreaMask()
 
-    for tf in getTfs():
-        faLookup[tf] = {}
-        saLookup[tf] = {}
-        ssaLookup[tf] = {}
-        vsaLookup[tf] = {}
-        tunnelLookup[tf] = {}
-
-    fam = getForbiddenAreaMask()
-    tm = getTunnelMask()
-    cm = getControlMask()
-    sm = getSlowAreaMask()
-    ssm = getSemiSlowAreaMask()
-    vsm = getVerySlowAreaMask()
-    phone = True if benchmark == "phone" else False
-    for y in range(0, size[1]):
-        for x in range(0, size[0]):
-            col = oMapMask.get_at((x, y))
-            if col == fam:
-                for tf in tfsShort:
-                    faLookup[tf][(int(x/tf), int(y/tf))] = True
-            elif col == tm:
-                for tf in tfsShort:
-                    tunnelLookup[tf][(int(x/tf), int(y/tf))] = True
-            elif col == cm:
-                controls.append((x, y))
-            elif not phone:
-                if col == sm:
-                    for tf in tfsShort:
-                        saLookup[tf][(int(x/tf), int(y/tf))] = True
+        for y in range(0, size[1]):
+            for x in range(0, size[0]):
+                pt = (x, y)
+                col = oMapMask.get_at(pt)
+                if col == fam:
+                    faLookup[1][pt] = True
+                elif col == tm:
+                    tunnelLookup[1][pt] = True
+                elif col == cm:
+                    controls.append(pt)
+                elif col == sm:
+                    saLookup[1][pt] = True
                 elif col == ssm:
-                    for tf in tfsShort:
-                        ssaLookup[tf][(int(x/tf), int(y/tf))] = True
+                    ssaLookup[1][pt] = True
                 elif col == vsm:
-                    for tf in tfsShort:
-                        vsaLookup[tf][(int(x/tf), int(y/tf))] = True
-                    
+                    vsaLookup[1][pt] = True
+
+    for tf in tfsShort[1:]:
+        for item in faLookup[1]:
+            faLookup[tf] = (item[0]//tf, item[1]//tf)
+        for item in saLookup[1]:
+            saLookup[tf] = (item[0]//tf, item[1]//tf)
+        for item in ssaLookup[1]:
+            ssaLookup[tf] = (item[0]//tf, item[1]//tf)
+        for item in vsaLookup[1]:
+            vsaLookup[tf] = (item[0]//tf, item[1]//tf)
+        for item in tunnelLookup[1]:
+            tunnelLookup[tf] = (item[0]//tf, item[1]//tf)
+
     prunedControls = []
     steps = len(controls) // 500
     step = 0
@@ -104,9 +119,9 @@ async def extractPngLookups(oMapMask, benchmark):
     return faLookup, saLookup, ssaLookup, vsaLookup, tunnelLookup, prunedControls
 
 
-async def extractPngLookupsFromFile(pngFileName, benchmark):
+async def extractPngLookupsFromFile(pngFileName):
     try:
-        oMapMask = pygame.image.load(pngFileName, benchmark)
+        oMapMask = pygame.image.load(pngFileName)
     except Exception as err:
         print(f"Cannot load map from file: {err=}, {type(err)=}")
         return {}, {}, {}, {}, {}, []
