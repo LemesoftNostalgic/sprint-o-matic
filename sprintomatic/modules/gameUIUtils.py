@@ -142,8 +142,8 @@ def uiEarlyInit(fullScreen, benchmark):
     global bigScreen
 
     pygame.init()
-    if benchmark == "phone":
-        bigScreen = pygame.display.set_mode((640,480))
+#    if benchmark == "phone":
+#        bigScreen = pygame.display.set_mode((640,480))
     if fullScreen:
         bigScreen = pygame.display.set_mode((0,0), pygame.FULLSCREEN)
     else:
