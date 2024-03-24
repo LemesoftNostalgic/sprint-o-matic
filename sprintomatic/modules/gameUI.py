@@ -528,7 +528,7 @@ def uiClearCanvas(controls, shortestRoutesArray, reachedControl, benchmark, memo
                         uiDrawLine(oMapMemorize, getTrackColor(), previousControlShrinked, controlShrinked, max(2, int(2/metersPerPixel)))
             previousControl = control
     if effectStep == getEffectStepStart(benchmark)//2 and memorize:
-        oMapMid = oMapMemorize.copy()
+        oMapMid = oMapMidMemorize.copy()
     if reachedControl != prevReachedControl:
         prevReachedControl = reachedControl
         if benchmark == "phone":
@@ -562,6 +562,7 @@ def uiClearCanvas(controls, shortestRoutesArray, reachedControl, benchmark, memo
                 oMapMidMemorize.blit(oMapMemorize, dest=(0,0), area=brect)
         else:
             oMapMid = oMap.copy()
+            oMapMidMemorize = oMapMemorize.copy()
 
     oMapCopy = oMapMid.copy()
     return (bboxStartX, bboxStartY)
