@@ -477,12 +477,26 @@ def uiRenderControls(controls, usePacemaker, amaze, shift):
 #    perfAddStop("renCtrls")
 
 
-def uiClearCanvas(controls, shortestRoutesArray, reachedControl, benchmark):
-    global oMapCopy, oMapEarly, oMap, oMapMid, prevReachedControl, bboxStartX, bboxStartY
+def blindAreasToMemorize(oMapMemorize):
+    xStep = randrange(60,90)
+    yStep = randrange(60,90)
+    minStep = min(xStep, yStep)
+    for x in range(0, oMapMemorize.get_size()[0], xStep):
+        for y in range(0, oMapMemorize.get_size()[1], yStep):
+            boundary = minStep // randrange(20, 60)
+            if randrange(2) == 0:
+                pygame.draw.rect(oMapMemorize, getWhiteColor(), [x + boundary, y + boundary, xStep - 2*boundary, yStep - 2*boundary])
+
+
+def uiClearCanvas(controls, shortestRoutesArray, reachedControl, benchmark, memorize):
+    global oMapCopy, oMapEarly, oMapMemorize, oMap, oMapMid, oMapMidMemorize, prevReachedControl, bboxStartX, bboxStartY
 
     surf.fill(getWhiteColor())
     if oMap is None:
         oMap = oMapEarly.copy()
+        if memorize:
+            oMapMemorize = oMapEarly.copy()
+            blindAreasToMemorize(oMapMemorize)
         prevReachedControl = 999999
         bboxStartX = 0
         bboxStartY = 0
@@ -494,8 +508,14 @@ def uiClearCanvas(controls, shortestRoutesArray, reachedControl, benchmark):
                 uiDrawLine(oMap, getTrackColor(), triangle[0], triangle[1], max(2, int(2/metersPerPixel)))
                 uiDrawLine(oMap, getTrackColor(), triangle[1], triangle[2], max(2, int( 2/metersPerPixel)))
                 uiDrawLine(oMap, getTrackColor(), triangle[2], triangle[0], max(2, int(2/metersPerPixel)))
+                if memorize:
+                    uiDrawLine(oMapMemorize, getTrackColor(), triangle[0], triangle[1], max(2, int(2/metersPerPixel)))
+                    uiDrawLine(oMapMemorize, getTrackColor(), triangle[1], triangle[2], max(2, int( 2/metersPerPixel)))
+                    uiDrawLine(oMapMemorize, getTrackColor(), triangle[2], triangle[0], max(2, int(2/metersPerPixel)))
             else:
                 uiDrawCircle(oMap, getTrackColor(), control, circleRadius/metersPerPixel, max(2, int(2/metersPerPixel)))
+                if memorize:
+                    uiDrawCircle(oMapMemorize, getTrackColor(), control, circleRadius/metersPerPixel, max(2, int(2/metersPerPixel)))
             if previousControl:
                 fraction = (circleRadiusMargin/metersPerPixel) / distanceBetweenPoints(control, previousControl)
                 lineItself = (control[0]-previousControl[0], control[1]-previousControl[1])
@@ -504,34 +524,44 @@ def uiClearCanvas(controls, shortestRoutesArray, reachedControl, benchmark):
                     previousControlShrinked = (previousControl[0]+lineDelta[0], previousControl[1]+lineDelta[1])
                     controlShrinked = (control[0]-lineDelta[0], control[1]-lineDelta[1])
                     uiDrawLine(oMap, getTrackColor(), previousControlShrinked, controlShrinked, max(2, int(2/metersPerPixel)))
+                    if memorize:
+                        uiDrawLine(oMapMemorize, getTrackColor(), previousControlShrinked, controlShrinked, max(2, int(2/metersPerPixel)))
             previousControl = control
-        oMapMid = oMap.copy()
-    if benchmark == "phone" and reachedControl != prevReachedControl:
+    if effectStep == getEffectStepStart(benchmark)//2 and memorize:
+        oMapMid = oMapMemorize.copy()
+    if reachedControl != prevReachedControl:
         prevReachedControl = reachedControl
-        getBigScreen().fill(getWhiteColor())
-        if reachedControl >= len(shortestRoutesArray):
-            reachedControl = len(shortestRoutesArray) - 1
-        points = shortestRoutesArray[reachedControl][0]
-        tmpBBox = getBoundingBox([points[0], points[0]], points)
-        x1 = tmpBBox[0][0]
-        x2 = tmpBBox[1][0]
-        y1 = tmpBBox[0][1]
-        y2 = tmpBBox[1][1]
-        dx = x2 - x1
-        dy = y2 - y1
-        if dx < dy:
-            x1 = x1 - dy//2
-            x2 = x2 + dy//2
+        if benchmark == "phone":
+            getBigScreen().fill(getWhiteColor())
+            if reachedControl >= len(shortestRoutesArray):
+                reachedControl = len(shortestRoutesArray) - 1
+            points = shortestRoutesArray[reachedControl][0]
+            tmpBBox = getBoundingBox([points[0], points[0]], points)
+            x1 = tmpBBox[0][0]
+            x2 = tmpBBox[1][0]
+            y1 = tmpBBox[0][1]
+            y2 = tmpBBox[1][1]
+            dx = x2 - x1
+            dy = y2 - y1
+            if dx < dy:
+                x1 = x1 - dy//2
+                x2 = x2 + dy//2
+            else:
+                y1 = y1 - dx//2
+                y2 = y2 + dx//2
+            bboxStartX = max(x1 - bboxThresh, 0)
+            bboxStartY = max(y1 - bboxThresh, 0)
+            bboxEndX = min(x2 + bboxThresh, oMap.get_size()[0])
+            bboxEndY = min(y2 + bboxThresh, oMap.get_size()[1])
+            brect = pygame.Rect(bboxStartX, bboxStartY, bboxEndX - bboxStartX, bboxEndY - bboxStartY)
+
+            oMapMid = pygame.Surface((bboxEndX - bboxStartX, bboxEndY - bboxStartY))
+            oMapMid.blit(oMap, dest=(0,0), area=brect)
+            if memorize:
+                oMapMidMemorize = pygame.Surface((bboxEndX - bboxStartX, bboxEndY - bboxStartY))
+                oMapMidMemorize.blit(oMapMemorize, dest=(0,0), area=brect)
         else:
-            y1 = y1 - dx//2
-            y2 = y2 + dx//2
-        bboxStartX = max(x1 - bboxThresh, 0)
-        bboxStartY = max(y1 - bboxThresh, 0)
-        bboxEndX = min(x2 + bboxThresh, oMap.get_size()[0])
-        bboxEndY = min(y2 + bboxThresh, oMap.get_size()[1])
-        brect = pygame.Rect(bboxStartX, bboxStartY, bboxEndX - bboxStartX, bboxEndY - bboxStartY)
-        oMapMid = pygame.Surface((bboxEndX - bboxStartX, bboxEndY - bboxStartY))
-        oMapMid.blit(oMap, dest=(0,0), area=brect)
+            oMapMid = oMap.copy()
 
     oMapCopy = oMapMid.copy()
     return (bboxStartX, bboxStartY)

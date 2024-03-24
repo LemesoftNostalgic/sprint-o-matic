@@ -17,6 +17,7 @@ Se sisältää äärettömän määrän sprinttisuunnistuksen reitinvalintahaast
 hauskan 2D-pelin muodossa. Katso seuraavat esittelyvideot saadaksesi
 alustavan kuvan siitä miten peli toimii:
 
+* [Sprint-O-Matic 8.0: karttamuistiharjoitus lisätty](https://youtu.be/DNg-9HHWzRM)
 * [Sprint-O-Matic 7.0: web sovellus, toimii selaimessa ja puhelimessa](https://youtu.be/cxk0ZU6YtcE)
 * [Sprint-O-Matic 5.0: parempi grafiikka ja enemmän karttoja](https://youtu.be/86cpFzc_-78)
 * [Sprint-O-Matic 4.0: uusi "AMaze"-toiminto ensimmäisen rastivälin harjoitteluun](https://youtu.be/nepM0oAiFn8)
@@ -126,9 +127,15 @@ A Maze -tilassa harjoittelet ensimmäiselle rastille lähtöä. Saat näkyviisi 
 Kymmenen sekunnin päästä saat tuloksen, sekä vertailuksi Sprint-O-Maticin ehdotuksen
 parhaasta lähtösuunnasta.
 
+### Karttamuistiharjoitus (osittainen valkoisen kartan suunnistus)
+
+![Sprint-O-Matic pelaaminen karttamuistitilassa by Jyrki Leskelä](/doc/WhiteMapExercise.png)
+
+Muistitilassa harjoittelet karttamuisitiasi. Jokaisella rastivälillä sinulla on aluksi 5 sekuntia aikaa katsoa kokonaista karttaa, jonka jälkeen osa kartasta peittyy valkoisilla laatikoilla. Käytä karttamuistiasi ja mielikuvitustasi päästäksesi rastilta toiselle.
+
 ### Jänistila
 
-![Sprint-O-Maticin pelattavuus tahdistimessa, kirjoittanut Jyrki Leskelä](/doc/GeneratedMapWithPacemaker.png)
+![Sprint-O-Maticin pelattavuus jänistilassa, kirjoittanut Jyrki Leskelä](/doc/GeneratedMapWithPacemaker.png)
 
 Jänistilassa kierrät reitin yhdessä jänisjuoksijan kanssa. Jänisjuoksija on
 henkilökohtainen virtuaalivalmentajasi. Se odottaa sinua jokaisella rastilla,
@@ -195,8 +202,6 @@ Tämänhetkinen idealista on seuraava:
 * lisää ulkoisia karttoja linkitettynä karttaluetteloon [ohje](/README-MAPS-FINNISH.md)
 * Korkeusmerkinnät -> ylämäestä hitaampi kuin alamäestä
 * Rastien numerointi, rastimääritteet, jne.
-
-* Muistiharjoitus n.s. valkoisen kartan suunnistus (poista osa karttamerkeistä esim 10 sekunnin päästä)
 * Score-O -tyyppinen (n.s. rogaining, kerää pisteet missä tahansa järjestyksessä, aikaraja)
 * Salli kuhunkin karttaan liittyvien käsinsuunniteltujen ratojen julkaiseminen
 * tapahtumien/moninpelin tuki (joutuisi olemaan maksullinen toiminto kattaakseen palvelinkulut)

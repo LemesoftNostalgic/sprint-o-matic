@@ -600,7 +600,7 @@ async def main():
                         if phoneRenderSkipCtr == 0:
                             if running:
                                 # Now enter the rendering phase
-                                shift = uiClearCanvas(controls, shortestRoutesArray, reachedControl, benchmark)
+                                shift = uiClearCanvas(controls, shortestRoutesArray, reachedControl, benchmark, gameSettings.memorize)
 
                                 if gameSettings.pacemaker == 0:
                                     uiRenderRoutes(shortestRoutes, "shortest", shift)

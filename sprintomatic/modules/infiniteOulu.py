@@ -272,12 +272,21 @@ def areaSetAt(area, png, mask, y, x, filltype):
         mask["faLookup"][pt] = True
     elif filltype in slowing:
         mask["saLookup"][pt] = True
+        mask["faLookup"].pop(pt, None)
     elif filltype in semislowing:
         mask["ssaLookup"][pt] = True
+        mask["faLookup"].pop(pt, None)
     elif filltype in veryslowing:
         mask["vsaLookup"][pt] = True
+        mask["faLookup"].pop(pt, None)
     elif filltype in SHELTERINTERNAL:
         mask["tunnelLookup"][pt] = True
+        mask["faLookup"].pop(pt, None)
+        mask["vsaLookup"].pop(pt, None)
+        mask["saLookup"].pop(pt, None)
+        mask["ssaLookup"].pop(pt, None)
+    else:
+        mask["faLookup"].pop(pt, None)
 
 
 def areaSetAtVisualOnly(png, mask, y, x, filltype):
@@ -1406,7 +1415,7 @@ async def getInfiniteOulu(blockSize, gridSize, boundary):
         for y in range(gridSize[1]):
             if await uiFlushEvents():
                 return None, None
-            perfAddStart("oBlock")    
+            perfAddStart("oBlock")
             yard, png, mask = await addBlock(blockSize, True)
             perfAddStop("oBlock")    
             await asyncio.sleep(0)

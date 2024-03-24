@@ -337,7 +337,7 @@ async def initScreen(imagePath, gameSettings, externalImageData, externalWorldCi
         # second row 6
         "micro", "    mini", "short", "regular", "longish", "long",
         # third row 2
-        "once", "    repeat", "fast  ", "pacemaker ", " amaze",
+        "once", "    repeat", "  memory", "pacer", " amaze",
         # fourth row 3
         "World", "", "team", "map", "start"
         ]
@@ -356,7 +356,7 @@ async def initScreen(imagePath, gameSettings, externalImageData, externalWorldCi
            [0.10, 0.10, 0.20, 0.30, 0.30],
            [0.00, 0.05, 0.15, 0.35, 0.45]
            ],
-        ["one-shot", "repeat", "superfast", "pacemaker", "amaze"],
+        ["one-shot", "repeat", "memorize", "pacemaker", "amaze"],
         ["infinite-world", "infinite-oulu", "external-team", "external-map"],
         ]
     infiniteOuluTerrains = ["shortLeg", "mediumLeg", "mediumLeg", "mediumLeg", "longLeg", "longLeg"]
@@ -556,21 +556,25 @@ async def initScreen(imagePath, gameSettings, externalImageData, externalWorldCi
             gameSettings.speed = "regular"
             gameSettings.pacemaker = 0
             gameSettings.amaze = False
+            gameSettings.memorize = False
         elif retSettings[2] == "pacemaker":
             gameSettings.pacemaker = randrange(1, 4)
             gameSettings.speed = "regular"
             gameSettings.continuous = False
             gameSettings.amaze = False
+            gameSettings.memorize = False
         elif retSettings[2] == "amaze":
             gameSettings.amaze = True
             gameSettings.pacemaker = False
             gameSettings.speed = "regular"
             gameSettings.continuous = True
+            gameSettings.memorize = False
         else:
-            gameSettings.speed = "superfast"
+            gameSettings.speed = "regular"
             gameSettings.pacemaker = 0
             gameSettings.continuous = False
             gameSettings.amaze = False
+            gameSettings.memorize = True
 
         if retSettings[3] == "infinite-oulu":
             gameSettings.infiniteOulu = True

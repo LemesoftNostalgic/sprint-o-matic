@@ -19,6 +19,7 @@ It provides you an infinite number of sprint orienteering route selection challe
 form of an entertaining 2D game. See the following YouTube videos to get an
 idea:
 
+* [Sprint-O-Matic 8.0: added a map memory exercise](https://youtu.be/DNg-9HHWzRM)
 * [Sprint-O-Matic 7.0: web application, works in browser and phone](https://youtu.be/cxk0ZU6YtcE)
 * [Sprint-O-Matic 5.0: better graphics and more maps](https://youtu.be/86cpFzc_-78)
 * [Sprint-O-Matic 4.0: new "AMaze" feature to practice the first-control problem](https://youtu.be/nepM0oAiFn8)
@@ -133,6 +134,12 @@ In the A Maze -mode, you exercise the 1st control. You get five random first-leg
 After 10 seconds, you get the verdict, and the Sprint-O-Matic proposal
 for the best direction.
 
+### Memory exercise (partial white map orienteering)
+
+![Sprint-O-Matic gameplay in a white map mode by Jyrki Leskelä](/doc/WhiteMapExercise.png)
+
+In the memory-mode, you exercise your map memory. For each control, you get 5 seconds to look at the complete map, and then some of it is covered with white boxes. Use your map memory and imagination to get from one control to another.
+
 ### Map types (World series / Infinite Oulu / External)
 
 There are three different categories of maps in Sprint-O-Matic.
@@ -170,7 +177,6 @@ The following ideas are next on the table:
 * Applications to App Store (Android, iPhone)
 * more maps to the map listing [using this procedure](/README-MAPS.md)
 * Height map -> uphill becomes slower than downhill
-* White map orienteering (remove some items from map after e.g 10 sec)
 * Add control numbering, control descriptions, etc.
 * Allow hand-crafted track designs for a given map, in addition to random ones
 * events/multiplayer support (might have to be a paid subcription to cover the
