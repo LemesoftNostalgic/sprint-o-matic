@@ -39,7 +39,7 @@ joudut valitsemaan pelivalinnat komentoriviparametreilla:
 
 **--continuous** Jatkuva pelisilmukka (tai yhden laukauksen peli)
 
-**--pacemaker** Tahdistimen juoksija, jota vastaan kilpailla (1-3, 0 ei mitään)
+**--pacemaker** Jänisjuoksija, jota vastaan kilpailla (1-3, 0 ei mitään)
 
 Ja jos haluat suunnitella tietyn reitin:
 

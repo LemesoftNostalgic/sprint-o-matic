@@ -26,7 +26,7 @@ idea:
 * [Sprint-O-Matic 5.0: better graphics and more maps](https://youtu.be/86cpFzc_-78)
 * [Sprint-O-Matic 4.0: new "AMaze" feature to practice the first-control problem](https://youtu.be/nepM0oAiFn8)
 * [Sprint-O-Matic 3.0: faster, webapp, hundreds of sprint orienteering maps all around the world](https://youtu.be/lmbBzbUQUbc)
-* [Sprint-O-Matic early prototype, generated map, pacemaker mode, treadmill stunt](https://youtu.be/VikFxwu9e0Q).
+* [Sprint-O-Matic early prototype, generated map, pacer mode, treadmill stunt](https://youtu.be/VikFxwu9e0Q).
 * [Trying out Sprint-O-Matic route analysis mode with a fantasy map](https://youtu.be/rI9zinYGOmc)
 * [Using a real sprint orienteering map with Sprint-O-Matic. Fast mode.](https://youtu.be/Kn53WGpEUgo)
 
@@ -119,12 +119,12 @@ The graphical analysis result looks like this:
 
 ![Sprint-O-Matic Analysis result by Jyrki Leskela](/doc/Analysis.png)
 
-### Pacemaker mode
+### Pacer mode
 
-![Sprint-O-Matic gameplay in pacemaker mode by Jyrki Leskelä](/doc/GeneratedMapWithPacemaker.png)
+![Sprint-O-Matic gameplay in pacer mode by Jyrki Leskelä](/doc/GeneratedMapWithPacemaker.png)
 
-In the pacemaker mode, you complete the track together with a pacemaker,
-your personal virtual coach. The pacemaker waits you at each control,
+In the pacer mode, you complete the track together with a pacer,
+your personal virtual coach. The pacer waits you at each control,
 and competes against/with you in between the controls.
 
 ### A Maze
@@ -206,16 +206,16 @@ The maximum size of the avatar, according to the law, is 7 meters.
 passionate on sprint orienteering. Thinks his genes are half cowboy,
 half Native American.
 
-**Aino Inkeri (A.I.) Kiburtz** A pacemaker, and an a proud artificial
+**Aino Inkeri (A.I.) Kiburtz** A pacer, and an a proud artificial
 intelligence loosely based on the ancient documentation found on
 Matthias Kiburtz, a distinguished sprint orienteer.
 The best friend of Sprint-O-Man.
 
-**Pertti-Uolevi (P.A.) Keinonen, e.v.v.k.** A pacemaker, and an avant-garde
+**Pertti-Uolevi (P.A.) Keinonen, e.v.v.k.** A pacer, and an avant-garde
 heavy metal afictionado, named after the best known heavy metal guitarist
 from the golden age of the genre, the one and only, Pertti Keinonen, RIP.
 
-**Lex Martin Luthoer, Chem. Engr.** A pacemaker, and an extremely vivid
+**Lex Martin Luthoer, Chem. Engr.** A pacer, and an extremely vivid
 runner. The most controversial figure due to his specialty in chemical
 engineering. Under suspicion on doping, but never got caught.
 

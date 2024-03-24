@@ -42,7 +42,7 @@ just a bit more detailed:
 
 **--continuous** Continuous game loop (or one-shot play)
 
-**--pacemaker** A pacemaker runner to compete against (1-3, 0 for none)
+**--pacemaker** A pacer runner to compete against (1-3, 0 for none)
 
 And in case you want to design a specific route:
 
