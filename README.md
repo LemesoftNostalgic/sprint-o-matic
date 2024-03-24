@@ -6,6 +6,8 @@
 
 _Linkki suomenkieliseen ohjeeseen_: [README-FINNISH.md](/README-FINNISH.md).
 
+_Directly to web-application_: [tinyurl.com/sprint-o-matic-webapp](https://lemesoftnostalgic.github.io/sprint-o-matic/)
+
 Sprint-O-Matic is a training application for sprint orienteering, or
 Sprint-O for short. What then is sprint orienteering?
 It is a fast paced foot navigation
