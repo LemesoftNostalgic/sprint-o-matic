@@ -481,11 +481,11 @@ def blindAreasToMemorize(oMapMemorize):
     xStep = randrange(60,90)
     yStep = randrange(60,90)
     minStep = min(xStep, yStep)
-    for x in range(0, oMapMemorize.get_size()[0], xStep):
+    for x in range(0, oMapMemorize.get_size()[0], xStep * 2):
         for y in range(0, oMapMemorize.get_size()[1], yStep):
             boundary = minStep // randrange(20, 60)
-            if randrange(2) == 0:
-                pygame.draw.rect(oMapMemorize, getWhiteColor(), [x + boundary, y + boundary, xStep - 2*boundary, yStep - 2*boundary])
+            whichone = randrange(2)
+            pygame.draw.rect(oMapMemorize, getWhiteColor(), [x + boundary + whichone * xStep, y + boundary, xStep - 2*boundary, yStep - 2*boundary])
 
 
 def uiClearCanvas(controls, shortestRoutesArray, reachedControl, benchmark, memorize):
