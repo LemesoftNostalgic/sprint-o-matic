@@ -24,6 +24,7 @@ FOREST = '.'
 DEEPFOREST = ':'
 VERYDEEPFOREST = ';'
 OPENAREA = '^'
+SEMIOPENAREA = 'S'
 SOLIDBLACK = '*'
 NARROWBLACK = 'I'
 SOLIDGREEN = 'G'
@@ -47,6 +48,7 @@ colors = {
     DEEPFOREST:      (195,230,200),
     VERYDEEPFOREST:  (175,220,180),
     OPENAREA:        (255,190,70),
+    SEMIOPENAREA:    (255,207,132),
     SOLIDBLACK:      (40,45,50),
     PATHBLACK:       (40,45,50),
     PATHWHITE:       (255,255,255),
@@ -181,9 +183,15 @@ oliveArea = [
     ]
 
 asphaltArea = [
-    ["landuse", ["railway","commercial","industrial","education","civic","retail","residential","observatory"]],
-    ["railway", ["platform_edge","construction","platform","abandoned","turntable","disused","razed"]],
-    ["amenity", ["events_venue","parking_space","parking","marketplace","bus_station","construction"]]
+    ["landuse", ["railway","commercial","industrial","education","retail"]],
+    ["railway", ["platform_edge","platform"]],
+    ["amenity", ["parking_space","parking","marketplace","bus_station"]]
+    ]
+
+semiOpenArea = [
+    ["landuse", ["residential","observatory"]],
+    ["railway", ["construction","abandoned","turntable","disused","razed"]],
+    ["amenity", ["events_venue","construction"]]
     ]
 
 brownArea = [
@@ -198,7 +206,7 @@ forestArea = [
 
 # meadow,heath semiopen; sand is sand
 openArea = [
-    ["landuse", ["grass","farmyard","recreation_ground","orchard","greenfield","allotments","farmland","grassland","meadow"]],
+    ["landuse", ["civic", "grass","farmyard","recreation_ground","orchard","greenfield","allotments","farmland","grassland","meadow"]],
     ["natural", ["heath", "grassland","sand","beach"]]
     ]
 
@@ -461,6 +469,14 @@ def drawPolygonWithBounds(png, mask, pointlist, polyInternalColor, polyBoundaryC
             markControlSpot(mask, point[0], point[1])
 
 
+def drawPolygonWithoutBounds(png, mask, pointlist, polyInternalColor, polyMaskColor):
+    if len(pointlist) > 2:
+        pygame.draw.polygon(mask, polyMaskColor, pointlist)
+        pygame.draw.polygon(png, polyInternalColor, pointlist)
+        for point in pointlist:
+            markControlSpot(mask, point[0], point[1])
+
+
 def drawContours(kernelWidth, contourArr, keepOneOf):
     width = contourArr.get_size()[0]
     height = contourArr.get_size()[1]
@@ -607,7 +623,7 @@ def drawWater(png, mask, waydb):
                 subwayarray = waydb[waytype][subway]
                 waydb[waytype].pop(subway)
                 for house in subwayarray:
-                    drawPolygonWithBounds(png, mask, house, colors[WATER], colors[WATER], getForbiddenAreaMask())
+                    drawPolygonWithoutBounds(png, mask, house, colors[WATER], getForbiddenAreaMask())
     png = boundarize(png,  colors[WATER], colors[WATER], colors[SOLIDBLACK])
     for waytypelist in coastLine:
         waytype = waytypelist[0]
@@ -619,7 +635,7 @@ def drawWater(png, mask, waydb):
                 for way in subwayarray:
                     polygonWay = coastlineToPolygon(way, png.get_size())
                     if polygonWay:
-                        drawPolygonWithBounds(png, mask, polygonWay, colors[WATER], colors[WATER], getForbiddenAreaMask())
+                        drawPolygonWithoutBounds(png, mask, polygonWay, colors[WATER], getForbiddenAreaMask())
                     drawPolylineWithWidth(png, mask, way, colors[SOLIDBLACK], getForbiddenAreaMask(), 2, True)
     for waytypelist in waterLine:
         waytype = waytypelist[0]
@@ -673,7 +689,20 @@ def drawOpenArea(png, mask, waydb):
                 subwayarray = waydb[waytype][subway]
                 waydb[waytype].pop(subway)
                 for area in subwayarray:
-                    drawPolygonWithBounds(png, mask, area, colors[OPENAREA], colors[OPENAREA], getSemiSlowAreaMask())
+                    drawPolygonWithoutBounds(png, mask, area, colors[OPENAREA], getSemiSlowAreaMask())
+    return png, mask
+
+
+def drawSemiOpenArea(png, mask, waydb):
+    for waytypelist in semiOpenArea:
+        waytype = waytypelist[0]
+        subwaylist = waytypelist[1]
+        for subway in subwaylist:
+            if waytype in waydb and subway in waydb[waytype]:
+                subwayarray = waydb[waytype][subway]
+                waydb[waytype].pop(subway)
+                for area in subwayarray:
+                    drawPolygonWithoutBounds(png, mask, area, colors[SEMIOPENAREA], getSemiSlowAreaMask())
     return png, mask
 
 
@@ -686,7 +715,7 @@ def drawForestArea(png, mask, waydb):
                 subwayarray = waydb[waytype][subway]
                 waydb[waytype].pop(subway)
                 for area in subwayarray:
-                    drawPolygonWithBounds(png, mask, area, colors[FOREST], colors[FOREST], getSlowAreaMask())
+                    drawPolygonWithoutBounds(png, mask, area, colors[FOREST], getSlowAreaMask())
     return png, mask
 
 
@@ -699,7 +728,7 @@ def drawBrownArea(png, mask, waydb):
                 subwayarray = waydb[waytype][subway]
                 waydb[waytype].pop(subway)
                 for area in subwayarray:
-                    drawPolygonWithBounds(png, mask, area, colors[BROWNX], colors[BROWNX], getSlowAreaMask())
+                    drawPolygonWithoutBounds(png, mask, area, colors[BROWNX], getSlowAreaMask())
     return png, mask
 
 
@@ -712,7 +741,7 @@ def drawAsphaltArea(png, mask, waydb):
                 subwayarray = waydb[waytype][subway]
                 waydb[waytype].pop(subway)
                 for area in subwayarray:
-                    drawPolygonWithBounds(png, mask, area, colors[ASPHALT], colors[ASPHALT], getNoMask())
+                    drawPolygonWithoutBounds(png, mask, area, colors[ASPHALT], getNoMask())
     return png, mask
 
 
@@ -725,11 +754,11 @@ def drawOliveArea(png, mask, waydb):
                 subwayarray = waydb[waytype][subway]
                 waydb[waytype].pop(subway)
                 for area in subwayarray:
-                    drawPolygonWithBounds(png, mask, area, colors[OLIVEGREEN], colors[OLIVEGREEN], getForbiddenAreaMask())
+                    drawPolygonWithoutBounds(png, mask, area, colors[OLIVEGREEN], getForbiddenAreaMask())
             elif waytype in waydb and subway == "":
                 for subwayarray in waydb[waytype]:
                     for area in subwayarray:
-                        drawPolygonWithBounds(png, mask, area, colors[OLIVEGREEN], colors[OLIVEGREEN], getForbiddenAreaMask())
+                        drawPolygonWithoutBounds(png, mask, area, colors[OLIVEGREEN], getForbiddenAreaMask())
                 
     return png, mask
 
@@ -743,7 +772,7 @@ def drawSolidGreenArea(png, mask, waydb):
                 subwayarray = waydb[waytype][subway]
                 waydb[waytype].pop(subway)
                 for area in subwayarray:
-                    drawPolygonWithBounds(png, mask, area, colors[SOLIDGREEN], colors[SOLIDGREEN], getForbiddenAreaMask())
+                    drawPolygonWithoutBounds(png, mask, area, colors[SOLIDGREEN], getForbiddenAreaMask())
     return png, mask
 
 
@@ -913,6 +942,11 @@ async def getInfiniteWorld(latlonMapOrigo, xyPictureSize, metersPerPixel, imageP
         return None, None
     perfAddStart("wAreas")
     perfAddStart("openEtc")
+    world, worldMask = drawSemiOpenArea(world, worldMask, db)
+
+    await asyncio.sleep(0)
+    if await uiFlushEvents():
+        return None, None
     world, worldMask = drawForestArea(world, worldMask, db)
 
     await asyncio.sleep(0)

@@ -562,7 +562,8 @@ def uiClearCanvas(controls, shortestRoutesArray, reachedControl, benchmark, memo
                 oMapMidMemorize.blit(oMapMemorize, dest=(0,0), area=brect)
         else:
             oMapMid = oMap.copy()
-            oMapMidMemorize = oMapMemorize.copy()
+            if memorize:
+                oMapMidMemorize = oMapMemorize.copy()
 
     oMapCopy = oMapMid.copy()
     return (bboxStartX, bboxStartY)
