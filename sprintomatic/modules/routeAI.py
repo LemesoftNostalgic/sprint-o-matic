@@ -975,7 +975,7 @@ async def getReadyShortestRoutesAsync(reachedControl):
     if not tasksRunning:
         for item in readyRoutesArrayAsync[preReachedControl:]:
             if item["route"] == None:
-                item["task"] = asyncio.create_task(slowaAccurateCalculateShortestRouteAsync(item["setuplist"]))
+                item["task"] = asyncio.create_task(slowAccurateCalculateShortestRouteAsync(item["setuplist"]))
                 break
 
     # finally, compose a return list
