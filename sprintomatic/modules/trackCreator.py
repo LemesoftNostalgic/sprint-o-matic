@@ -25,7 +25,7 @@ import asyncio
 from .mathUtils import angleBetweenLineSegments, distanceBetweenPoints, distanceBetweenPointAndLine, calculatePathDistance
 from .gameUIUtils import uiFlushEvents
 from .pathPruning import pruneEnsureLineOfSightExt, pruneShortestRouteExtAsync
-from .routeAI import calculateCoarseRouteExt, calculateShortestRouteAsync, ultimateCalculateShortestRouteAsync
+from .routeAI import calculateCoarseRouteExt, calculateShortestRouteAsync, slowAccurateCalculateShortestRouteAsync
 
 
 firstControlMinDistance = 100
