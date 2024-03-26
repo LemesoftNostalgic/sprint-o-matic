@@ -38,6 +38,27 @@ sleepTimeThreshold = 0.05
 start_time = None
 
 
+#maxX = 16 + 4
+#maxY = 16 + 4
+#def dump(title, tf, pointA, pointB, forbiddenAreaLookup, otherLookup):
+#    ptA = (pointA[0] // tf, pointA[1] // tf)
+#    ptB = (pointB[0] // tf, pointB[1] // tf)
+#    print(title, ":")
+#    for y in range(maxY // tf):
+#        for x in range(maxX // tf):
+#            if (x, y) == ptA:
+#                print("A", end="")
+#            elif (x, y) == ptB:
+#                print("B", end="")
+#            elif (x, y) in forbiddenAreaLookup[tf]:
+#                print("X", end="")
+#            elif (x, y) in otherLookup:
+#                print(".", end="")
+#            else:
+#                print(" ", end="")
+#        print("")
+
+
 def getDirections(point):
     return [
         [(point[0] - 1, point[1]), 1.0],
@@ -335,7 +356,6 @@ async def calculateShortestRouteAsync(setupList):
     preComputedScaled = []
     for item in preComputed:
         preComputedScaled.append((item[0] // tf, item[1] // tf))
-
     if preComputedScaled:
         shortestRoute = preComputedScaled
     else:
@@ -403,13 +423,12 @@ async def slowAccurateCalculateShortestRouteAsync(setupList):
         # Find a rudimentary angular route with a painter algo with A* flavour
         stop = False
         while not stop:
-            backPoints = []
-
+            somethingHappened = False
             for point in backRouteLookup.copy():
                 directions = getDirections(point)
                 for direction in directions:
                     newPoint = direction[0]
-                    if (newPoint not in backRouteLookup or backRouteLookup[point] + newScore < backRouteLookup[newPoint]) and newPoint not in forbiddenLookup:
+                    if newPoint not in forbiddenLookup:
                         factor = 1.0
                         if newPoint in slowLookup:
                             factor = getSlowdownFactor()
@@ -418,8 +437,9 @@ async def slowAccurateCalculateShortestRouteAsync(setupList):
                         elif newPoint in verySlowLookup:
                             factor = getVerySlowdownFactor()
                         newScore = direction[1] * factor
-                        backRouteLookup[newPoint] = backRouteLookup[point] + newScore
-                        backPoints.append(newPoint)
+                        if newPoint not in backRouteLookup or backRouteLookup[point] + newScore < backRouteLookup[newPoint]:
+                            backRouteLookup[newPoint] = backRouteLookup[point] + newScore
+                            somethingHappened = True
 
                 if time.time() - sleep_time > sleepTimeThreshold:
                     sleep_time = time.time()
@@ -429,7 +449,7 @@ async def slowAccurateCalculateShortestRouteAsync(setupList):
                 directions = getDirections(point)
                 for direction in directions:
                     newPoint = direction[0]
-                    if (newPoint not in routeLookup or routeLookup[point] + newScore <= routeLookup[newPoint]) and newPoint not in forbiddenLookup:
+                    if newPoint not in forbiddenLookup:
                         factor = 1.0
                         if newPoint in slowLookup:
                             factor = getSlowdownFactor()
@@ -438,28 +458,39 @@ async def slowAccurateCalculateShortestRouteAsync(setupList):
                         elif newPoint in verySlowLookup:
                             factor = getVerySlowdownFactor()
                         newScore = direction[1] * factor
-                        routeLookup[newPoint] = routeLookup[point] + newScore
-                        if newPoint in backRouteLookup:
-                            stop = True
-                            intersectionPointBack = newPoint
-                            intersectionPointFront = newPoint
-                            break
-                    if stop:
-                        break
+                        if newPoint not in routeLookup or routeLookup[point] + newScore < routeLookup[newPoint]:
+                            routeLookup[newPoint] = routeLookup[point] + newScore
+                            somethingHappened = True
+                            if newPoint in backRouteLookup:
+                                stop = True
+                                intersectionPoint = newPoint
+                                break
 
                 if time.time() - sleep_time > sleepTimeThreshold:
                     sleep_time = time.time()
                     await asyncio.sleep(0)
 
+                if stop:
+                    break
+
+
             if time.time() - start_time > getAiPoolMaxTimeLimit(tf):
                 break
+
+            # no progress, take next precision
+            if not somethingHappened:
+                break
+
+        # this is also intentional!
+        if not stop:
+            continue
 
         # this is also intentional!
         if time.time() - start_time > getAiPoolMaxTimeLimit(tf):
             continue
 
         # Pick up the rudimentary angular route out of the painted data
-        point = intersectionPointBack
+        point = intersectionPoint
         score = backRouteLookup[point]
         while score > startScore:
             directions = getDirections(point)
@@ -480,7 +511,7 @@ async def slowAccurateCalculateShortestRouteAsync(setupList):
                 sleep_time = time.time()
                 await asyncio.sleep(0)
 
-        point = intersectionPointFront
+        point = intersectionPoint
         shortestRoute.append(point)
         score = routeLookup[point]
         while score > startScore:
@@ -516,6 +547,278 @@ async def slowAccurateCalculateShortestRouteAsync(setupList):
 def slowAccurateCalculateShortestRoute(setupList):
     return asyncio.run(slowAccurateCalculateShortestRouteAsync(setupList))
 
+
+def lookupPow2(lookup):
+    pow2lookup = {}
+    for point in lookup:
+        base = lookup[point]
+        left = (point[0] - 1, point[1])
+        right = (point[0] + 1, point[1])
+        up = (point[0], point[1] - 1)
+        down = (point[0], point[1] + 1)
+        scoreLU = base
+        scoreLD = base
+        scoreRU = base
+        scoreRD = base
+        pointLU = (point[0]*2, point[1]*2)
+        pointLD = (point[0]*2, point[1]*2 + 1)
+        pointRU = (point[0]*2 + 1, point[1]*2)
+        pointRD = (point[0]*2 + 1, point[1]*2 + 1)
+        if left in lookup:
+            scoreLU = (scoreLU + scoreLU + scoreLU + lookup[left]) / 4
+            scoreLD = scoreLU
+        if right in lookup:
+            scoreRU = (scoreRU + scoreRU + scoreRU + lookup[right]) / 4
+            scoreRD = scoreRU
+        if up in lookup:
+            scoreLU = (scoreLU + scoreLU + scoreLU + lookup[up]) / 4
+            scoreRU = (scoreRU + scoreRU + scoreRU + lookup[up]) / 4
+        if down in lookup:
+            scoreLD = (scoreLD + scoreLD + scoreLD + lookup[down]) / 4
+            scoreRD = (scoreRD + scoreRD + scoreRD + lookup[down]) / 4
+        pow2lookup[pointLU] = scoreLU
+        pow2lookup[pointLD] = scoreLD
+        pow2lookup[pointRU] = scoreRU
+        pow2lookup[pointRD] = scoreRD
+    return pow2lookup
+
+
+# Calculate shortest route between A and B, with higher precision re-iterations
+async def ultimateCalculateShortestRouteAsync(setupList):
+
+    pointA = setupList[0]
+    pointB = setupList[1]
+    forbiddenAreaLookup = setupList[2]
+    slowAreaLookup = setupList[3]
+    semiSlowAreaLookup = setupList[4]
+    verySlowAreaLookup = setupList[5]
+    maxPrecision = setupList[6]
+    pacemakerInd = setupList[7]
+
+    sft = tfs[:maxPrecision]
+    sft.reverse()
+
+    backRouteLookups = {}
+    routeLookups = {}
+    intersectionPoints = {}
+    prevIntersectionScore = None
+    prevIntersectionBackScore = None
+
+    # this algorithm requires power of two series
+    for ind in range(len(sft) - 1):
+        assert sft[ind] / 2 == sft[ind + 1]
+
+    for tf in sft:
+        if not tf in forbiddenAreaLookup or not forbiddenAreaLookup[tf]:
+            backRouteLookups[tf] = {}
+            routeLookups[tf] = {}
+            intersectionPoints[tf] = None
+            if tf != sft[-1]:
+                routeLookup = lookupPow2(backRouteLookup)
+                backRouteLookup = lookupPow2(backRouteLookup)
+                prevIntersectionScore = None
+                prevIntersectionBackScore = None
+            continue
+        start_time = time.time()
+        sleep_time = time.time()
+        forbiddenLookup = forbiddenAreaLookup[tf]
+        slowLookup = {}
+        if tf in slowAreaLookup:
+            slowLookup = slowAreaLookup[tf]
+        semiSlowLookup = {}
+        if tf in semiSlowAreaLookup:
+            semiSlowLookup = slowAreaLookup[tf]
+        verySlowLookup = {}
+        if tf in verySlowAreaLookup:
+            verySlowLookup = slowAreaLookup[tf]
+
+        # The algorithm is time-restricted
+        if time.time() - start_time > getAiPoolMaxTimeLimit(tf):
+            backRouteLookups[tf] = {}
+            routeLookups[tf] = {}
+            intersectionPoints[tf] = None
+            if tf != sft[-1]:
+                routeLookup = lookupPow2(routeLookup)
+                backRouteLookup = lookupPow2(backRouteLookup)
+                prevIntersectionScore = None
+                prevIntersectionBackScore = None
+            continue
+
+        tfA = (int(pointA[0]/tf), int(pointA[1]/tf))
+        tfB = (int(pointB[0]/tf), int(pointB[1]/tf))
+        startScore = 1.0
+        intersectionPoint = None
+        intersectionScore = None
+        intersectionBackScore = None
+
+        if tf == sft[0]:
+            routeLookup = {}
+            backRouteLookup = {}
+            routeLookup[tfA] = startScore
+            backRouteLookup[tfB] = startScore
+
+        # Find a rudimentary angular route with a painter algo with A* flavour
+        stop = False
+        while not stop:
+            somethingHappened = False
+            for point in backRouteLookup.copy():
+                directions = getDirections(point)
+                for direction in directions:
+                    newPoint = direction[0]
+                    if newPoint not in forbiddenLookup:
+                        factor = 1.0
+                        if newPoint in slowLookup:
+                            factor = getSlowdownFactor()
+                        elif newPoint in semiSlowLookup:
+                            factor = getSemiSlowdownFactor()
+                        elif newPoint in verySlowLookup:
+                            factor = getVerySlowdownFactor()
+                        newScore = direction[1] * factor
+                        if newPoint not in backRouteLookup or backRouteLookup[point] + newScore < backRouteLookup[newPoint]:
+#                            if newPoint not in backRouteLookup:
+#                                print("found new backPoint ", newPoint)
+#                            else:
+#                                print("found nearer backPoint ", newPoint)
+                            if prevIntersectionBackScore is None or backRouteLookup[point] + newScore < prevIntersectionBackScore:
+                                backRouteLookup[newPoint] = backRouteLookup[point] + newScore
+                                somethingHappened = True
+
+                if time.time() - sleep_time > sleepTimeThreshold:
+                    sleep_time = time.time()
+                    await asyncio.sleep(0)
+
+            for point in routeLookup.copy():
+                directions = getDirections(point)
+                for direction in directions:
+                    newPoint = direction[0]
+                    if newPoint not in forbiddenLookup:
+                        factor = 1.0
+                        if newPoint in slowLookup:
+                            factor = getSlowdownFactor()
+                        elif newPoint in semiSlowLookup:
+                            factor = getSemiSlowdownFactor()
+                        elif newPoint in verySlowLookup:
+                            factor = getVerySlowdownFactor()
+                        newScore = direction[1] * factor
+                        if newPoint not in routeLookup or routeLookup[point] + newScore < routeLookup[newPoint]:
+#                            if newPoint not in routeLookup:
+#                                print("found new frontPoint ", newPoint)
+#                            else:
+#                                print("found nearer frontPoint ", newPoint)
+                            if prevIntersectionScore is None or routeLookup[point] + newScore < prevIntersectionScore:
+#                                print("iness")
+                                routeLookup[newPoint] = routeLookup[point] + newScore
+                                somethingHappened = True
+                                if newPoint in backRouteLookup:
+                                    if prevIntersectionScore is None:
+                                        stop = True
+                                        intersectionPoint = newPoint
+                                        break
+                                    elif routeLookup[newPoint] + backRouteLookup[newPoint] < prevIntersectionScore + prevIntersectionBackScore:
+                                        intersectionPoint = newPoint
+
+                if time.time() - sleep_time > sleepTimeThreshold:
+                    sleep_time = time.time()
+                    await asyncio.sleep(0)
+
+                if stop:
+                    break
+
+#            dump("front", tf, pointA, pointB, forbiddenAreaLookup, routeLookup)
+#            dump("back", tf, pointA, pointB, forbiddenAreaLookup, backRouteLookup)
+#            print("")
+
+            if time.time() - start_time > getAiPoolMaxTimeLimit(tf):
+#                print("time")
+                break
+
+            # no progress, take next precision
+            if not somethingHappened:
+#                print("nothingHapp")
+                break
+
+        backRouteLookups[tf] = backRouteLookup
+        routeLookups[tf] = routeLookup
+        intersectionPoints[tf] = intersectionPoint
+        if tf != sft[-1]:
+            routeLookup = lookupPow2(routeLookup)
+            backRouteLookup = lookupPow2(backRouteLookup)
+            if intersectionPoint is not None:
+                intersectionPointTf = (intersectionPoint[0]*2, intersectionPoint[1]*2)
+                if intersectionPointTf in routeLookup:
+                    prevIntersectionScore = routeLookup[intersectionPointTf]
+                    prevIntersectionBackScore = backRouteLookup[intersectionPointTf]
+
+    # pick up routelookup, backroutelookups, intersectionpoint and tf
+    intersectionPoint = None
+    backRouteLookup = {}
+    routeLookup = {}
+    for tmpTf in tfs:
+        if tmpTf in intersectionPoints and intersectionPoints[tmpTf] is not None:
+            intersectionPoint = intersectionPoints[tmpTf]
+            routeLookup = routeLookups[tmpTf]
+            backRouteLookup = backRouteLookups[tmpTf]
+            tf = tmpTf
+    if intersectionPoint == None:
+        return []
+
+    # Pick up the rudimentary angular route out of the painted data
+    shortestRoute = []
+    point = intersectionPoint
+    score = backRouteLookup[point]
+    while score > startScore:
+        directions = getDirections(point)
+        minScore = minScoreInit
+        minPoint = None
+        for direction in directions:
+             newPoint = direction[0]
+             if newPoint in backRouteLookup and backRouteLookup[newPoint] < score:
+                 minScore = backRouteLookup[newPoint]
+                 minPoint = newPoint
+        score = minScore
+        if not minPoint:
+            return []
+        point = minPoint
+        shortestRoute.insert(0, point)
+
+        if time.time() - sleep_time > sleepTimeThreshold:
+            sleep_time = time.time()
+            await asyncio.sleep(0)
+
+    point = intersectionPoint
+    shortestRoute.append(point)
+    score = routeLookup[point]
+    while score > startScore:
+        directions = getDirections(point)
+        minScore = minScoreInit
+        minPoint = None
+        for direction in directions:
+             newPoint = direction[0]
+             if newPoint in routeLookup and routeLookup[newPoint] < score:
+                 minScore = routeLookup[newPoint]
+                 minPoint = newPoint
+        score = minScore
+        if not minPoint:
+            return []
+        point = minPoint
+        shortestRoute.append(point)
+
+        if time.time() - sleep_time > sleepTimeThreshold:
+            sleep_time = time.time()
+            await asyncio.sleep(0)
+
+    scaledShortestRoute = []
+    for point in shortestRoute:
+        scaledShortestRoute.append((point[0] * tf, point[1] * tf))
+
+    # Straighten the route into a beautiful one
+    if pacemakerInd != 2:
+        scaledShortestRoute = await pruneShortestRouteAsync(scaledShortestRoute, forbiddenAreaLookup[1], slowAreaLookup[1], semiSlowAreaLookup[1], verySlowAreaLookup[1])
+    return scaledShortestRoute
+
+
+def ultimateCalculateShortestRoute(setupList):
+    return asyncio.run(ultimateCalculateShortestRouteAsync(setupList))
 
 
 # Global variables for the AI pools
@@ -580,7 +883,7 @@ def getReadyShortestRoutes():
                 if readyRoutesArray[index]["route"] == None:
                     readyRoutesArray[index]["route"] = []
                     aiSlots[ind]["aiIndex"] = index
-                    aiSlots[ind]["aiResult"] = aiSlots[ind]["aiPool"].map_async(slowAccurateCalculateShortestRoute, readyRoutesArray[index]["setuplist"])
+                    aiSlots[ind]["aiResult"] = aiSlots[ind]["aiPool"].map_async(ultimateCalculateShortestRoute, readyRoutesArray[index]["setuplist"])
                     break
 
     freeSlots = 0
@@ -667,7 +970,7 @@ async def getReadyShortestRoutesAsync(reachedControl):
     if not tasksRunning:
         for item in readyRoutesArrayAsync[preReachedControl:]:
             if item["route"] == None:
-                item["task"] = asyncio.create_task(slowAccurateCalculateShortestRouteAsync(item["setuplist"]))
+                item["task"] = asyncio.create_task(ultimateCalculateShortestRouteAsync(item["setuplist"]))
                 break
 
     # finally, compose a return list
@@ -679,3 +982,39 @@ async def getReadyShortestRoutesAsync(reachedControl):
             returnRoutesArray.append(item["route"])
     return returnRoutesArray
 
+
+#if __name__ == "__main__":
+#    pointA = (4,4)
+#    pointB = (4, 12)
+#    forbiddenAreaLookup = {1:{(0,8):True, (1,8):True, (2,8):True, (3,8):True, (5,8):True, (6,8):True, (7,8):True, (10,8):True, (11,8):True},
+#                           2:{(0,4):True, (1,4):True, (2,4):True, (3,4):True, (5,4):True},
+#                           4:{(0,2):True, (1,2):True, (2,2):True},
+#                           8:{}}
+#    for x in range(17):
+#        y = 0
+#        forbiddenAreaLookup[1][(x, y)] = True
+#        forbiddenAreaLookup[2][(x//2, y//2)] = True
+#        forbiddenAreaLookup[4][(x//4, y//4)] = True
+#        y = 16
+#        forbiddenAreaLookup[1][(x, y)] = True
+#        forbiddenAreaLookup[2][(x//2, y//2)] = True
+#        forbiddenAreaLookup[4][(x//4, y//4)] = True
+#    for y in range(17):
+#        x = 0
+#        forbiddenAreaLookup[1][(x, y)] = True
+#        forbiddenAreaLookup[2][(x//2, y//2)] = True
+#        forbiddenAreaLookup[4][(x//4, y//4)] = True
+#        x = 16
+#        forbiddenAreaLookup[1][(x, y)] = True
+#        forbiddenAreaLookup[2][(x//2, y//2)] = True
+#        forbiddenAreaLookup[4][(x//4, y//4)] = True
+#    slowAreaLookup = {1:{}}
+#    semiSlowAreaLookup = {1:{}}
+#    verySlowAreaLookup = {1:{}}
+#    maxPrecision = 3
+#    pacemakerInd = 0
+#
+#    dump("initPos", 1, pointA, pointB, forbiddenAreaLookup, {})
+#    dump("initPos4", 4, pointA, pointB, forbiddenAreaLookup, {})
+#
+#    print(ultimateCalculateShortestRoute([pointA, pointB, forbiddenAreaLookup, slowAreaLookup, semiSlowAreaLookup, verySlowAreaLookup, maxPrecision, pacemakerInd]))
