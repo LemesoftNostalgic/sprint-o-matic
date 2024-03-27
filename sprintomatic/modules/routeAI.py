@@ -609,9 +609,10 @@ async def ultimateCalculateShortestRouteAsync(setupList):
     semiSlowAreaLookup = setupList[4]
     verySlowAreaLookup = setupList[5]
     maxPrecision = setupList[6]
-    pacemakerInd = setupList[7]
+    fromPrecision = setupList[7]
+    pacemakerInd = setupList[8]
 
-    sft = tfs[:maxPrecision]
+    sft = tfs[fromPrecision:maxPrecision]
     sft.reverse()
 
     backRouteLookups = {}
@@ -780,8 +781,8 @@ async def ultimateCalculateShortestRouteAsync(setupList):
                      minScore = backRouteLookup[newPoint]
                      minPoint = newPoint
             score = minScore
-            if not minPoint:
-                continue
+            if minPoint is None:
+                return []
             point = minPoint
             shortestRoute.insert(0, point)
     
@@ -802,8 +803,8 @@ async def ultimateCalculateShortestRouteAsync(setupList):
                      minScore = routeLookup[newPoint]
                      minPoint = newPoint
             score = minScore
-            if not minPoint:
-                continue
+            if minPoint is None:
+                return []
             point = minPoint
             shortestRoute.append(point)
     
@@ -854,7 +855,7 @@ def initializeAINextTrack(ctrls, faLookup, saLookup, ssaLookup, vsaLookup, pacem
     readyRoutesArray = []
 
     for index in range(len(ctrls) - 1):
-        readyRoutesArray.append({"setuplist": [[ctrls[index], ctrls[index+1], faLookup, saLookup, ssaLookup, vsaLookup, 2, pacemakerInd]], "route": None})
+        readyRoutesArray.append({"setuplist": [[ctrls[index], ctrls[index+1], faLookup, saLookup, ssaLookup, vsaLookup, 2, 0, pacemakerInd]], "route": None})
 
     for ind in range(aiNumberOfSlots):
         aiSlots[ind]["aiIndex"] = None
@@ -872,7 +873,9 @@ def getReadyShortestRoutes():
         aiIndex = aiSlots[ind]["aiIndex"]
         aiResult = aiSlots[ind]["aiResult"]
         if aiResult is not None and aiResult.ready():
-            readyRoutesArray[aiIndex]["route"] = aiResult.get(timeout=getAiPoolMaxTimeLimit(1) * 2 + 2).copy()
+            route = aiResult.get(timeout=getAiPoolMaxTimeLimit(1) * 2 + 2).copy()[0]
+            route.reverse()
+            readyRoutesArray[aiIndex]["route"] = [route]
             aiSlots[ind]["aiIndex"] = None
             aiSlots[ind]["aiResult"] = None
 
@@ -888,7 +891,7 @@ def getReadyShortestRoutes():
                 if readyRoutesArray[index]["route"] == None:
                     readyRoutesArray[index]["route"] = []
                     aiSlots[ind]["aiIndex"] = index
-                    aiSlots[ind]["aiResult"] = aiSlots[ind]["aiPool"].map_async(slowAccurateCalculateShortestRoute, readyRoutesArray[index]["setuplist"])
+                    aiSlots[ind]["aiResult"] = aiSlots[ind]["aiPool"].map_async(ultimateCalculateShortestRoute, readyRoutesArray[index]["setuplist"])
                     break
 
     freeSlots = 0
@@ -938,7 +941,7 @@ async def initializeAINextTrackAsync(ctrls, faLookup, saLookup, ssaLookup, vsaLo
 
     # initialize structure
     for index in range(len(ctrls) - 1):
-        readyRoutesArrayAsync.append({"setuplist": [ctrls[index], ctrls[index+1], faLookup, saLookup, ssaLookup, vsaLookup, 2, pacemakerInd], "task": None, "route": None})
+        readyRoutesArrayAsync.append({"setuplist": [ctrls[index], ctrls[index+1], faLookup, saLookup, ssaLookup, vsaLookup, 2, 1, pacemakerInd], "setuplist2": [ctrls[index], ctrls[index+1], faLookup, saLookup, ssaLookup, vsaLookup, 2, 0, pacemakerInd], "task": None, "route": None, "route2": None})
 
 
 async def getReadyShortestRoutesAsync(reachedControl):
@@ -948,9 +951,11 @@ async def getReadyShortestRoutesAsync(reachedControl):
     for item in readyRoutesArrayAsync:
         if item["task"] is not None:
             if item["task"].done():
-                item["route"] = item["task"].result()
+                if item["route"] == None:
+                    item["route"] = item["task"].result()
+                elif item["route2"] == None:
+                    item["route2"] = item["task"].result()
                 item["task"] = None
-
     # cancel overtime tasks
     preReachedControl = reachedControl - 1
     if preReachedControl < 0:
@@ -975,7 +980,10 @@ async def getReadyShortestRoutesAsync(reachedControl):
     if not tasksRunning:
         for item in readyRoutesArrayAsync[preReachedControl:]:
             if item["route"] == None:
-                item["task"] = asyncio.create_task(slowAccurateCalculateShortestRouteAsync(item["setuplist"]))
+                item["task"] = asyncio.create_task(ultimateCalculateShortestRouteAsync(item["setuplist"]))
+                break
+            elif item["route2"] == None:
+                item["task"] = asyncio.create_task(ultimateCalculateShortestRouteAsync(item["setuplist2"]))
                 break
 
     # finally, compose a return list
@@ -983,6 +991,8 @@ async def getReadyShortestRoutesAsync(reachedControl):
     for item in readyRoutesArrayAsync:
         if item["route"] is None:
             returnRoutesArray.append([])
-        else:
+        elif item["route2"] is None:
             returnRoutesArray.append(item["route"])
+        else:
+            returnRoutesArray.append(item["route2"])
     return returnRoutesArray
