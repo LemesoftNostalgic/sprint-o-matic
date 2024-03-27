@@ -776,7 +776,7 @@ async def ultimateCalculateShortestRouteAsync(setupList):
             minPoint = None
             for direction in directions:
                  newPoint = direction[0]
-                 if newPoint in backRouteLookup and backRouteLookup[newPoint] <= score and newPoint not in shortestRoute:
+                 if newPoint in backRouteLookup and backRouteLookup[newPoint] < minScore and newPoint not in shortestRoute:
                      minScore = backRouteLookup[newPoint]
                      minPoint = newPoint
             score = minScore
@@ -798,7 +798,7 @@ async def ultimateCalculateShortestRouteAsync(setupList):
             minPoint = None
             for direction in directions:
                  newPoint = direction[0]
-                 if newPoint in routeLookup and routeLookup[newPoint] <= score and newPoint not in shortestRoute:
+                 if newPoint in routeLookup and routeLookup[newPoint] < minScore and newPoint not in shortestRoute:
                      minScore = routeLookup[newPoint]
                      minPoint = newPoint
             score = minScore

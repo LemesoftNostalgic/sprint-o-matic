@@ -25,7 +25,7 @@ import asyncio
 from .mathUtils import angleBetweenLineSegments, distanceBetweenPoints, distanceBetweenPointAndLine, calculatePathDistance
 from .gameUIUtils import uiFlushEvents
 from .pathPruning import pruneEnsureLineOfSightExt, pruneShortestRouteExtAsync
-from .routeAI import calculateCoarseRouteExt, calculateShortestRouteAsync, slowAccurateCalculateShortestRouteAsync
+from .routeAI import calculateCoarseRouteExt, calculateShortestRouteAsync, slowAccurateCalculateShortestRouteAsync, ultimateCalculateShortestRouteAsync
 
 
 firstControlMinDistance = 100
@@ -309,7 +309,7 @@ async def createAmazeControls(cfg, distribution, metersPerPixel, faLookups, saLo
 
     shortests = []
     for ind in range(len(ctrls) - 1):
-        shortests.append([await slowAccurateCalculateShortestRouteAsync([ctrls[ind], ctrls[ind + 1], faLookups, saLookups, ssaLookups, vsaLookups, 3, 0])])
+        shortests.append([await ultimateCalculateShortestRouteAsync([ctrls[ind], ctrls[ind + 1], faLookups, saLookups, ssaLookups, vsaLookups, 3, 0])])
         if await uiFlushEvents():
             return [], [], [], [], 0.0
         if not shortests[ind][0]:
