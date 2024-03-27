@@ -353,6 +353,7 @@ async def main():
     reachedControl = None
     quitting = False
     firstTime = True
+    fingerInUse = False
     preInitSleep = 0 # after first start, turn this to 1
 #    perfAddStop("ini")
 

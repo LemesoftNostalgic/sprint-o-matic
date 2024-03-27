@@ -872,7 +872,9 @@ def getReadyShortestRoutes():
         aiIndex = aiSlots[ind]["aiIndex"]
         aiResult = aiSlots[ind]["aiResult"]
         if aiResult is not None and aiResult.ready():
-            readyRoutesArray[aiIndex]["route"] = aiResult.get(timeout=getAiPoolMaxTimeLimit(1) * 2 + 2).copy()
+            route = aiResult.get(timeout=getAiPoolMaxTimeLimit(1) * 2 + 2).copy()[0]
+            route.reverse()
+            readyRoutesArray[aiIndex]["route"] = [route]
             aiSlots[ind]["aiIndex"] = None
             aiSlots[ind]["aiResult"] = None
 
@@ -888,7 +890,7 @@ def getReadyShortestRoutes():
                 if readyRoutesArray[index]["route"] == None:
                     readyRoutesArray[index]["route"] = []
                     aiSlots[ind]["aiIndex"] = index
-                    aiSlots[ind]["aiResult"] = aiSlots[ind]["aiPool"].map_async(slowAccurateCalculateShortestRoute, readyRoutesArray[index]["setuplist"])
+                    aiSlots[ind]["aiResult"] = aiSlots[ind]["aiPool"].map_async(ultimateCalculateShortestRoute, readyRoutesArray[index]["setuplist"])
                     break
 
     freeSlots = 0
@@ -950,7 +952,6 @@ async def getReadyShortestRoutesAsync(reachedControl):
             if item["task"].done():
                 item["route"] = item["task"].result()
                 item["task"] = None
-
     # cancel overtime tasks
     preReachedControl = reachedControl - 1
     if preReachedControl < 0:
@@ -975,7 +976,7 @@ async def getReadyShortestRoutesAsync(reachedControl):
     if not tasksRunning:
         for item in readyRoutesArrayAsync[preReachedControl:]:
             if item["route"] == None:
-                item["task"] = asyncio.create_task(slowAccurateCalculateShortestRouteAsync(item["setuplist"]))
+                item["task"] = asyncio.create_task(ultimateCalculateShortestRouteAsync(item["setuplist"]))
                 break
 
     # finally, compose a return list
