@@ -197,6 +197,9 @@ def startElevatorMelody():
     if noSounds:
         return
 
+    if sys.platform == 'emscripten':
+        return
+
     melodyChannel.play(melodySounds[-1], loops=-1, fade_ms=120000)
 
 def stopMelody():

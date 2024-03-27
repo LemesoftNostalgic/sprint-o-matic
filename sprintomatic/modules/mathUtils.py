@@ -138,6 +138,24 @@ def getNearestPointOfList(backrouteLookupAdditions, newPoint):
     return nearest
 
 
+def getLineSpots(ptA, ptB, unitsPerStep):
+    testPtList = []
+    if ptA == ptB:
+        return testPtList
+
+    steps = int(max(abs(ptA[0]- ptB[0]), abs(ptA[1] - ptB[1]))) * 2
+    steps = steps // unitsPerStep
+
+    if steps:
+        incr = (float(ptB[0] - ptA[0]) / float(steps), float(ptB[1] - ptA[1]) / float(steps))
+        start = (float(ptA[0]), float(ptA[1]))
+
+        for ind in range(steps):
+            testPt = (int(start[0] + ind * incr[0]), int(start[1] + ind * incr[1]))
+            testPtList.append(testPt)
+    return testPtList
+
+
 def calculatePathDistance(path):
     dist = 0.0
     for index in range(len(path) - 1):

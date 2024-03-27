@@ -22,7 +22,7 @@ import random
 import time
 import asyncio
 
-from .mathUtils import angleBetweenLineSegments, distanceBetweenPoints, distanceBetweenPointAndLine, calculatePathDistance
+from .mathUtils import angleBetweenLineSegments, distanceBetweenPoints, distanceBetweenPointAndLine, calculatePathDistance, getLineSpots
 from .gameUIUtils import uiFlushEvents
 from .pathPruning import pruneEnsureLineOfSightExt, pruneShortestRouteExtAsync
 from .routeAI import calculateCoarseRouteExt, calculateShortestRouteAsync, slowAccurateCalculateShortestRouteAsync, ultimateCalculateShortestRouteAsync
@@ -34,7 +34,7 @@ pickDistMaxTime = 1.0
 pickMaxTime = pickDistMaxTime / maxDifficultAttempts
 totMaxTime = 15.0
 totMaxTimeAmaze = 40.0
-minOldNearness = 20
+minOldNearness = 30
 
 def pickLegLen(distribution, metersPerPixel):
     a = random.random()
@@ -62,6 +62,13 @@ def fastGetDecentControl(cfg, ctrls, minlen, maxlen):
                 if distanceBetweenPoints(cfg[realInd], ctrl) < minOldNearness:
                     badFound = True
                     break
+            for i in range(len(ctrls[:-2])):
+                if badFound:
+                    break
+                for linespot in getLineSpots(ctrls[i], ctrls[i+1], minOldNearness//2):
+                    if distanceBetweenPoints(cfg[realInd], linespot) < minOldNearness:
+                        badFound = True
+                        break
             if not badFound:
                 return realInd
     return None
