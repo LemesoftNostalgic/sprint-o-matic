@@ -30,45 +30,12 @@ alustavan kuvan siitä miten peli toimii:
 
 ## Sisällysluettelo
 
-   * [Asennus](#asennus)
    * [Käyttö](#käyttö)
+   * [Asennus](#asennus)
    * [Uusien karttojen lisääminen Sprint-O-Maticiin](#uusien-karttojen-lisääminen-sprint-o-Maticiin)
    * [Tietoja tästä ohjelmistosta ja sen lisenssistä](#tietoja-tästä-ohjelmistosta-ja-sen-lisenssistä)
    * [Sekalaiset aiheet](#sekalaiset-aiheet)
    * [Komentorivin käyttö](#lomentorivin-käyttö)
-
-## Asennus
-
-### Web-sovellus
-
-Käytä web-versiota, jos haluat testata sovellusta heti.
-Web-sovellus toimii melko hyvin nykyaikaisessa selaimessa, paitsi
-äänen laatu, joka vaihtelee. Suosittelen silti web-versiota koska se
-on aina ajan tasalla.
-
-Web-sovellusta voi käyttää myös puhelimessa,
-mutta silloin äänet eivät ole päällä, eikä grafiikka ole yhtä hyvä kuin
-tietokoneessa.
-
-  * [Web-sovellus käynnistyy tästä linkistä](https://lemesoftnostalgic.github.io/sprint-o-matic/)
-
-### Ladattava sovellus
-
-Sinun täytyy ladata ja asentaa sovellus jotta voit käyttää komentoriviparametrejä. Ladattava sovellus on hiukan nopeampi kuin web-sovellus ja pelattavuudeltaan hieman parempi.
-
-  * [Windows-asennus](/WINDOWS-FINNISH.md)
-  * [Linux-asennus](/LINUX-FINNISH.md)
-  * [MacBook-asennus](/MACBOOK-FINNISH.md)
-
-  * [Ohjeet komentoriviparametrien käyttöön](/FINNISH-CMDLINE.md)
-
-### Laitteistovaatimukset
-
-Sovellus on testattu Ubuntu 20.04 ja
-Windows 10 -laitteissa.  Web-versio tarvitsee suhteellisen modernin selaimen.
-**--accurate** komentoparametrin käyttäminen vaatii suhteellisen nykyaikaisen
-tietokoneen, koska sen hakualgoritmit suoritetaan useissa prosesseissa.
-
 
 ## Käyttö
 
@@ -178,6 +145,39 @@ lisää tulee.
 
 Tarkista seuraavasta kappaleesta tiedot, jotka vaaditaan, jotta kartta voidaan tehdä näkyväksi
 Sprint-O-Maticin käyttäjille.
+
+
+## Asennus
+
+### Web-sovellus
+
+Käytä web-versiota, jos haluat testata sovellusta heti.
+Web-sovellus toimii melko hyvin nykyaikaisessa selaimessa, paitsi
+äänen laatu, joka vaihtelee. Suosittelen silti web-versiota koska se
+on aina ajan tasalla.
+
+Web-sovellusta voi käyttää myös puhelimessa,
+mutta silloin äänet eivät ole päällä, eikä grafiikka ole yhtä hyvä kuin
+tietokoneessa.
+
+  * [Web-sovellus käynnistyy tästä linkistä](https://lemesoftnostalgic.github.io/sprint-o-matic/)
+
+### Ladattava sovellus
+
+Sinun täytyy ladata ja asentaa sovellus jotta voit käyttää komentoriviparametrejä. Ladattava sovellus on hiukan nopeampi kuin web-sovellus ja pelattavuudeltaan hieman parempi.
+
+  * [Windows-asennus](/WINDOWS-FINNISH.md)
+  * [Linux-asennus](/LINUX-FINNISH.md)
+  * [MacBook-asennus](/MACBOOK-FINNISH.md)
+
+  * [Ohjeet komentoriviparametrien käyttöön](/FINNISH-CMDLINE.md)
+
+### Laitteistovaatimukset
+
+Sovellus on testattu Ubuntu 20.04 ja
+Windows 10 -laitteissa.  Web-versio tarvitsee suhteellisen modernin selaimen.
+**--accurate** komentoparametrin käyttäminen vaatii suhteellisen nykyaikaisen
+tietokoneen, koska sen hakualgoritmit suoritetaan useissa prosesseissa.
 
 
 ## Uusien karttojen käyttäminen Sprint-O-Matic:in kanssa

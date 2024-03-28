@@ -37,46 +37,12 @@ which have improved a little bit during this winter.
 
 ## Table of Contents
 
-  * [Installation](#installation)
   * [Usage](#usage)
+  * [Installation](#installation)
   * [Adding new maps to Sprint-O-Matic](#adding-new-maps-to-sprint-o-matic)
   * [Software developent and license](#software-developent-and-license)
   * [Misc topics](#misc-topics)
   * [Command-line usage](#command-line-usage)
-
-## Installation
-
-### Web application
-
-Use the web version if you want to try the app immediately.
-The web application works quite ok with the modern browsers, except for
-the sound quality, which varies. However, the web version is recommended because
-is always up-to date.
-
-The web app can also be used with phones,
-but there is no sounds, and the graphics is not as good as with PC.
-
-  * [Web application starts here](https://lemesoftnostalgic.github.io/sprint-o-matic/)
-
-### Downloadable application
-
-You can use the command-line options only with the downloadable application.
-It is also a bit faster and nicer to play than the web application.
-
-  * [Windows installation](/WINDOWS.md)
-  * [Linux installation](/LINUX.md)
-  * [MacBook installation](/MACBOOK.md)
-
-  * [Instructions for command line parameters](/CMDLINE.md)
-
-### Hardware requirements
-
-The native application has been tested against Ubuntu 20.04 and
-Windows 10. The web version requires a relatively modern browser.
-
-Using the **--accurate** command-line parameter requires a powerful
-Linux PC due to
-its search algorithms that run in separate processes.
 
 ## Usage
 
@@ -157,6 +123,40 @@ There are three different categories of maps in Sprint-O-Matic.
 The Sprint-O-Matic can also link to **external** maps. All you have to do is to send necessary details of a map to sprint.o.matic at gmail.com. If the license of the map is permissive enough, I will then list it at [https://github.com/LemesoftNostalgic/sprint-o-matic-external-map-links](https://github.com/LemesoftNostalgic/sprint-o-matic-external-map-links) and it will become playable. I can even grant some teams a permission to maintain their own list of maps, if there is interest. The application checks the lists every time it starts, and shows the map selection one-by-one when user toggles the "external/team" and "external/map" buttons of the home screen. In the beginning there is one example team with some maps already. I hope more is coming.
 
 See the following chapter for the data that is needed, to make a map playable in Sprint-O-Matic.
+
+## Installation
+
+### Web application
+
+Use the web version if you want to try the app immediately.
+The web application works quite ok with the modern browsers, except for
+the sound quality, which varies. However, the web version is recommended because
+is always up-to date.
+
+The web app can also be used with phones,
+but there is no sounds, and the graphics is not as good as with PC.
+
+  * [Web application starts here](https://lemesoftnostalgic.github.io/sprint-o-matic/)
+
+### Downloadable application
+
+You can use the command-line options only with the downloadable application.
+It is also a bit faster and nicer to play than the web application.
+
+  * [Windows installation](/WINDOWS.md)
+  * [Linux installation](/LINUX.md)
+  * [MacBook installation](/MACBOOK.md)
+
+  * [Instructions for command line parameters](/CMDLINE.md)
+
+### Hardware requirements
+
+The native application has been tested against Ubuntu 20.04 and
+Windows 10. The web version requires a relatively modern browser.
+
+Using the **--accurate** command-line parameter requires a powerful
+Linux PC due to
+its search algorithms that run in separate processes.
 
 ## Adding new maps to Sprint-O-Matic
 
