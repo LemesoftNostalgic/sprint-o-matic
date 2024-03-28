@@ -1,6 +1,6 @@
 # Sprint-O-Matic
 
-![Sprint-O-Matic logo by Jyrki Leskela](/doc/logo.png)
+![Sprint-O-Matic logo by Jyrki Leskela](/doc/CompanyLogo.png)
 
 _Suoraan web-sovellukseen_: [tinyurl.com/sprint-o-matic-webapp](https://lemesoftnostalgic.github.io/sprint-o-matic/)
 
