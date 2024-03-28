@@ -47,6 +47,15 @@ xStartOrig = 280
 yStartOrig = 300
 
 
+def blitImageScaled(surf, controlFlagImage, controlPoint, portrait):
+    if not portrait:
+        fs = convertXCoordinate(24)
+    else:
+        fs = int(convertYCoordinate(24) / 1.7)
+    sc = pygame.transform.scale(controlFlagImage, (fs, fs))
+    surf.blit(sc, controlPoint)
+
+
 def showTextShadowed(surf, textCenter, fontSize, textStr, textColor, textShadowShift, portrait):
         if not portrait:
             fs = convertXCoordinate(fontSize)
@@ -62,6 +71,7 @@ def showTextShadowed(surf, textCenter, fontSize, textStr, textColor, textShadowS
         textRect = aText.get_rect()
         textRect.center = textCenter
         surf.blit(aText, textRect)
+        return (textCenter[0], (2 * textCenter[1] + textRect[1])//3)
 
 
 def showInitArrow(surf, spot, inScale, portrait):
@@ -87,7 +97,7 @@ async def uiRenderImmediate(pos, textStr, fast, benchmark, portrait):
     await uiFlip(fast)
 
 
-def showInitSelectionConstantTexts(surf, positions, selections, inScale, texts, titleTexts, titleTextPositions, creditTexts, creditTextPositions, news, newsPosition, externalOverallText, externalOverallPos, benchmark, portrait):
+def showInitSelectionConstantTexts(surf, positions, selections, inScale, texts, titleTexts, titleTextPositions, creditTexts, creditTextPositions, news, newsPosition, externalOverallText, externalOverallPos, controlFlagImage, benchmark, portrait):
     # scale for the current display
     if not portrait:
         xStep = convertXCoordinate(xStepOrig)
@@ -134,7 +144,8 @@ def showInitSelectionConstantTexts(surf, positions, selections, inScale, texts, 
     for ind in range(len(creditTextPositions)):
         showTextShadowed(surf, creditTextPositions[ind], 28, creditTexts[ind], getTrackColor(), shift, portrait)
     titleTextCenter = (surf.get_size()[0] / 2, yStart * 0.25)
-    showTextShadowed(surf, titleTextCenter, 96, getApplicationTitle(), titleColorRandom, 3 * shift, portrait)
+    controlPoint = showTextShadowed(surf, titleTextCenter, 96, getApplicationTitle(), titleColorRandom, 3 * shift, portrait)
+    blitImageScaled(surf, controlFlagImage, controlPoint, portrait)
     if news:
         showTextShadowed(surf, newsPosition, 28, news, getPacemakerColor(2), shift, portrait)
     showTextShadowed(surf, (newsPosition[0], newsPosition[1] * 1.2), 28, "Homepage: tinyurl.com/sprint-o-matic", getPacemakerColor(2), shift, portrait)
@@ -368,6 +379,8 @@ async def initScreen(imagePath, gameSettings, externalImageData, externalWorldCi
     backgroundImage = getBigScreen().copy()
     tmpImage = pygame.transform.scale(pygame.image.load(backgroundImageFile), getBigScreen().get_size())
     backgroundImage.blit(tmpImage, (0, 0))
+    controlFlagImageFile = imagePath + "lemesoftnostalgic/controlFlag.png"
+    controlFlagImage = pygame.image.load(controlFlagImageFile)
     externalExampleTeamText = ""
     externalExampleText = ""
     worldExampleText = ""
@@ -526,7 +539,7 @@ async def initScreen(imagePath, gameSettings, externalImageData, externalWorldCi
                 selections[-4] = True
 
             if firstTime:
-                showInitSelectionConstantTexts(backgroundImage, positions, selections, initCircleRadius, texts, titleTexts, titleTextPositions, creditTexts, creditTextPositions, news, newsPosition, externalExampleOverallText, externalExampleOverallPosition, benchmark, portrait)
+                showInitSelectionConstantTexts(backgroundImage, positions, selections, initCircleRadius, texts, titleTexts, titleTextPositions, creditTexts, creditTextPositions, news, newsPosition, externalExampleOverallText, externalExampleOverallPosition, controlFlagImage, benchmark, portrait)
             getBigScreen().blit(backgroundImage, backgroundImage.get_rect())
             showInitSelections(getBigScreen(), positions, selections, initCircleRadius, texts, titleTexts, titleTextPositions, externalExampleTeamText, externalExampleTeamSelectionPosition, externalExampleText, externalExampleSelectionPosition, ouluExampleText, ouluExampleSelectionPosition, worldExampleText, worldExampleSelectionPosition, benchmark, portrait)
             showInitArrow(getBigScreen(), positions[initScreenPos], arrowScale, portrait)
