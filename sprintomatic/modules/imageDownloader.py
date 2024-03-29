@@ -160,6 +160,7 @@ async def downloadExternalImageData(ownMasterListing):
             if sys.platform == 'emscripten':
                 import platform
                 from pathlib import Path
+                teamMapListingUrl = team["map-listing-url"]
                 pth = Path(teamMapListingUrl)
                 data = ""
                 async with platform.fopen(pth, "r") as textfile:
@@ -199,9 +200,7 @@ async def downloadMapSurfacesBasedOnUrl(item):
             pth = Path(name)
             r_content = b''
             async with platform.fopen(pth, "rb") as binfile:
-                r_content = binfile.read()
-            img = io.BytesIO(r_content)
-            imgsurf = pygame.image.load(img) # -> Surface
+                imgsurf = pygame.image.load(binfile)
         else:
             import requests
             import io
@@ -224,9 +223,7 @@ async def downloadMapSurfacesBasedOnUrl(item):
             pth = Path(name)
             r_content = b''
             async with platform.fopen(pth, "rb") as binfile:
-                r_content = binfile.read()
-            img = io.BytesIO(r_content)
-            imgsurf = pygame.image.load(img) # -> Surface
+                pngsurf = pygame.image.load(binfile)
         else:
             import requests
             import io
@@ -253,9 +250,7 @@ async def downloadSoundBasedOnUrl(name):
             pth = Path(soundUrl + name)
             r_content = b''
             async with platform.fopen(pth, "rb") as binfile:
-                r_content = binfile.read()
-            snd = io.BytesIO(r_content)
-            sound = pygame.mixer.Sound(snd) # -> Sound
+                sound = pygame.mixer.Sound(binfile)
         else:
             import requests
             import io
