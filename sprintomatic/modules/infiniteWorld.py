@@ -420,6 +420,8 @@ async def constructWayDb(latlonMapOrigo, xyPictureSize, metersPerPixel, xyShift)
                         nameFound = True
                         middlestName = name
     perfAddStop("wDBHandle2")
+    if not waydb:
+        waydb = checkIfWaydbInLocalCache(latlonMapOrigo)
 
     return waydb, middlestName
 

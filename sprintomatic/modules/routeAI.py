@@ -25,7 +25,7 @@ import sys
 
 from .pathPruning import pruneShortestRouteAsync, pruneEnsureGoodShortcut, pruneEnsureLineOfSight
 from .mathUtils import getBoundingBox, getNearestPointOfList, distanceBetweenPoints, calculatePathDistance
-from .utils import getSlowdownFactor, getSemiSlowdownFactor, getVerySlowdownFactor, getAiPoolMaxTimeLimit
+from .utils import getSlowdownFactor, getSemiSlowdownFactor, getVerySlowdownFactor, getAiPoolMaxTimeLimit, getPreRouteCount
 
 minScoreInit = 10000
 maxScoreInit = -10000
@@ -923,7 +923,7 @@ def getReadyShortestRoutes():
 
 readyRoutesArrayAsync = []
 
-async def initializeAINextTrackAsync(ctrls, faLookup, saLookup, ssaLookup, vsaLookup, pacemakerInd):
+async def initializeAINextTrackAsync(ctrls, faLookup, saLookup, ssaLookup, vsaLookup, pacemakerInd, preShortestRoutes):
     global asyncSlot
     global readyRoutesArrayAsync
 
@@ -949,7 +949,10 @@ async def initializeAINextTrackAsync(ctrls, faLookup, saLookup, ssaLookup, vsaLo
     # initialize structure
     for index in range(len(ctrls) - 1):
         if sys.platform == 'emscripten':
-            readyRoutesArrayAsync.append({"setuplist": [ctrls[index], ctrls[index+1], faLookup, saLookup, ssaLookup, vsaLookup, 0, pacemakerInd, []], "setuplist2": [ctrls[index], ctrls[index+1], faLookup, saLookup, ssaLookup, vsaLookup, 2, 1, pacemakerInd], "task": None, "task2": None, "route": None, "route2": None, "index": index})
+            if index < getPreRouteCount():
+                readyRoutesArrayAsync.append({"setuplist": [ctrls[index], ctrls[index+1], faLookup, saLookup, ssaLookup, vsaLookup, 0, pacemakerInd, []], "setuplist2": [ctrls[index], ctrls[index+1], faLookup, saLookup, ssaLookup, vsaLookup, 2, 1, pacemakerInd], "task": None, "task2": None, "route": preShortestRoutes[index][0], "route2": None, "index": index})
+            else:
+                readyRoutesArrayAsync.append({"setuplist": [ctrls[index], ctrls[index+1], faLookup, saLookup, ssaLookup, vsaLookup, 0, pacemakerInd, []], "setuplist2": [ctrls[index], ctrls[index+1], faLookup, saLookup, ssaLookup, vsaLookup, 2, 1, pacemakerInd], "task": None, "task2": None, "route": None, "route2": None, "index": index})
         else:
             readyRoutesArrayAsync.append({"setuplist": [ctrls[index], ctrls[index+1], faLookup, saLookup, ssaLookup, vsaLookup, 2, 1, pacemakerInd], "setuplist2": [ctrls[index], ctrls[index+1], faLookup, saLookup, ssaLookup, vsaLookup, 2, 0, pacemakerInd], "task": None, "task2": None, "route": None, "route2": None, "index": index})
 
@@ -1024,12 +1027,8 @@ async def getReadyShortestRoutesAsync(reachedControl):
     for item in readyRoutesArrayAsync:
         if (item["route"] is None or len(item["route"]) == 0) and (item["route2"] is None or len(item["route2"]) == 0):
             returnRoutesArray.append([])
-            print("z,", end="")
         elif (item["route2"] is None or len(item["route2"]) == 0):
-            print("route (", item["index"], ")= ", item["route"][0], ", ", end="")
             returnRoutesArray.append(item["route"])
         else:
-            print("route2 (", item["index"], ")= ", item["route2"][0], ", ", end="")
             returnRoutesArray.append(item["route2"])
-    print("")
     return returnRoutesArray

@@ -22,6 +22,9 @@ import sys, os
 def getSemiSlowdownFactor():
     return 1.5
 
+def getPreRouteCount():
+    return 3
+
 def getSlowdownFactor():
     return 2.0
 

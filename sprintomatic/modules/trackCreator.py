@@ -26,7 +26,7 @@ from .mathUtils import angleBetweenLineSegments, distanceBetweenPoints, distance
 from .gameUIUtils import uiFlushEvents
 from .pathPruning import pruneEnsureLineOfSightExt, pruneShortestRouteExtAsync
 from .routeAI import calculateCoarseRouteExt, calculateShortestRouteAsync, slowAccurateCalculateShortestRouteAsync, ultimateCalculateShortestRouteAsync
-
+from .utils import getPreRouteCount
 
 firstControlMinDistance = 100
 maxDifficultAttempts = 4
@@ -219,6 +219,13 @@ async def createAutoControls(cfg, trackLength, distribution, metersPerPixel, faL
         if time.time() - start_tot_time > totMaxTime:
             break
         await asyncio.sleep(0)
+
+    # only make a couple of these
+    start_tot_time = time.time()
+    for ind in range(min(getPreRouteCount(), len(shortests))):
+        shortests[ind] = [await calculateShortestRouteAsync([ctrls[ind], ctrls[ind + 1], faLookups, saLookups, ssaLookups, vsaLookups, precision, pacemakerInd, shortests[ind][0].copy()])]
+        if time.time() - start_tot_time > totMaxTime:
+            break
 
     return ctrls, shortests
 

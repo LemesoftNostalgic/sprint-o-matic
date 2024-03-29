@@ -1,27 +1,5 @@
 [
     {
-        "name": "Tartu",
-        "map-url": "https://raw.githubusercontent.com/LemesoftNostalgic/sprint-o-matic-map-image-example/main/Sprint_orienteering_map_Ropka_Tartu_Estonia_cartography_map.jpg?raw=true",
-        "map-license": "CC BY-SA 4.0 Deed",
-         "map-credits": "Mark Puusepp, 2017",
-         "lookup-png-url": "https://raw.githubusercontent.com/LemesoftNostalgic/sprint-o-matic-map-image-example/main/lookup.png?raw=true",
-         "lookup-png-license": "CC BY-SA 4.0 Deed",
-         "lookup-png-credits": "Jyrki Leskela, 2024",
-         "meters-per-pixel": 1.2,
-         "default-zoom": 1.0
-    },
-    {
-        "name": "Bygholm",
-        "map-url": "https://raw.githubusercontent.com/LemesoftNostalgic/sprint-o-matic-map-image-example/main/1280px-Orienteringskort_bygholm_2005.PNG?raw=true",
-        "map-license": "CC BY-SA 3.0 Deed",
-         "map-credits": "Horsens Orienteringsklub, 2006",
-         "lookup-png-url": "https://raw.githubusercontent.com/LemesoftNostalgic/sprint-o-matic-map-image-example/main/bygholm-lookup.png?raw=true",
-         "lookup-png-license": "CC BY-SA 3.0 Deed",
-         "lookup-png-credits": "Jyrki Leskela, 2024",
-         "meters-per-pixel": 1.3,
-         "default-zoom": 1.0
-    },
-    {
         "name": "Fantasy",
         "map-url": "https://raw.githubusercontent.com/LemesoftNostalgic/sprint-o-matic-map-image-example/main/FantasySprintMap.png?raw=true",
         "map-license": "CC BY-SA 4.0 Deed",

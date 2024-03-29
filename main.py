@@ -117,7 +117,7 @@ async def setTheStageForNewRound(cfg):
         if gameSettings.accurate:
             initializeAINextTrack(ctrls, faLookup, saLookup, ssaLookup, vsaLookup, gameSettings.pacemaker)
             shortestRoutesArray = getReadyShortestRoutes()
-        await initializeAINextTrackAsync(ctrls, faLookup, saLookup, ssaLookup, vsaLookup, gameSettings.pacemaker)
+        await initializeAINextTrackAsync(ctrls, faLookup, saLookup, ssaLookup, vsaLookup, gameSettings.pacemaker, shortestRoutesArray)
         shortestRoutesArrayAsync = await getReadyShortestRoutesAsync(reachedControl)
         shortestRoutes = []
         futureShortestRoutes = []
