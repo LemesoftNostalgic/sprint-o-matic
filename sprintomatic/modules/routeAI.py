@@ -941,7 +941,10 @@ async def initializeAINextTrackAsync(ctrls, faLookup, saLookup, ssaLookup, vsaLo
 
     # initialize structure
     for index in range(len(ctrls) - 1):
-        readyRoutesArrayAsync.append({"setuplist": [ctrls[index], ctrls[index+1], faLookup, saLookup, ssaLookup, vsaLookup, 2, 1, pacemakerInd], "setuplist2": [ctrls[index], ctrls[index+1], faLookup, saLookup, ssaLookup, vsaLookup, 2, 0, pacemakerInd], "task": None, "route": None, "route2": None})
+        if sys.platform == 'emscripten':
+            readyRoutesArrayAsync.append({"setuplist": [ctrls[index], ctrls[index+1], faLookup, saLookup, ssaLookup, vsaLookup, 0, pacemakerInd, []], "setuplist2": [ctrls[index], ctrls[index+1], faLookup, saLookup, ssaLookup, vsaLookup, 2, 1, pacemakerInd], "task": None, "route": None, "route2": None, "index": index})
+        else:
+            readyRoutesArrayAsync.append({"setuplist": [ctrls[index], ctrls[index+1], faLookup, saLookup, ssaLookup, vsaLookup, 2, 1, pacemakerInd], "setuplist2": [ctrls[index], ctrls[index+1], faLookup, saLookup, ssaLookup, vsaLookup, 2, 0, pacemakerInd], "task": None, "route": None, "route2": None, "index": index})
 
 
 async def getReadyShortestRoutesAsync(reachedControl):
@@ -956,6 +959,7 @@ async def getReadyShortestRoutesAsync(reachedControl):
                 elif item["route2"] == None:
                     item["route2"] = item["task"].result()
                 item["task"] = None
+
     # cancel overtime tasks
     preReachedControl = reachedControl - 1
     if preReachedControl < 0:
@@ -978,18 +982,35 @@ async def getReadyShortestRoutesAsync(reachedControl):
 
     # if not, start a new one
     if not tasksRunning:
-        for item in readyRoutesArrayAsync[preReachedControl:]:
+        tmpArrayAsync = readyRoutesArrayAsync[preReachedControl:]
+        for ind in range(len(tmpArrayAsync)):
+            item = tmpArrayAsync[ind]
+            nextitem = None
+            if ind < len(tmpArrayAsync) - 1:
+                nextitem = tmpArrayAsync[ind + 1]
             if item["route"] == None:
-                item["task"] = asyncio.create_task(ultimateCalculateShortestRouteAsync(item["setuplist"]))
+                if sys.platform == 'emscripten':
+                    item["task"] = asyncio.create_task(calculateShortestRouteAsync(item["setuplist"]))
+                else:
+                    item["task"] = asyncio.create_task(ultimateCalculateShortestRouteAsync(item["setuplist"]))
+                break
+            elif nextitem is not None and  nextitem["route"] == None:
+                if sys.platform == 'emscripten':
+                    nextitem["task"] = asyncio.create_task(calculateShortestRouteAsync(item["setuplist"]))
+                else:
+                    nextitem["task"] = asyncio.create_task(ultimateCalculateShortestRouteAsync(item["setuplist"]))
                 break
             elif item["route2"] == None:
-                item["task"] = asyncio.create_task(ultimateCalculateShortestRouteAsync(item["setuplist2"]))
+                if sys.platform == 'emscripten':
+                    item["task"] = asyncio.create_task(ultimateCalculateShortestRouteAsync(item["setuplist2"]))
+                else:
+                    item["task"] = asyncio.create_task(ultimateCalculateShortestRouteAsync(item["setuplist2"]))
                 break
 
     # finally, compose a return list
     returnRoutesArray = []
     for item in readyRoutesArrayAsync:
-        if item["route"] is None:
+        if item["route"] is None and item["route2"] is None:
             returnRoutesArray.append([])
         elif item["route2"] is None:
             returnRoutesArray.append(item["route"])

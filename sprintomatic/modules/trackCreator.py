@@ -220,13 +220,6 @@ async def createAutoControls(cfg, trackLength, distribution, metersPerPixel, faL
             break
         await asyncio.sleep(0)
 
-    # only complete the work afterwards
-    start_tot_time = time.time()
-    for ind in range(len(shortests)):
-        shortests[ind] = [await calculateShortestRouteAsync([ctrls[ind], ctrls[ind + 1], faLookups, saLookups, ssaLookups, vsaLookups, precision, pacemakerInd, shortests[ind][0].copy()])]
-        if time.time() - start_tot_time > totMaxTime:
-            break
-
     return ctrls, shortests
 
 
