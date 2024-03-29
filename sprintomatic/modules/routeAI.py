@@ -1012,8 +1012,14 @@ async def getReadyShortestRoutesAsync(reachedControl):
     for item in readyRoutesArrayAsync:
         if item["route"] is None and item["route2"] is None:
             returnRoutesArray.append([])
+            print("z,", end="")
         elif item["route2"] is None:
+            if item["route"]:
+                print("route (", item["index"], ")= ", item["route"][0], ", ", end="")
             returnRoutesArray.append(item["route"])
         else:
+            if item["route2"]:
+                print("route2 (", item["index"], ")= ", item["route2"][0], ", ", end="")
             returnRoutesArray.append(item["route2"])
+    print("")
     return returnRoutesArray
