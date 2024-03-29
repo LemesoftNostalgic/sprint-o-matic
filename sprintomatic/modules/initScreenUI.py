@@ -212,12 +212,7 @@ async def veryFirstTime(benchmark, portrait):
     if veryFirstTime:
         uiSubmitTextListSlide(creditTextsEarly, portrait)
         await uiFlip(False)
-        if benchmark == "phone":
-            await asyncio.sleep(0)
-        elif benchmark == "web":
-            await asyncio.sleep(0.5)
-        else:
-            await asyncio.sleep(1.0)
+        await asyncio.sleep(0)
         veryFirstTime = False
 
 

@@ -25,6 +25,7 @@ import sys
 from .utils import getPackagePath
 
 
+soundUrl = "https://raw.githubusercontent.com/LemesoftNostalgic/sprint-o-matic-sounds/main/"
 listingOfTeamsWithListing = "https://raw.githubusercontent.com/LemesoftNostalgic/sprint-o-matic-external-map-links/main/teams-hosting-their-own-map-listing.json"
 listingOfMapsInCities = "https://raw.githubusercontent.com/LemesoftNostalgic/sprint-o-matic-external-map-links/main/world-city-maps.json"
 newsUrl= "https://raw.githubusercontent.com/LemesoftNostalgic/sprint-o-matic-external-map-links/main/NEWS.txt"
@@ -241,3 +242,26 @@ async def downloadMapSurfacesBasedOnUrl(item):
         pngsurf = pygame.image.load(img) # -> Surface
 
     return imgsurf, pngsurf
+
+
+async def downloadSoundBasedOnUrl(name):
+    sound = None
+    try:
+        if sys.platform == 'emscripten':
+            import platform
+            from pathlib import Path
+            pth = Path(soundUrl + name)
+            r_content = b''
+            async with platform.fopen(pth, "rb") as binfile:
+                r_content = binfile.read()
+            snd = io.BytesIO(r_content)
+            sound = pygame.mixer.Sound(snd) # -> Sound
+        else:
+            import requests
+            import io
+            r = requests.get(soundUrl + name)
+            snd = io.BytesIO(r.content)
+            sound = pygame.mixer.Sound(snd) # -> Sound
+    except Exception as err:
+        sound = None
+    return sound

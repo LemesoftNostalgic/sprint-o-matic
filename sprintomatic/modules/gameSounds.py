@@ -21,6 +21,9 @@ import pygame
 import os
 import sys
 from random import randrange
+import asyncio
+
+from .imageDownloader import downloadSoundBasedOnUrl
 
 stepsChannelNumber = 0
 effectChannelNumber = 1
@@ -94,7 +97,7 @@ stepSound = None
 
 left = False
 
-def initSounds(soundRoot, benchmark):
+async def initSounds(soundRoot, benchmark):
     global stepsChannel
     global birdsChannel
     global effectChannel
@@ -120,35 +123,46 @@ def initSounds(soundRoot, benchmark):
 
     for leftStep in leftSteps:
         fact = 0.02
-        
-        leftSounds.append(pygame.mixer.Sound(os.path.join(soundRoot, soundPath, leftStep)))
-        leftSounds[-1].set_volume(5*fact + fact * randrange(0, 3))
+
+        sound = await downloadSoundBasedOnUrl(os.path.join(soundPath, leftStep).replace("\\", "/"))
+        if sound is not None:
+            leftSounds.append(sound)
+            leftSounds[-1].set_volume(5*fact + fact * randrange(0, 3))
     for rightStep in rightSteps:
-        rightSounds.append(pygame.mixer.Sound(os.path.join(soundRoot, soundPath, rightStep)))
-        rightSounds[-1].set_volume(5*fact + fact * randrange(0, 3))
+        sound = await downloadSoundBasedOnUrl(os.path.join(soundPath, rightStep).replace("\\", "/"))
+        if sound is not None:
+            rightSounds.append(sound)
+            rightSounds[-1].set_volume(5*fact + fact * randrange(0, 3))
     for melodyPath in melodyPaths:
-        sound = pygame.mixer.Sound(os.path.join(soundRoot, melodyPath))
-        if sys.platform == 'emscripten':
-            sound.set_volume(0.3)
-        else:
-            sound.set_volume(0.8)
-        melodySounds.append(sound)
+        sound = await downloadSoundBasedOnUrl(melodyPath)
+        if sound is not None:
+            if sys.platform == 'emscripten':
+                sound.set_volume(0.3)
+            else:
+                sound.set_volume(0.8)
+            melodySounds.append(sound)
     melodyCtr = len(melodySounds) - 1
-    birdsSound = pygame.mixer.Sound(os.path.join(soundRoot,  birdsPath))
     if sys.platform == 'emscripten':
-        birdsSound.set_volume(0.0)
+        birdsSound = None
     else:
-        birdsSound.set_volume(0.4)
-    shoutSound = pygame.mixer.Sound(os.path.join(soundRoot, shoutPath))
-    shoutSound.set_volume(0.3)
-    pacemakerShoutSound = pygame.mixer.Sound(os.path.join(soundRoot, pacemakerShoutPath))
-    pacemakerShoutSound.set_volume(0.5)
-    finishSound = pygame.mixer.Sound(os.path.join(soundRoot, finishPath))
-    finishSound.set_volume(0.6)
-    startSound = pygame.mixer.Sound(os.path.join(soundRoot, startPath))
-    startSound.set_volume(0.8)
-    stepSound = pygame.mixer.Sound(os.path.join(soundRoot, stepPath))
-    stepSound.set_volume(0.8)
+        birdsSound = await downloadSoundBasedOnUrl(birdsPath)
+        if birdsSound is not None:
+            birdsSound.set_volume(0.4)
+    shoutSound = await downloadSoundBasedOnUrl(shoutPath)
+    if shoutSound is not None:
+        shoutSound.set_volume(0.3)
+    pacemakerShoutSound = await downloadSoundBasedOnUrl(pacemakerShoutPath)
+    if pacemakerShoutSound is not None:
+        pacemakerShoutSound.set_volume(0.5)
+    finishSound = await downloadSoundBasedOnUrl(finishPath)
+    if finishSound is not None:
+        finishSound.set_volume(0.6)
+    startSound = await downloadSoundBasedOnUrl(startPath)
+    if startSound is not None:
+        startSound.set_volume(0.8)
+    stepSound = await downloadSoundBasedOnUrl(stepPath)
+    if stepSound is not None:
+        stepSound.set_volume(0.8)
 
     stepsChannel = pygame.mixer.Channel(stepsChannelNumber)
     birdsChannel = pygame.mixer.Channel(birdsChannelNumber)
@@ -171,14 +185,15 @@ def maintainRunningStepEffect():
 
     if not stepsChannel.get_busy():
         maxInd = min(len(leftSounds), len(rightSounds)) - 1
-        ind = randrange(0, maxInd)
-        if left:
-            left = False
-            sound = rightSounds[ind]
-        else:
-            left = True
-            sound = leftSounds[ind]
-        stepsChannel.play(sound, maxtime=300)
+        if maxInd > 0:
+            ind = randrange(0, maxInd)
+            if left:
+                left = False
+                sound = rightSounds[ind]
+            else:
+                left = True
+                sound = leftSounds[ind]
+            stepsChannel.play(sound, maxtime=300)
 
 
 def startMelody():
@@ -187,10 +202,11 @@ def startMelody():
     if noSounds:
         return
 
-    melodyCtr = melodyCtr + 1
-    if melodyCtr >= len(melodySounds):
-        melodyCtr = 0
-    melodyChannel.play(melodySounds[melodyCtr], loops=-1, fade_ms=20000)
+    if len(melodySounds) > 0:
+        melodyCtr = melodyCtr + 1
+        if melodyCtr >= len(melodySounds):
+            melodyCtr = 0
+        melodyChannel.play(melodySounds[melodyCtr], loops=-1, fade_ms=20000)
 
 def startElevatorMelody():
 
@@ -200,7 +216,8 @@ def startElevatorMelody():
     if sys.platform == 'emscripten':
         return
 
-    melodyChannel.play(melodySounds[-1], loops=-1, fade_ms=120000)
+    if len(melodySounds) > 0:
+        melodyChannel.play(melodySounds[-1], loops=-1, fade_ms=120000)
 
 def stopMelody():
 
@@ -214,7 +231,8 @@ def startBirds():
     if noSounds:
         return
 
-    melodyChannel.play(birdsSound, loops=-1)
+    if birdsSound is not None:
+        melodyChannel.play(birdsSound, loops=-1)
 
 def stopBirds():
     global melodyCtr
@@ -222,29 +240,33 @@ def stopBirds():
     if noSounds:
         return
 
-    melodyCtr = len(melodySounds) - 1
-    melodyChannel.stop()
+    if len(melodySounds) > 0:
+        melodyCtr = len(melodySounds) - 1
+        melodyChannel.stop()
 
 def shoutEffect():
 
     if noSounds:
         return
 
-    effectChannel.play(shoutSound, maxtime=1000)
+    if shoutSound is not None:
+        effectChannel.play(shoutSound, maxtime=1000)
 
 def pacemakerShoutEffect():
 
     if noSounds:
         return
 
-    effectChannel.play(pacemakerShoutSound)
+    if pacemakerShoutSound is not None:
+        effectChannel.play(pacemakerShoutSound)
 
 def startEffect():
 
     if noSounds:
         return
 
-    effectChannel.play(startSound)
+    if startSound is not None:
+        effectChannel.play(startSound)
 
 def stopEffects():
 
@@ -258,11 +280,13 @@ def stepEffect():
     if noSounds:
         return
 
-    effectChannel.play(stepSound)
+    if stepSound is not None:
+        effectChannel.play(stepSound)
 
 def finishEffect():
 
     if noSounds:
         return
 
-    effectChannel.play(finishSound)
+    if finishSound is not None:
+        effectChannel.play(finishSound)

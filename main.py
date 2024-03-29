@@ -297,7 +297,7 @@ async def main():
          gameSettings.offline = offline
     externalWorldCityMap = await downloadExternalWorldCityMap()
     news = await downloadNews()
-    initSounds(gameSettings.soundRoot, benchmark)
+    await initSounds(gameSettings.soundRoot, benchmark)
     
     # statistics and route display initial values
     shortestRoutesArray = []
