@@ -937,14 +937,21 @@ async def initializeAINextTrackAsync(ctrls, faLookup, saLookup, ssaLookup, vsaLo
                 except asyncio.CancelledError:
                     pass
                 item["task"] = None
+            if item["task2"] is not None:
+                item["task2"].cancel()
+                try:
+                    await item["task2"]
+                except asyncio.CancelledError:
+                    pass
+                item["task2"] = None
     readyRoutesArrayAsync = []
 
     # initialize structure
     for index in range(len(ctrls) - 1):
         if sys.platform == 'emscripten':
-            readyRoutesArrayAsync.append({"setuplist": [ctrls[index], ctrls[index+1], faLookup, saLookup, ssaLookup, vsaLookup, 0, pacemakerInd, []], "setuplist2": [ctrls[index], ctrls[index+1], faLookup, saLookup, ssaLookup, vsaLookup, 2, 1, pacemakerInd], "task": None, "route": None, "route2": None, "index": index})
+            readyRoutesArrayAsync.append({"setuplist": [ctrls[index], ctrls[index+1], faLookup, saLookup, ssaLookup, vsaLookup, 0, pacemakerInd, []], "setuplist2": [ctrls[index], ctrls[index+1], faLookup, saLookup, ssaLookup, vsaLookup, 2, 1, pacemakerInd], "task": None, "task2": None, "route": None, "route2": None, "index": index})
         else:
-            readyRoutesArrayAsync.append({"setuplist": [ctrls[index], ctrls[index+1], faLookup, saLookup, ssaLookup, vsaLookup, 2, 1, pacemakerInd], "setuplist2": [ctrls[index], ctrls[index+1], faLookup, saLookup, ssaLookup, vsaLookup, 2, 0, pacemakerInd], "task": None, "route": None, "route2": None, "index": index})
+            readyRoutesArrayAsync.append({"setuplist": [ctrls[index], ctrls[index+1], faLookup, saLookup, ssaLookup, vsaLookup, 2, 1, pacemakerInd], "setuplist2": [ctrls[index], ctrls[index+1], faLookup, saLookup, ssaLookup, vsaLookup, 2, 0, pacemakerInd], "task": None, "task2": None, "route": None, "route2": None, "index": index})
 
 
 async def getReadyShortestRoutesAsync(reachedControl):
@@ -956,9 +963,12 @@ async def getReadyShortestRoutesAsync(reachedControl):
             if item["task"].done():
                 if item["route"] == None:
                     item["route"] = item["task"].result()
-                elif item["route2"] == None:
-                    item["route2"] = item["task"].result()
                 item["task"] = None
+        if item["task2"] is not None:
+            if item["task2"].done():
+                if item["route2"] == None:
+                    item["route2"] = item["task2"].result()
+                item["task2"] = None
 
     # cancel overtime tasks
     preReachedControl = reachedControl - 1
@@ -972,54 +982,54 @@ async def getReadyShortestRoutesAsync(reachedControl):
             except asyncio.CancelledError:
                 pass
             item["task"] = None
+        if item["task2"] is not None:
+            item["task2"].cancel()
+            try:
+                await item["task2"]
+            except asyncio.CancelledError:
+                pass
+            item["task2"] = None
 
     # check if any non-overtime task running
     tasksRunning = False
+    tasksRunning2 = False
     for item in readyRoutesArrayAsync[preReachedControl:]:
         if item["task"] is not None:
             tasksRunning = True
             break
+        if item["task2"] is not None:
+            tasksRunning2 = True
+            break
 
     # if not, start a new one
     if not tasksRunning:
-        tmpArrayAsync = readyRoutesArrayAsync[preReachedControl:]
-        for ind in range(len(tmpArrayAsync)):
-            item = tmpArrayAsync[ind]
-            nextitem = None
-            if ind < len(tmpArrayAsync) - 1:
-                nextitem = tmpArrayAsync[ind + 1]
+        for item in readyRoutesArrayAsync[preReachedControl:]:
             if item["route"] == None:
                 if sys.platform == 'emscripten':
                     item["task"] = asyncio.create_task(calculateShortestRouteAsync(item["setuplist"]))
                 else:
                     item["task"] = asyncio.create_task(ultimateCalculateShortestRouteAsync(item["setuplist"]))
                 break
-            elif nextitem is not None and  nextitem["route"] == None:
+    if not tasksRunning2:
+        for item in readyRoutesArrayAsync[preReachedControl:]:
+            if item["route2"] == None:
                 if sys.platform == 'emscripten':
-                    nextitem["task"] = asyncio.create_task(calculateShortestRouteAsync(item["setuplist"]))
+                    item["task2"] = asyncio.create_task(ultimateCalculateShortestRouteAsync(item["setuplist2"]))
                 else:
-                    nextitem["task"] = asyncio.create_task(ultimateCalculateShortestRouteAsync(item["setuplist"]))
-                break
-            elif item["route2"] == None:
-                if sys.platform == 'emscripten':
-                    item["task"] = asyncio.create_task(ultimateCalculateShortestRouteAsync(item["setuplist2"]))
-                else:
-                    item["task"] = asyncio.create_task(ultimateCalculateShortestRouteAsync(item["setuplist2"]))
+                    item["task2"] = asyncio.create_task(ultimateCalculateShortestRouteAsync(item["setuplist2"]))
                 break
 
     # finally, compose a return list
     returnRoutesArray = []
     for item in readyRoutesArrayAsync:
-        if item["route"] is None and item["route2"] is None:
+        if (item["route"] is None or len(item["route"]) == 0) and (item["route2"] is None or len(item["route2"]) == 0):
             returnRoutesArray.append([])
             print("z,", end="")
-        elif item["route2"] is None:
-            if item["route"]:
-                print("route (", item["index"], ")= ", item["route"][0], ", ", end="")
+        elif (item["route2"] is None or len(item["route2"]) == 0):
+            print("route (", item["index"], ")= ", item["route"][0], ", ", end="")
             returnRoutesArray.append(item["route"])
         else:
-            if item["route2"]:
-                print("route2 (", item["index"], ")= ", item["route2"][0], ", ", end="")
+            print("route2 (", item["index"], ")= ", item["route2"][0], ", ", end="")
             returnRoutesArray.append(item["route2"])
     print("")
     return returnRoutesArray
