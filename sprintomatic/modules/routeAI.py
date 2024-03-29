@@ -950,9 +950,9 @@ async def initializeAINextTrackAsync(ctrls, faLookup, saLookup, ssaLookup, vsaLo
     for index in range(len(ctrls) - 1):
         if sys.platform == 'emscripten':
             if index < getPreRouteCount():
-                readyRoutesArrayAsync.append({"setuplist": [ctrls[index], ctrls[index+1], faLookup, saLookup, ssaLookup, vsaLookup, 0, pacemakerInd, []], "setuplist2": [ctrls[index], ctrls[index+1], faLookup, saLookup, ssaLookup, vsaLookup, 2, 1, pacemakerInd], "task": None, "task2": None, "route": preShortestRoutes[index][0], "route2": None, "index": index})
+                readyRoutesArrayAsync.append({"setuplist": [ctrls[index], ctrls[index+1], faLookup, saLookup, ssaLookup, vsaLookup, 0, pacemakerInd, []], "setuplist2": [ctrls[index], ctrls[index+1], faLookup, saLookup, ssaLookup, vsaLookup, 2, 0, pacemakerInd], "task": None, "task2": None, "route": preShortestRoutes[index][0], "route2": None, "index": index})
             else:
-                readyRoutesArrayAsync.append({"setuplist": [ctrls[index], ctrls[index+1], faLookup, saLookup, ssaLookup, vsaLookup, 0, pacemakerInd, []], "setuplist2": [ctrls[index], ctrls[index+1], faLookup, saLookup, ssaLookup, vsaLookup, 2, 1, pacemakerInd], "task": None, "task2": None, "route": None, "route2": None, "index": index})
+                readyRoutesArrayAsync.append({"setuplist": [ctrls[index], ctrls[index+1], faLookup, saLookup, ssaLookup, vsaLookup, 0, pacemakerInd, []], "setuplist2": [ctrls[index], ctrls[index+1], faLookup, saLookup, ssaLookup, vsaLookup, 2, 0, pacemakerInd], "task": None, "task2": None, "route": None, "route2": None, "index": index})
         else:
             readyRoutesArrayAsync.append({"setuplist": [ctrls[index], ctrls[index+1], faLookup, saLookup, ssaLookup, vsaLookup, 2, 1, pacemakerInd], "setuplist2": [ctrls[index], ctrls[index+1], faLookup, saLookup, ssaLookup, vsaLookup, 2, 0, pacemakerInd], "task": None, "task2": None, "route": None, "route2": None, "index": index})
 
