@@ -41,7 +41,7 @@ alustavan kuvan siitä miten peli toimii:
 
 ### Aloitusnäyttö
 
-![Sprint-O-Maticin aloitusnäyttö, kirjoittanut Jyrki Leskela](/doc/InitialDisplay.png)
+![Sprint-O-Maticin aloitusnäyttö, kirjoittanut Jyrki Leskela](/doc/InitialDisplay.jpg)
 
 Kun käynnistät sovelluksen, ensin tulee näkyviin aloitusnäyttö.
 Se mahdollistaa radan pituuden ja rastivälien pituuden määrittämisen,
@@ -62,7 +62,7 @@ painikkeista käännetään suuntaa vasemmalle tai oikealle, esc tai keskipainik
 Käyttö on tarkoituksella niin yksinkertaista että pelatessa ei tarvitse istua
 epäterveellisesti pöydän ääressä. Langatonta hiirtä käyttäen voit vaikka treenata samanaikaisesti.
 
-![Sprint-O-Maticin pelaaminen fantasiakartalla, kirjoittanut Jyrki Leskela](/doc/ExternalFantasyMap.png)
+![Sprint-O-Maticin pelaaminen fantasiakartalla, kirjoittanut Jyrki Leskela](/doc/ExternalFantasyMap.jpg)
 
 ### Reittianalyysi-tilat (repeat, once, fast)
 
@@ -85,11 +85,11 @@ parhaan reitin arvion olevan tarkempi.
 
 Graafisen analyysin tulos näyttää tältä:
 
-![Sprint-O-Matic-analyysin tulos, Jyrki Leskela](/doc/Analysis.png)
+![Sprint-O-Matic-analyysin tulos, Jyrki Leskela](/doc/Analysis.jpg)
 
 ### A Maze
 
-![Sprint-O-Matic gameplay in a maze mode by Jyrki Leskelä](/doc/AMaze.png)
+![Sprint-O-Matic gameplay in a maze mode by Jyrki Leskelä](/doc/AMaze.jpg)
 
 A Maze -tilassa harjoittelet ensimmäiselle rastille lähtöä. Saat näkyviisi viisi satunnaista ensimmäistä rastiväliä yksi kerrallaan. Tehtäväsi on kääntää kartta kymmenessä sekunnissa optimaaliseen lähtösuuntaan.
 
@@ -98,13 +98,13 @@ parhaasta lähtösuunnasta.
 
 ### Karttamuistiharjoitus (osittainen valkoisen kartan suunnistus)
 
-![Sprint-O-Matic pelaaminen karttamuistitilassa by Jyrki Leskelä](/doc/WhiteMapExercise.png)
+![Sprint-O-Matic pelaaminen karttamuistitilassa by Jyrki Leskelä](/doc/WhiteMapExercise.jpg)
 
 Muistitilassa harjoittelet karttamuisitiasi. Jokaisella rastivälillä sinulla on aluksi 5 sekuntia aikaa katsoa kokonaista karttaa, jonka jälkeen osa kartasta peittyy valkoisilla laatikoilla. Käytä karttamuistiasi ja mielikuvitustasi päästäksesi rastilta toiselle.
 
 ### Jänistila
 
-![Sprint-O-Maticin pelattavuus jänistilassa, kirjoittanut Jyrki Leskelä](/doc/GeneratedMapWithPacemaker.png)
+![Sprint-O-Maticin pelattavuus jänistilassa, kirjoittanut Jyrki Leskelä](/doc/GeneratedMapWithPacemaker.jpg)
 
 Jänistilassa kierrät reitin yhdessä jänisjuoksijan kanssa. Jänisjuoksija on
 henkilökohtainen virtuaalivalmentajasi. Se odottaa sinua jokaisella rastilla,
@@ -120,7 +120,7 @@ Sprint-O-Maticissa on kolme erilaista karttatyyppiä.
 **Infinite Oulu** on automaattisesti luotu kaupunkikorttelikartta, joka kerta erilainen.
 Infinite Oulu on Sprint-O-Matic-sovelluksen sisäinen järjestelmä.
 
-![Sprint-O-Matic kartta Barcelonan alueelta, kirjoittanut Jyrki Leskelä](/doc/Barcelona.png)
+![Sprint-O-Matic kartta Barcelonan alueelta, kirjoittanut Jyrki Leskelä](/doc/Barcelona.jpg)
 
 +**Word series** Sprint-O-Matic v2.0.0 versiosta lähtien. Kasvava määrä
 sprinttikarttoja maailman parhaista sprinttimaastoita.
@@ -130,7 +130,7 @@ Toiminto käyttää pohjana OpenStreetMap-järjestelmän karttadataa.
 Uusia kaupunkeja tai sijainteja voi ehdottaa yksinkertaisesti
 lähettämällä viesti sähköpostiin sprint.o.matic miukumauku gmail.com.
 
-![Sprint-O-Matic-pelikartta ulkoisella kartalla, kirjoittanut Jyrki Leskelä](/doc/tartu/ExternalMapWithRouteAnalysis.png)
+![Sprint-O-Matic-pelikartta ulkoisella kartalla, kirjoittanut Jyrki Leskelä](/doc/tartu/ExternalMapWithRouteAnalysis.jpg)
 
 Sprint-O-Matic:in voi myös linkittää **ulkoisiin** karttoihin. 
 Sinun tarvitsee vain lähettää tarvittavat tiedot kartasta osoitteeseen

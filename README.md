@@ -48,7 +48,7 @@ which have improved a little bit during this winter.
 
 ### Home screen
 
-![Sprint-O-Matic Home Screen by Jyrki Leskela](/doc/InitialDisplay.png)
+![Sprint-O-Matic Home Screen by Jyrki Leskela](/doc/InitialDisplay.jpg)
 
 The first thing you see, when you start the application, is the home screen.
 It allows for the basic setting of track and leg length, play modes, and map selection. The home screen can be used from keyboard (arrow keys to move the blue pointer, enter/space to select, esc to exit), or
@@ -60,7 +60,7 @@ When you have selected all the settings, move the blue pointer to the finish cir
 
 The gameplay keys are similar to the home screen keys: Arrow keys or mouse buttons to turn left or right, esc or middle button to quit. The usage is intentionally simlified.
 
-![Sprint-O-Matic gameplay with a fantasy map by Jyrki Leskela](/doc/ExternalFantasyMap.png)
+![Sprint-O-Matic gameplay with a fantasy map by Jyrki Leskela](/doc/ExternalFantasyMap.jpg)
 
 ### Route analysis modes (repeat, once, fast)
 
@@ -83,11 +83,11 @@ be more accurate.
 
 The graphical analysis result looks like this:
 
-![Sprint-O-Matic Analysis result by Jyrki Leskela](/doc/Analysis.png)
+![Sprint-O-Matic Analysis result by Jyrki Leskela](/doc/Analysis.jpg)
 
 ### Pacer mode
 
-![Sprint-O-Matic gameplay in pacer mode by Jyrki Leskelä](/doc/GeneratedMapWithPacemaker.png)
+![Sprint-O-Matic gameplay in pacer mode by Jyrki Leskelä](/doc/GeneratedMapWithPacemaker.jpg)
 
 In the pacer mode, you complete the track together with a pacer,
 your personal virtual coach. The pacer waits you at each control,
@@ -95,7 +95,7 @@ and competes against/with you in between the controls.
 
 ### A Maze
 
-![Sprint-O-Matic gameplay in a maze mode by Jyrki Leskelä](/doc/AMaze.png)
+![Sprint-O-Matic gameplay in a maze mode by Jyrki Leskelä](/doc/AMaze.jpg)
 
 In the A Maze -mode, you exercise the 1st control. You get five random first-leg challenges with only the start and the first control shown. You have 10 seconds to turn the map in the best running direction.
 
@@ -104,7 +104,7 @@ for the best direction.
 
 ### Memory exercise (partial white map orienteering)
 
-![Sprint-O-Matic gameplay in a white map mode by Jyrki Leskelä](/doc/WhiteMapExercise.png)
+![Sprint-O-Matic gameplay in a white map mode by Jyrki Leskelä](/doc/WhiteMapExercise.jpg)
 
 In the memory-mode, you exercise your map memory. For each control, you get 5 seconds to look at the complete map, and then some of it is covered with white boxes. Use your map memory and imagination to get from one control to another.
 
@@ -114,11 +114,11 @@ There are three different categories of maps in Sprint-O-Matic.
 
 **Infinite Oulu** is an automatically generated city-block-map, different map every time. The Infinite Oulu is also an internal system of the Sprint-O-Matic application.
 
-![Sprint-O-Matic gameplay with a Barcelona map by Jyrki Leskelä](/doc/Barcelona.png)
+![Sprint-O-Matic gameplay with a Barcelona map by Jyrki Leskelä](/doc/Barcelona.jpg)
 
 **World sprint maps** is available from Sprint-O-Matic v2.0.0 onwards. It is a growing collection of hand-picked sprint orienteering maps from the best cityscapes all around the world. From Oulu to Helsinki, Tokio to Paris, I've got you covered. The initial numbers are 72 cities and 662 maps, and it is expected to grow fast. The World sprint maps is also an automatic system internally using Map data from OpenStreetMap. You don't have to do to anything to get more maps. In fact, you can propose a city or a coordinate with a simple e-mail to sprint.o.matic at gmail.com.
 
-![Sprint-O-Matic gameplay map with an external map by Jyrki Leskelä](/doc/tartu/ExternalMapWithRouteAnalysis.png)
+![Sprint-O-Matic gameplay map with an external map by Jyrki Leskelä](/doc/tartu/ExternalMapWithRouteAnalysis.jpg)
 
 The Sprint-O-Matic can also link to **external** maps. All you have to do is to send necessary details of a map to sprint.o.matic at gmail.com. If the license of the map is permissive enough, I will then list it at [https://github.com/LemesoftNostalgic/sprint-o-matic-external-map-links](https://github.com/LemesoftNostalgic/sprint-o-matic-external-map-links) and it will become playable. I can even grant some teams a permission to maintain their own list of maps, if there is interest. The application checks the lists every time it starts, and shows the map selection one-by-one when user toggles the "external/team" and "external/map" buttons of the home screen. In the beginning there is one example team with some maps already. I hope more is coming.
 
