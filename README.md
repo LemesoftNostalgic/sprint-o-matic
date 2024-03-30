@@ -83,7 +83,7 @@ be more accurate.
 
 The graphical analysis result looks like this:
 
-![Sprint-O-Matic Analysis result by Jyrki Leskela](/doc/Analysis.jpg)
+![Sprint-O-Matic Analysis result by Jyrki Leskela](/doc/Analysis.png)
 
 ### Pacer mode
 

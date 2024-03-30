@@ -85,7 +85,7 @@ parhaan reitin arvion olevan tarkempi.
 
 Graafisen analyysin tulos näyttää tältä:
 
-![Sprint-O-Matic-analyysin tulos, Jyrki Leskela](/doc/Analysis.jpg)
+![Sprint-O-Matic-analyysin tulos, Jyrki Leskela](/doc/Analysis.png)
 
 ### A Maze
 
