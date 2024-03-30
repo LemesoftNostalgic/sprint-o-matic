@@ -23,7 +23,7 @@ from random import randrange
 
 import sys
 
-from .pathPruning import pruneShortestRouteAsync, pruneEnsureGoodShortcut, pruneEnsureLineOfSight
+from .pathPruning import pruneShortestRouteAsync, quickPruneShortestRouteAsync, pruneEnsureGoodShortcut, pruneEnsureLineOfSight
 from .mathUtils import getBoundingBox, getNearestPointOfList, distanceBetweenPoints, calculatePathDistance
 from .utils import getSlowdownFactor, getSemiSlowdownFactor, getVerySlowdownFactor, getAiPoolMaxTimeLimit, getPreRouteCount
 
@@ -367,6 +367,8 @@ async def calculateShortestRouteAsync(setupList):
     # Straighten the route into a beautiful one
     if pacemakerInd != 2:
         shortestRoute = await pruneShortestRouteAsync(shortestRoute, forbiddenLookup, slowLookup, semiSlowLookup, verySlowLookup)
+    else:
+        shortestRoute = await quickPruneShortestRouteAsync(shortestRoute, forbiddenLookup, slowLookup, semiSlowLookup, verySlowLookup)
 
     shortestRoute = [(x[0] * tf, x[1] * tf) for x in shortestRoute.copy()]
 

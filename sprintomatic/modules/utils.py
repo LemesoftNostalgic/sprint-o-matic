@@ -23,7 +23,7 @@ def getSemiSlowdownFactor():
     return 1.5
 
 def getPreRouteCount():
-    return 3
+    return 10
 
 def getSlowdownFactor():
     return 2.0

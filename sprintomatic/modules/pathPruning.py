@@ -210,15 +210,19 @@ async def pruneShortestRouteResAsync(route, forbiddenLookup, slowLookup, semiSlo
 
 
 async def pruneShortestRouteAsync(route, forbiddenLookup, slowLookup, semiSlowLookup, verySlowLookup):
-    iters = { 13: 1, 7: 1, 3: 2, 1: 3 }
-    res = pruneDefaultRes
-    route = await pruneShortestRouteResAsync(route, forbiddenLookup, slowLookup, semiSlowLookup, verySlowLookup, 1, 16)
+    iters = { 13: 1, 7: 1, 3: 1, 1: 3 }
     for res in [13, 7, 3, 1]:
         route = await pruneShortestRouteResAsync(route, forbiddenLookup, slowLookup, semiSlowLookup, verySlowLookup, res, iters[res])
-    for split in [(0.8, 0.8), (0.7, 0.4), (0.4, 0.7), (0.5, 0.5), (0.3, 0.3), (0.2, 0.2)]:
-        for jump in range(2, 0, -1):
-            route = await pruneCutTheCornersAsync(route, forbiddenLookup, slowLookup, semiSlowLookup, verySlowLookup, split, jump)
+    route = await pruneShortestRouteResAsync(route, forbiddenLookup, slowLookup, semiSlowLookup, verySlowLookup, 1, 4)
+    for split in [(0.8, 0.8), (0.7, 0.4), (0.4, 0.7), (0.5, 0.5), (0.2, 0.2)]:
+        route = await pruneCutTheCornersAsync(route, forbiddenLookup, slowLookup, semiSlowLookup, verySlowLookup, split, 1)
 
+    return route
+
+
+async def quickPruneShortestRouteAsync(route, forbiddenLookup, slowLookup, semiSlowLookup, verySlowLookup):
+    route = await pruneShortestRouteResAsync(route, forbiddenLookup, slowLookup, semiSlowLookup, verySlowLookup, 13, 1)
+    route = await pruneCutTheCornersAsync(route, forbiddenLookup, slowLookup, semiSlowLookup, verySlowLookup, (0.5, 0.5), 1)
     return route
 
 
