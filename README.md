@@ -58,7 +58,7 @@ When you have selected all the settings, move the blue pointer to the finish cir
 
 ### Gameplay
 
-The gameplay keys are similar to the home screen keys: Arrow keys or mouse buttons to turn left or right, esc or middle button to quit. The usage is intentionally simlified.
+The gameplay keys are similar to the home screen keys: Arrow keys or mouse buttons to turn left or right, esc or middle button to quit. The usage is intentionally simplified.
 
 ![Sprint-O-Matic gameplay with a fantasy map by Jyrki Leskela](/doc/ExternalFantasyMap.jpg)
 
