@@ -28,7 +28,7 @@ from sprintomatic.modules.routeAI import initializeAITables, closeAITables, init
 from sprintomatic.modules.gameSettings import returnSettings, returnConfig
 from sprintomatic.modules.mathUtils import angleOfLine, angleOfPath, getRandomAngle, calculatePathDistance, angleDifference, fromRadiansToDegrees
 from sprintomatic.modules.trackCreator import createAutoControls, createAmazeControls
-from sprintomatic.modules.gameUIUtils import uiEarlyInit, uiLateQuit, uiFlushEvents
+from sprintomatic.modules.gameUIUtils import uiEarlyInit, uiLateQuit, uiFlushEvents, uiDrawFaDebug
 from sprintomatic.modules.initScreenUI import initScreen, veryFirstTime
 from sprintomatic.modules.gameUI import uiInit, uiInitStartTriangle, uiStartControlEffect, uiControlEffectEnded, uiCenterTurnZoomTheMap, uiAnimatePlayer, uiAnimatePacemaker, uiRenderRoutes, uiRenderControls, uiCompleteRender, uiEvent, uiClearCanvas, raiseControlApproachZoom, lowerControlApproachZoom, uiRenderPacemakerText, uiRenderAIText, uiControlEffectRestart, uiRenderExternalMapInfo, uiStoreAnalysis, uiClearBuffers
 from sprintomatic.modules.gameEngine import startOverPlayerRoute, playerRoute, calculateNextStep, closeToControl, quiteCloseToControl, longLapEveryOther, generateAngleStep, normalizeAngleStep, defaultAngle, getPlayerRoute, getPacemakerThreshold, getPacemakerPos
@@ -313,6 +313,7 @@ async def main():
     shortestWeightedDistance = None
     playerWeightedDistance = None
     finishTexts = ["", "", ""]
+    faDebug = False
 
     # pacemaker parameters
     pacemakerSteps = 0
@@ -401,6 +402,8 @@ async def main():
             else:
                 # Ok for init...
 
+                if faDebug:
+                    uiDrawFaDebug(generatedOrDownloadedMap, faLookup)
                 # generic default unless modified when setting the stage
                 position = uiInit(gameSettings.mapFileName, gameSettings.imageRoot, generatedOrDownloadedMap, gameSettings.metersPerPixel, benchmark)
 

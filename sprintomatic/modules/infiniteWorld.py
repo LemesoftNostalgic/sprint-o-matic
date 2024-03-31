@@ -467,6 +467,7 @@ def drawPolygonWithBounds(png, mask, pointlist, polyInternalColor, polyBoundaryC
         pygame.draw.polygon(mask, polyMaskColor, pointlist)
         pygame.draw.polygon(png, polyInternalColor, pointlist)
         uiDrawLines(png, polyBoundaryColor, pointlist + [pointlist[0]], 1)
+        pygame.draw.lines(mask, polyMaskColor, False, pointlist + [pointlist[0]], width=1)
         for point in pointlist:
             markControlSpot(mask, point[0], point[1])
 

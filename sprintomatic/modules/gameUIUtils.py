@@ -24,7 +24,7 @@ import time
 import math
 
 from .mathUtils import triangleCreator, rotateVector, angleOfLine
-from .utils import getPackagePath
+from .utils import getPackagePath, getForbiddenAreaMask
 
 xReference = 1920
 yReference = 1080
@@ -134,6 +134,11 @@ def getEffectStepStart(benchmark):
         return 64
     else:
         return 64
+
+
+def uiDrawFaDebug(img, faLookup):
+    for coord in faLookup[1]:
+        img.fill(getForbiddenAreaMask(), (coord, (1, 1)))
 
 
 def uiEarlyInit(fullScreen, benchmark):
