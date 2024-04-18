@@ -44,8 +44,11 @@ prevBigRect = None
 finishTextStr =      "Finish time: "
 finishTextStr2 =     "    Distance: "
 finishTextStr3 =     " m"
-finishTextStr4 =     "    Runner error: "
+finishTextStr4 =     "    Wasted dist: "
 finishTextStr5 =     " %"
+
+pacemakerTextStr4 =     "    Result: "
+
 
 amazeStr1 =      "          A MAZE BEGINS!   LEVEL: "
 amazeStr2 =      "   TURN TO RUNNING DIRECTION          "
@@ -124,7 +127,7 @@ def uiInit(fileName, imagePath, generatedMap, metersPerPixerInput, benchmark):
     return me
 
 
-def uiShowFinishText(someSurface, finishTexts, amaze, portrait):
+def uiShowFinishText(someSurface, finishTexts, amaze, portrait, pacemakerInd, pacemakerResText):
     timeConsumed = finishTexts[0]
     distance = finishTexts[1]
     error = finishTexts[2]
@@ -140,6 +143,9 @@ def uiShowFinishText(someSurface, finishTexts, amaze, portrait):
         textItself = finishTextStr + timeConsumed + finishTextStr2 + distance + finishTextStr3 + finishTextStr4 + error + finishTextStr5
         if amaze:
             textItself = amazeTextStr + timeConsumed + amazeTextStr2 + distance + amazeTextStr3 + amazeTextStr4 + error + amazeTextStr5
+        elif pacemakerInd:
+            textItself = amazeTextStr + timeConsumed + amazeTextStr2 + distance + amazeTextStr3 + pacemakerTextStr4 + pacemakerResText
+
         finishText = pygame.font.Font(getMasterFont(), fs).render(textItself, True, getFinishTextColor())
         finishTextRect = finishText.get_rect()
         finishTextRect.center = finishTextCenter
@@ -315,7 +321,7 @@ def uiAnimatePacemaker(pos, angle, scale, pacemakerInd, inTunnel, background, sh
         feetPlusPacemaker = uiAnimateCharacter(oMapCopy, p, math.pi - angle, getPacemakerColor(pacemakerInd), 0.6 * scale / metersPerPixel, feetPlusPacemaker, inTunnel, background, False)
 
 
-async def uiCompleteRender(finishTexts, mapInfoTextList, pacemakerInd, pacemakerTextNeeded, aiTextNeeded, amaze, amazeNumber, firstTime, moveLegs, inTunnel, portrait, fingerInUse):
+async def uiCompleteRender(finishTexts, mapInfoTextList, pacemakerInd, pacemakerTextNeeded, aiTextNeeded, amaze, amazeNumber, firstTime, moveLegs, inTunnel, portrait, fingerInUse, pacemakerResText):
     global prevBigRect
     perfAddStart("renComlete")
     xShift = (getBigScreen().get_size()[0]//2 - surfMe[0])
@@ -339,7 +345,7 @@ async def uiCompleteRender(finishTexts, mapInfoTextList, pacemakerInd, pacemaker
     if aiTextNeeded:
         uiRenderAIText(portrait)
 
-    uiShowFinishText(getBigScreen(), finishTexts, amaze, portrait)
+    uiShowFinishText(getBigScreen(), finishTexts, amaze, portrait, pacemakerInd, pacemakerResText)
     if mapInfoTextList:
         uiRenderExternalMapInfo(mapInfoTextList, fingerInUse, portrait)
     showInfoBoxTxt(getBigScreen())

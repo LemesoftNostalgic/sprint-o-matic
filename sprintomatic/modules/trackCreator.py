@@ -265,14 +265,14 @@ async def createAmazeControls(cfg, distribution, metersPerPixel, faLookups, saLo
 
         leftChanged = False
         # check there either right or left alternative
-        preComputedLeft, jumps = calculateCoarseRouteExt(ctrls[-1], ctrl, faLookups, 2, True, False, dist * 20)
+        preComputedLeft, dummy_jumps = calculateCoarseRouteExt(ctrls[-1], ctrl, faLookups, 2, True, False, dist * 20)
         if len(preComputedLeft) < 3 or calculatePathDistance(preComputedLeft) < dist + dist / deAmazeFactor:
             preComputedLeft = preComputedMid
             leftChanged = True
         if time.time() - start_tot_time > totMaxTimeAmaze or await uiFlushEvents():
             return [], [], [], [], 0.0
 
-        preComputedRight, jumps = calculateCoarseRouteExt(ctrls[-1], ctrl, faLookups, 2, False, True, dist * 20)
+        preComputedRight, dummy_jumps = calculateCoarseRouteExt(ctrls[-1], ctrl, faLookups, 2, False, True, dist * 20)
         if len(preComputedRight) < 3 or calculatePathDistance(preComputedRight) < dist + dist / deAmazeFactor:
             if not leftChanged:
                 preComputedRight = preComputedMid
@@ -324,10 +324,10 @@ async def createAmazeControls(cfg, distribution, metersPerPixel, faLookups, saLo
 
     if normalizedDifference < 0.01:
         normalizedDifference = 0.01
-    difficulty = int((calculatePathDistance(preComputedLeft) + dist) / (normalizedDifference * 1000))
+    difficulty = int(math.log(jumps * (calculatePathDistance(preComputedLeft) + dist) / (normalizedDifference * 1000)))
     if difficulty < 1:
         difficulty = 1
-    
+
     return ctrls, shortests, beautifiedLeft, beautifiedRight, difficulty
 
 

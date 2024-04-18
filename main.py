@@ -56,6 +56,7 @@ async def setTheStageForNewRound(cfg):
     global autoControls
     global pacemakerPath
     global pacemakerSteps
+    global pacemakerFirst
     global pacemakerStartThreshold
     global pacemakerPosition
     global pacemakerAngle
@@ -131,6 +132,7 @@ async def setTheStageForNewRound(cfg):
         inTunnelPacmaker = False
         pacemakerPath = None
         pacemakerSteps = 0
+        pacemakerFirst = 0
         pacemakerStartThreshold = 0
         pacemakerPosition = None
         amazeThresholdWaiting = 0
@@ -215,9 +217,9 @@ async def updateRoutesAndDistances(amaze):
     await uiFlushEvents()
     if shortestRoutes:
         shortestDistance = shortestDistance + calculatePathDistance(shortestRoutes[0])
-        shortestWeightedDistance = shortestWeightedDistance + calculatePathWeightedDistance(shortestRoutes[0], saLookup, ssaLookup, vsaLookup)
+        shortestWeightedDistance = shortestWeightedDistance + calculatePathDistance(shortestRoutes[0])
         await asyncio.sleep(0)
-        playerWeightedDistance = playerWeightedDistance + calculatePathWeightedDistance(playerRoutes[0], saLookup, ssaLookup, vsaLookup)
+        playerWeightedDistance = playerWeightedDistance + calculatePathDistance(playerRoutes[0])
     startOverPlayerRoute()
 
 
@@ -248,6 +250,7 @@ async def main():
     global pacemakerStartThreshold
     global pacemakerStep
     global pacemakerSteps
+    global pacemakerFirst
     global playerDistance
     global playerRoutes
     global playerRoutesArray
@@ -621,6 +624,7 @@ async def main():
                                         pacemakerStep = -5
                                         if pacemakerPrepareForShout:
                                             pacemakerShoutEffect()
+                                            pacemakerFirst = pacemakerFirst + 1
                                             pacemakerPrepareForShout = False
                                     elif pacemakerPosition == pacemakerPath[0]:
                                         pacemakerStep = pacemakerStep + 1
@@ -662,7 +666,8 @@ async def main():
                                                 externalMapInfoTexts = [stripMapName(subitem["map-url"]), subitem["map-license"], subitem["map-credits"], stripMapName(subitem["lookup-png-url"]), subitem["lookup-png-license"], subitem["lookup-png-credits"]]
                                                 break
                             if gameSettings.noUiTest != "yes":
-                                await uiCompleteRender(finishTexts, externalMapInfoTexts, gameSettings.pacemaker, pacemakerTextNeeded, aiTextNeeded, gameSettings.amaze, difficulty, firstTime, moveLegs, inTunnel, portrait, fingerInUse)
+                                pacerText = " " + str(len(controls) - 1 - pacemakerFirst) + " - " + str(pacemakerFirst) + " "
+                                await uiCompleteRender(finishTexts, externalMapInfoTexts, gameSettings.pacemaker, pacemakerTextNeeded, aiTextNeeded, gameSettings.amaze, difficulty, firstTime, moveLegs, inTunnel, portrait, fingerInUse, pacerText)
                             firstTime = False
 
                         if benchmark == "phone":
