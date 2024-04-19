@@ -19,6 +19,15 @@ countoursMaxOutOf = 4
 countoursMinKernelWidth = 4
 countoursMaxKernelWidth = 7
 
+# Zoom changes these
+polyBorderWidth = 1
+cliffWidth = 4
+waterBorderWidth = 2
+wideFenceWidth = 2
+narrowFenceWidth = 1
+radius = 3
+crossradius = 2
+
 # types
 FOREST = '.'
 DEEPFOREST = ':'
@@ -35,6 +44,7 @@ WATER = '~'
 ASPHALT = '#'
 TMPASPHALT = '§'
 BROWNX = 'x'
+LIGHTBROWNX = 'l'
 BLACKX = 'X'
 STONE = 'o'
 BROWNSTONE = 'p'
@@ -61,6 +71,7 @@ colors = {
     ASPHALT:         (250, 210, 175),
     TMPASPHALT:         (251, 211, 176),
     BROWNX:          (224, 113, 30),
+    LIGHTBROWNX:     (244, 133, 50),
     BLACKX:          (40,45,50),
     STONE:           (40,45,50),
     BROWNSTONE:      (224, 113, 30),
@@ -123,8 +134,8 @@ houseArray = [
     ]
 
 shelterArray = [
-    ["building", ["hut","ruins","garbage_shed","terrace","grandstand","shelter","shed", "canopy", "greenhouse", "barn", "cowshed", "roof","farm_auxiliary"]],
-    ["highway", ["corridor","bridleway", "steps"]]
+    ["building", ["hut","ruins","garbage_shed","terrace","grandstand","shelter","shed", "canopy", "greenhouse", "barn", "cowshed", "roof","farm_auxiliary"]]
+    , ["highway", ["corridor","bridleway", "steps"]]
 ]
 
 wideWayWidthMeters = 20
@@ -141,7 +152,6 @@ unclassifiedWayWidthMeters = 10
 unclassifiedWay = [
     ["highway", ["unclassified","service","proposed","platform","construction","rest_area"]]
     ]
-    
 
 smallWayWidthMeters = 5
 smallWay = [
@@ -194,10 +204,6 @@ semiOpenArea = [
     ["amenity", ["events_venue","construction"]]
     ]
 
-brownArea = [
-    ["landuse", ["greenhouse_horticulture","construction","quarry","brownfield","landfill"]]
-]
-
 # reef is stony
 forestArea = [
     ["landuse", ["snowfill","churchyard","reservoir"]],
@@ -206,7 +212,7 @@ forestArea = [
 
 # meadow,heath semiopen; sand is sand
 openArea = [
-    ["landuse", ["civic", "grass","farmyard","recreation_ground","orchard","greenfield","allotments","farmland","grassland","meadow"]],
+    ["landuse", ["civic", "grass","farmyard","recreation_ground","orchard","greenfield","allotments","farmland","grassland","meadow", "greenhouse_horticulture","construction","quarry","brownfield","landfill"]],
     ["natural", ["heath", "grassland","sand","beach"]]
     ]
 
@@ -352,7 +358,6 @@ def oppositeToLatLonCoordinates(latlonMapOrigo, xyPictureSize, metersPerPixel):
     lat_to_meters = 111132
     lon_to_meters = lat_to_meters * cos(radians(latlonMapOrigo[0]))
 
-
     latlonOffset = (xyPictureSize[1] / lat_to_meters *metersPerPixel, xyPictureSize[0] / lon_to_meters *metersPerPixel)
     latlonPos = (latlonMapOrigo[0] + latlonOffset[0], latlonMapOrigo[1] + latlonOffset[1])
     return latlonPos
@@ -466,8 +471,8 @@ def drawPolygonWithBounds(png, mask, pointlist, polyInternalColor, polyBoundaryC
     if len(pointlist) > 2:
         pygame.draw.polygon(mask, polyMaskColor, pointlist)
         pygame.draw.polygon(png, polyInternalColor, pointlist)
-        uiDrawLines(png, polyBoundaryColor, pointlist + [pointlist[0]], 1)
-        pygame.draw.lines(mask, polyMaskColor, False, pointlist + [pointlist[0]], width=1)
+        uiDrawLines(png, polyBoundaryColor, pointlist + [pointlist[0]], polyBorderWidth)
+        pygame.draw.lines(mask, polyMaskColor, False, pointlist + [pointlist[0]], width=polyBorderWidth)
         for point in pointlist:
             markControlSpot(mask, point[0], point[1])
 
@@ -480,9 +485,22 @@ def drawPolygonWithoutBounds(png, mask, pointlist, polyInternalColor, polyMaskCo
             markControlSpot(mask, point[0], point[1])
 
 
+def drawPolygonWithoutBoundsNoControl(png, mask, pointlist, polyInternalColor, polyMaskColor):
+    if len(pointlist) > 2:
+        pygame.draw.polygon(mask, polyMaskColor, pointlist)
+        pygame.draw.polygon(png, polyInternalColor, pointlist)
+
+
+def drawPolygonOnlyBoundsNoControl(png, mask, pointlist, polyBoundaryColor, polyMaskColor):
+    if len(pointlist) > 2:
+        pygame.draw.polygon(mask, polyMaskColor, pointlist)
+        uiDrawLines(png, polyBoundaryColor, pointlist + [pointlist[0]], cliffWidth)
+
+
 def drawContours(kernelWidth, contourArr, keepOneOf):
-    width = contourArr.get_size()[0]
-    height = contourArr.get_size()[1]
+    arrZoom = polyBorderWidth
+    width = contourArr.get_size()[0] // arrZoom
+    height = contourArr.get_size()[1] // arrZoom
     maxDim = max(width, height) + kernelWidth
     iZoom = maxDim // kernelWidth
 
@@ -548,24 +566,23 @@ def drawContours(kernelWidth, contourArr, keepOneOf):
         for shift in [(-2, 0), (2, 0), (0, 2), (0, -2), (-2, 2), (2, 2), (2, -2), (-2, -2)]:
             point2 = (point[0] + shift[0], point[1] + shift[1])
             if point2 in contourLookup:
-                uiDrawLine(contourArr, colors[BROWNX], point, point2, 1)
+                contourArrPoint = (point[0] * arrZoom, point[1] * arrZoom)
+                contourArrPoint2 = (point2[0] * arrZoom, point2[1] * arrZoom)
+                uiDrawLine(contourArr, colors[BROWNX], contourArrPoint, contourArrPoint2, polyBorderWidth)
 
     return sumArr, contourArr
 
 
 def drawSpot(png, mask, pointlist, filltype):
-    radius = 3
-    crossradius = 2
-    marshradius = 2
     x = pointlist[0][0]
     y = pointlist[0][1]
     if filltype == BROWNX or filltype == BLACKX:
-        pygame.draw.line(png, colors[filltype], (x-crossradius, y-crossradius), (x+crossradius, y+crossradius))
-        pygame.draw.line(png, colors[filltype], (x-crossradius, y+crossradius), (x+crossradius, y-crossradius))
+        pygame.draw.line(png, colors[filltype], (x-crossradius, y-crossradius), (x+crossradius, y+crossradius), width=polyBorderWidth)
+        pygame.draw.line(png, colors[filltype], (x-crossradius, y+crossradius), (x+crossradius, y-crossradius), width=polyBorderWidth)
     elif filltype == STONE or filltype == BROWNSTONE:
         pygame.draw.circle(png, colors[filltype], (x, y), radius)
     elif filltype == GREENCIRCLE:
-        pygame.draw.circle(png, colors[filltype], (x, y), radius = 2)
+        pygame.draw.circle(png, colors[filltype], (x, y), crossradius)
     markControlSpot(mask, x, y)
         
 
@@ -575,10 +592,9 @@ def boundarize(png, tmpColorToBoundarize, colorToBoundarize, boundaryColor):
     for y in range(1, size[1]-1):
         for x in range(1, size[0]-1):
             if png.get_at((x, y)) == tmpColorToBoundarize:
+                pngCopy.set_at((x, y), colorToBoundarize)
                 if (png.get_at((x, y-1)) != tmpColorToBoundarize or png.get_at((x, y+1)) != tmpColorToBoundarize or png.get_at((x-1, y)) != tmpColorToBoundarize or png.get_at((x+1, y)) != tmpColorToBoundarize):
-                    pngCopy.set_at((x, y), boundaryColor)
-                else:
-                    pngCopy.set_at((x, y), colorToBoundarize)
+                    pygame.draw.rect(pngCopy, boundaryColor, [x - polyBorderWidth/2, y - polyBorderWidth/2, polyBorderWidth, polyBorderWidth])
     return pngCopy
 
 
@@ -604,6 +620,27 @@ def drawHouses(png, mask, waydb):
     return png, mask
 
 
+def createMapBorders(world, worldMask, borders):
+    width = world.get_size()[0]
+    height = world.get_size()[1]
+    for pointlist in borders:
+        scaledPointlist = []
+        for item in pointlist:
+            scaledPointlist.append((int(item[0]*polyBorderWidth), int(item[1]*polyBorderWidth)))
+        drawPolygonWithoutBoundsNoControl(world, worldMask, scaledPointlist, colors[FOREST], getForbiddenAreaMask())
+    pygame.draw.rect(world, colors[WATER], [ 20 * polyBorderWidth,  20 * polyBorderWidth, width-40 * polyBorderWidth, height-40* polyBorderWidth ], width=waterBorderWidth)    
+    return world, worldMask
+
+
+def createForbiddenBorders(world, worldMask, borders):
+    for pointlist in borders:
+        scaledPointlist = []
+        for item in pointlist:
+            scaledPointlist.append((int(item[0]*polyBorderWidth), int(item[1]*polyBorderWidth)))
+        drawPolygonOnlyBoundsNoControl(world, worldMask, scaledPointlist, getForbiddenAreaMask(), getForbiddenAreaMask())
+    return world, worldMask
+
+
 def drawCliff(png, mask, waydb):
     for waytypelist in cliffArea:
         waytype = waytypelist[0]
@@ -613,7 +650,7 @@ def drawCliff(png, mask, waydb):
                 subwayarray = waydb[waytype][subway]
                 waydb[waytype].pop(subway)
                 for way in subwayarray:
-                    drawPolylineWithWidth(png, mask, way, colors[SOLIDBLACK], getForbiddenAreaMask(), 4, True)
+                    drawPolylineWithWidth(png, mask, way, colors[SOLIDBLACK], getForbiddenAreaMask(), cliffWidth, True)
     return png, mask
 
 
@@ -639,7 +676,7 @@ def drawWater(png, mask, waydb):
                     polygonWay = coastlineToPolygon(way, png.get_size())
                     if polygonWay:
                         drawPolygonWithoutBounds(png, mask, polygonWay, colors[WATER], getForbiddenAreaMask())
-                    drawPolylineWithWidth(png, mask, way, colors[SOLIDBLACK], getForbiddenAreaMask(), 2, True)
+                    drawPolylineWithWidth(png, mask, way, colors[SOLIDBLACK], getForbiddenAreaMask(), waterBorderWidth, True)
     for waytypelist in waterLine:
         waytype = waytypelist[0]
         subwaylist = waytypelist[1]
@@ -648,7 +685,7 @@ def drawWater(png, mask, waydb):
                 subwayarray = waydb[waytype][subway]
                 waydb[waytype].pop(subway)
                 for way in subwayarray:
-                    drawPolylineWithWidth(png, mask, way, colors[WATER], getForbiddenAreaMask(), 2, True)
+                    drawPolylineWithWidth(png, mask, way, colors[WATER], getForbiddenAreaMask(), waterBorderWidth, True)
     return png, mask
 
 
@@ -661,7 +698,7 @@ def drawFences(png, mask, waydb):
                 subwayarray = waydb[waytype][subway]
                 waydb[waytype].pop(subway)
                 for way in subwayarray:
-                    drawPolylineWithWidth(png, mask, way, colors[SOLIDBLACK], getForbiddenAreaMask(), 2, True)
+                    drawPolylineWithWidth(png, mask, way, colors[SOLIDBLACK], getForbiddenAreaMask(), wideFenceWidth, True)
     for waytypelist in solidGreenFence:
         waytype = waytypelist[0]
         subwaylist = waytypelist[1]
@@ -670,7 +707,7 @@ def drawFences(png, mask, waydb):
                 subwayarray = waydb[waytype][subway]
                 waydb[waytype].pop(subway)
                 for way in subwayarray:
-                    drawPolylineWithWidth(png, mask, way, colors[SOLIDGREEN], getForbiddenAreaMask(), 2, True)
+                    drawPolylineWithWidth(png, mask, way, colors[SOLIDGREEN], getForbiddenAreaMask(), wideFenceWidth, True)
     for waytypelist in thinFence:
         waytype = waytypelist[0]
         subwaylist = waytypelist[1]
@@ -679,7 +716,7 @@ def drawFences(png, mask, waydb):
                 subwayarray = waydb[waytype][subway]
                 waydb[waytype].pop(subway)
                 for way in subwayarray:
-                    drawPolylineWithWidth(png, mask, way, colors[SOLIDBLACK], getVerySlowAreaMask(), 1, True)
+                    drawPolylineWithWidth(png, mask, way, colors[SOLIDBLACK], getVerySlowAreaMask(), narrowFenceWidth, True)
     return png, mask
 
 
@@ -719,19 +756,6 @@ def drawForestArea(png, mask, waydb):
                 waydb[waytype].pop(subway)
                 for area in subwayarray:
                     drawPolygonWithoutBounds(png, mask, area, colors[FOREST], getSlowAreaMask())
-    return png, mask
-
-
-def drawBrownArea(png, mask, waydb):
-    for waytypelist in brownArea:
-        waytype = waytypelist[0]
-        subwaylist = waytypelist[1]
-        for subway in subwaylist:
-            if waytype in waydb and subway in waydb[waytype]:
-                subwayarray = waydb[waytype][subway]
-                waydb[waytype].pop(subway)
-                for area in subwayarray:
-                    drawPolygonWithoutBounds(png, mask, area, colors[BROWNX], getSlowAreaMask())
     return png, mask
 
 
@@ -897,7 +921,7 @@ def drawArtificialSpot(png, mask):
 
 def drawArtificialSpots(png, mask):
     x, y = png.get_size()
-    minNumSpots = (x*y)//(4*400*spotnessFactor)
+    minNumSpots = (x*y)//(4*400*spotnessFactor * polyBorderWidth * polyBorderWidth)
     maxNumSpots = 4 * minNumSpots
     for ind in range(randrange(minNumSpots,maxNumSpots)):
         png, mask = drawArtificialSpot(png, mask)
@@ -962,11 +986,6 @@ async def getInfiniteWorld(latlonMapOrigo, xyPictureSize, metersPerPixel, imageP
     if await uiFlushEvents():
         return None, None
     perfAddStart("asphaltEtc")
-    world, worldMask = drawBrownArea(world, worldMask, db)
-
-    await asyncio.sleep(0)
-    if await uiFlushEvents():
-        return None, None
     world, worldMask = drawAsphaltArea(world, worldMask, db)
 
     await asyncio.sleep(0)
@@ -1034,12 +1053,12 @@ async def getInfiniteWorld(latlonMapOrigo, xyPictureSize, metersPerPixel, imageP
     perfAddStart("spotsetc")
     world, worldMask = drawSpots(world, worldMask, db)
     x, y = worldMask.get_size()
-    pygame.draw.rect(worldMask, getForbiddenAreaMask(), [(2,2), ((x-2, y-2))], width=2)
+    pygame.draw.rect(worldMask, getForbiddenAreaMask(), [ 2, 2, x-4, y-4 ], width=2)
     perfAddStop("spotsetc")
 
     perfAddStop("wAreas")
 
-    return world, worldMask
+    return world, worldMask, mapName
 
 
 def getInfiniteWorldPlace(city, citymap):
@@ -1060,8 +1079,29 @@ def getInfiniteWorldPlace(city, citymap):
     return None, None
 
 
-async def getInfiniteWorldDefault(place, imagePath, benchmark, portrait):
+async def getInfiniteWorldDefaultZoomed(place, imagePath, benchmark, portrait, zoom):
+    global polyBorderWidth
+    global cliffWidth
+    global waterBorderWidth
+    global wideFenceWidth
+    global narrowFenceWidth
+    global radius
+    global crossradius
+
+    polyBorderWidth = 1 * zoom
+    cliffWidth = 4 * zoom
+    waterBorderWidth = 2 * zoom
+    wideFenceWidth = 2 * zoom
+    narrowFenceWidth = 1 * zoom
+    radius = 3 * zoom
+    crossradius = 2 * zoom
+
     latlonMapOrigo = tuple(place)
-    metersPerPixel = (0.9 + 0.2 *random())
-    xyPictureSize = (1024, 720)
+    metersPerPixel = (1.0 / zoom)
+    xyPictureSize = (1024 * zoom, 720 * zoom)
     return await getInfiniteWorld(latlonMapOrigo, xyPictureSize, metersPerPixel, imagePath, benchmark, portrait)
+
+
+async def getInfiniteWorldDefault(place, imagePath, benchmark, portrait):
+    world, worldMask, dummyMapName = await getInfiniteWorldDefaultZoomed(place, imagePath, benchmark, portrait, 1)
+    return world, worldMask
