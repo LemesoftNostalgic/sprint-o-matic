@@ -199,7 +199,6 @@ async def downloadMapSurfacesBasedOnUrl(item):
             import platform
             from pathlib import Path
             pth = Path(name)
-            r_content = b''
             async with platform.fopen(pth, "rb") as binfile:
                 imgsurf = pygame.image.load(binfile)
         else:
@@ -222,7 +221,6 @@ async def downloadMapSurfacesBasedOnUrl(item):
             import platform
             from pathlib import Path
             pth = Path(name)
-            r_content = b''
             async with platform.fopen(pth, "rb") as binfile:
                 pngsurf = pygame.image.load(binfile)
         else:
@@ -258,24 +256,18 @@ async def downloadAds():
             import requests
             response = requests.get(advertisementListing)
             data = response.text
-            print("hei")
         listingofads = json.loads(data)
     except Exception as err:
-        print(err)
         listingofads = []
 
-    print(listingofads)
     returnads = []
     for ad in listingofads:
-        print(ad)
         pngsurf = None
         try:
             if sys.platform == 'emscripten':
                 import platform
                 from pathlib import Path
                 pth = Path(ad["ad-url"])
-                pngsurf = pygame.image.load(binfile)
-                data = b''
                 async with platform.fopen(pth, "rb") as binfile:
                     pngsurf = pygame.image.load(binfile)
             else:
@@ -284,7 +276,6 @@ async def downloadAds():
                 r = requests.get(ad["ad-url"])
                 png = io.BytesIO(r.content)
                 pngsurf = pygame.image.load(png) # -> Surface
-                print("jei")
         except Exception as err:
             pngsurf = None
         if pngsurf is not None:
@@ -299,7 +290,6 @@ async def downloadSoundBasedOnUrl(name):
             import platform
             from pathlib import Path
             pth = Path(soundUrl + name)
-            r_content = b''
             async with platform.fopen(pth, "rb") as binfile:
                 sound = pygame.mixer.Sound(binfile)
         else:
