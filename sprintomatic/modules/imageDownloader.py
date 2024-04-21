@@ -28,6 +28,7 @@ from .utils import getPackagePath
 soundUrl = "https://raw.githubusercontent.com/LemesoftNostalgic/sprint-o-matic-sounds/main/"
 listingOfTeamsWithListing = "https://raw.githubusercontent.com/LemesoftNostalgic/sprint-o-matic-external-map-links/main/teams-hosting-their-own-map-listing.json"
 listingOfMapsInCities = "https://raw.githubusercontent.com/LemesoftNostalgic/sprint-o-matic-external-map-links/main/world-city-maps.json"
+advertisementListing = "https://raw.githubusercontent.com/LemesoftNostalgic/sprint-o-matic-external-map-links/main/advertisement-listing.json"
 newsUrl= "https://raw.githubusercontent.com/LemesoftNostalgic/sprint-o-matic-external-map-links/main/NEWS.txt"
 
 offlineNews = "data/sprint-o-matic-external-map-links-main/NEWS.txt"
@@ -239,6 +240,56 @@ async def downloadMapSurfacesBasedOnUrl(item):
         pngsurf = pygame.image.load(img) # -> Surface
 
     return imgsurf, pngsurf
+
+
+async def downloadAds():
+    listingofads = []
+
+    offline = False
+    try:
+        if sys.platform == 'emscripten':
+            import platform
+            from pathlib import Path
+            pth = Path(advertisementListing)
+            data = ""
+            async with platform.fopen(pth, "r") as textfile:
+                data = textfile.read()
+        else:
+            import requests
+            response = requests.get(advertisementListing)
+            data = response.text
+            print("hei")
+        listingofads = json.loads(data)
+    except Exception as err:
+        print(err)
+        listingofads = []
+
+    print(listingofads)
+    returnads = []
+    for ad in listingofads:
+        print(ad)
+        pngsurf = None
+        try:
+            if sys.platform == 'emscripten':
+                import platform
+                from pathlib import Path
+                pth = Path(ad["ad-url"])
+                pngsurf = pygame.image.load(binfile)
+                data = b''
+                async with platform.fopen(pth, "rb") as binfile:
+                    pngsurf = pygame.image.load(binfile)
+            else:
+                import requests
+                import io
+                r = requests.get(ad["ad-url"])
+                png = io.BytesIO(r.content)
+                pngsurf = pygame.image.load(png) # -> Surface
+                print("jei")
+        except Exception as err:
+            pngsurf = None
+        if pngsurf is not None:
+            returnads.append(pngsurf)
+    return returnads
 
 
 async def downloadSoundBasedOnUrl(name):

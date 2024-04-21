@@ -220,6 +220,10 @@ async def pruneShortestRouteAsync(route, forbiddenLookup, slowLookup, semiSlowLo
     return route
 
 
+async def pruneShortestRoute(route, forbiddenLookup, slowLookup, semiSlowLookup, verySlowLookup):
+    return asyncio.run(pruneShortestRoute(route, forbiddenLookup, slowLookup, semiSlowLookup, verySlowLookup))
+
+
 async def quickPruneShortestRouteAsync(route, forbiddenLookup, slowLookup, semiSlowLookup, verySlowLookup):
     route = await pruneShortestRouteResAsync(route, forbiddenLookup, slowLookup, semiSlowLookup, verySlowLookup, 13, 1)
     route = await pruneCutTheCornersAsync(route, forbiddenLookup, slowLookup, semiSlowLookup, verySlowLookup, (0.5, 0.5), 1)

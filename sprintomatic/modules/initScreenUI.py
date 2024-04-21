@@ -20,6 +20,7 @@
 import asyncio
 import pygame
 import math
+import time
 
 from .gameUIUtils import getApplicationTitle, getMasterFont, getStopKey, getUpKey, getLeftKey, getRightKey, getDownKey, getEnterKey, getSpaceKey, getBackKey, getPlayerColor, getPacemakerColor, getTrackColor, getCreditColor, getGreyColor, convertXCoordinate, convertYCoordinate, getBigScreen, getTimerStep, uiDrawTriangle, uiFlip, uiSubmitSlide, uiSubmitTextListSlide, uiFlushEvents, uiFadeVisibleSlide, uiFadeUnVisibleSlide, uiDrawLine, uiDrawCircle
 
@@ -33,7 +34,7 @@ selections = [
     False, True, False, False, False, False,
     False, True, False, False, False, False,
     True, False, False, False, False,
-    True, False, False, False]
+    False, False, True, False]
 
 arrowScale = 4
 initCircleRadius = 30
@@ -46,6 +47,11 @@ yStepOrig = 200
 xStartOrig = 280
 yStartOrig = 300
 
+adPrevTime = None
+adStepCounter = None
+adCounter = None
+adInvisibleCount = 1
+adVisibleCount = 9
 
 def blitImageScaled(surf, controlFlagImage, controlPoint, portrait):
     if not portrait:
@@ -72,6 +78,40 @@ def showTextShadowed(surf, textCenter, fontSize, textStr, textColor, textShadowS
         textRect.center = textCenter
         surf.blit(aText, textRect)
         return (textCenter[0], (2 * textCenter[1] + textRect[1])//3)
+
+
+def showAds(surf, portrait, ads):
+
+    global adPrevTime
+    global adStepCounter
+    global adCounter
+
+    if time.time() > adPrevTime + 1.0:
+        adPrevTime = time.time()
+        adStepCounter = adStepCounter + 1
+        if adStepCounter > adInvisibleCount + adVisibleCount:
+            adStepCounter = 0
+            adCounter = adCounter + 1
+            if adCounter >= len(ads):
+                adCounter = 0
+
+    if adStepCounter > adInvisibleCount:
+        if not portrait:
+            xStep = convertXCoordinate(xStepOrig)
+            yStep = convertYCoordinate(yStepOrig)
+            adsPosition = ((10 * xStep), (1.5 * yStep))
+        else:
+            xStep = convertXCoordinate(xStepOrig*2)
+            yStep = convertYCoordinate((yStepOrig*5)//11)
+            adsPosition = ((4.5 * xStep), (4 * yStep))
+
+        scale = convertXCoordinate(1.0)
+        if len(ads) > 0:
+            ad = ads[adCounter]
+            adRect = ad.get_rect()
+            adRect.center = adsPosition
+            sc = pygame.transform.scale(ad, (scale, scale))
+            surf.blit(ad, adRect)
 
 
 def showInitArrow(surf, spot, inScale, portrait):
@@ -239,16 +279,21 @@ initScreenPos = 0
 externalExampleTeamCtr = 0
 externalExampleCtr = 0
 worldExampleCtr = 0
-async def initScreen(imagePath, gameSettings, externalImageData, externalWorldCityMap, news, benchmark, portrait):
+async def initScreen(imagePath, gameSettings, externalImageData, externalWorldCityMap, news, benchmark, portrait, ads):
     global selections
     global externalExampleTeamCtr
     global externalExampleCtr
     global worldExampleCtr
     global initScreenPos
     global veryFirstTime
+    global adPrevTime
+    global adStepCounter
+    global adCounter
 
     firstTime = True
-
+    adPrevTime = time.time()
+    adStepCounter = 0
+    adCounter = 0
 
     if not portrait:
         # scale for the current display
@@ -538,6 +583,7 @@ async def initScreen(imagePath, gameSettings, externalImageData, externalWorldCi
             getBigScreen().blit(backgroundImage, backgroundImage.get_rect())
             showInitSelections(getBigScreen(), positions, selections, initCircleRadius, texts, titleTexts, titleTextPositions, externalExampleTeamText, externalExampleTeamSelectionPosition, externalExampleText, externalExampleSelectionPosition, ouluExampleText, ouluExampleSelectionPosition, worldExampleText, worldExampleSelectionPosition, benchmark, portrait)
             showInitArrow(getBigScreen(), positions[initScreenPos], arrowScale, portrait)
+            showAds(getBigScreen(), portrait, ads)
             if gameSettings.infoBox:
                 showInfoBoxTxt(getBigScreen())
             if firstTime:

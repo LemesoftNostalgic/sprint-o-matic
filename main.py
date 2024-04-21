@@ -34,7 +34,7 @@ from sprintomatic.modules.gameUI import uiInit, uiInitStartTriangle, uiStartCont
 from sprintomatic.modules.gameEngine import startOverPlayerRoute, playerRoute, calculateNextStep, closeToControl, quiteCloseToControl, longLapEveryOther, generateAngleStep, normalizeAngleStep, defaultAngle, getPlayerRoute, getPacemakerThreshold, getPacemakerPos
 from sprintomatic.modules.pathPruning import calculatePathWeightedDistance
 from sprintomatic.modules.gameSounds import initSounds, stopSounds, maintainRunningStepEffect, startMelody, startElevatorMelody, stopMelody, startBirds, stopBirds, shoutEffect, pacemakerShoutEffect, finishEffect, startEffect, stopEffects
-from sprintomatic.modules.imageDownloader import downloadExternalImageData, downloadExternalWorldCityMap, downloadNews
+from sprintomatic.modules.imageDownloader import downloadExternalImageData, downloadExternalWorldCityMap, downloadNews, downloadAds
 
 from sprintomatic.modules.perfSuite import perfClearSuite, perfActivate, perfAddStart, perfAddStop, perfBenchmark
 
@@ -93,6 +93,7 @@ async def setTheStageForNewRound(cfg):
 
 #    perfAddStart("crOth")
     news = await downloadNews()
+    ads = await downloadAds()
 
     # Initialize evereything that has to be initialized for a new run
     if ctrls and len(ctrls) > 1:
@@ -300,6 +301,7 @@ async def main():
          gameSettings.offline = offline
     externalWorldCityMap = await downloadExternalWorldCityMap()
     news = await downloadNews()
+    ads = await downloadAds()
     await initSounds(gameSettings.soundRoot, benchmark)
     
     # statistics and route display initial values
@@ -369,7 +371,7 @@ async def main():
             await asyncio.sleep(preInitSleep)
             preInitSleep = 1
             await uiFlushEvents()
-            (quitting, gameSettings, fingerInUse) = await initScreen(gameSettings.imageRoot, gameSettings, externalImageData, externalWorldCityMap, news, benchmark, portrait)
+            (quitting, gameSettings, fingerInUse) = await initScreen(gameSettings.imageRoot, gameSettings, externalImageData, externalWorldCityMap, news, benchmark, portrait, ads)
             running = True
             if quitting:
                 running = False
