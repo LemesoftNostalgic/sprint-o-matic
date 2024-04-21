@@ -21,7 +21,7 @@ a = Analysis(
     ['main.py'],
     pathex=[],
     binaries=[],
-    datas=[('./images/lemesoftnostalgic/*','./images/lemesoftnostalgic'), ('./fonts/*','./fonts'), ('./sounds/*','./sounds/'),('./sounds/*','./sounds/'), ('./sounds/21608__ali_6868__gravel-footsteps/*', './sounds/21608__ali_6868__gravel-footsteps'), ('./sounds/berdnikov2004/*', './sounds/berdnikov2004'),  ('./sounds/cgoulao/*', './sounds/cgoulao'), ('./sounds/crk365/*', './sounds/crk365'),  ('./sounds/frodo89/*', './sounds/frodo89'), ('./sounds/furbyguy/*', './sounds/furbyguy'),  ('./sounds/jackslay/*', './sounds/jackslay'), ('./sounds/josefpres/*', './sounds/josefpres'),  ('./sounds/szymalix/*', './sounds/szymalix'), ('./sounds/badoink/*', './sounds/badoink'),  ('./sounds/bronxio/*', './sounds/bronxio'), ('./sounds/craigsmith/*', './sounds/craigsmith'),  ('./sounds/fran_ky/*', './sounds/fran_ky'), ('./sounds/fupicat/*', './sounds/fupicat'),  ('./sounds/iykqic0/*', './sounds/iykqic0'), ('./sounds/johaynes/*', './sounds/johaynes'),  ('./sounds/nomiqbomi/*', './sounds/nomiqbomi'), ('./sounds/seth/*', './sounds/seth'),  ('./sounds/the_loner/*', './sounds/the_loner') ],
+    datas=[('./images/lemesoftnostalgic/*','./images/lemesoftnostalgic'), ('./fonts/*','./fonts') ],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},
