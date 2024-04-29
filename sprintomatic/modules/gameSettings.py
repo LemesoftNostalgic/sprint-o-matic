@@ -27,7 +27,7 @@ from .utils import getPackagePath
 from .infiniteOulu import getInfiniteOulu
 from .infiniteWorld import getInfiniteWorldDefault
 from .lookupPngReader import extractPngLookups, extractPngLookupsFromFile
-from .imageDownloader import downloadMapSurfacesBasedOnUrl
+from .imageDownloader import downloadMapSurfacesBasedOnUrl, downloadMapSurfacesBasedOnPlace
 from .perfSuite import perfAddStart, perfAddStop
 
 def numRestrict(minVal, maxVal):
@@ -59,6 +59,7 @@ def returnSettings():
             self.amaze="no"
             self.memorize="no"
             self.place=[0.0, 0.0]
+            self.placeName="noname"
             self.pacemaker=1
             self.metersPerPixel=0
             self.infoBox="no"
@@ -188,7 +189,9 @@ async def returnConfig(gameSettings, externalImageData, infiniteWorldCityMap, be
 
     elif gameSettings.infiniteWorld:
 #        perfAddStart("world")
-        png, pngMask = await getInfiniteWorldDefault(gameSettings.place, gameSettings.imageRoot, benchmark, portrait)
+        png, pngMask = await downloadMapSurfacesBasedOnPlace(gameSettings.placeName)
+        if png is None or pngMask is None:
+            png, pngMask = await getInfiniteWorldDefault(gameSettings.place, gameSettings.imageRoot, benchmark, portrait)
 #        perfAddStop("world")
         perfAddStart("pngLookupMsk")
         faLookup, saLookup, ssaLookup, vsaLookup, tunnelLookup, config = await extractPngLookups(pngMask)

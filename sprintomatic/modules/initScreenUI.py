@@ -640,10 +640,10 @@ async def initScreen(imagePath, gameSettings, externalImageData, externalWorldCi
             gameSettings.infiniteOulu = False
             gameSettings.infiniteWorld = True
             gameSettings.infiniteWorldCity = worldExampleText
-            gameSettings.place, placeName = getInfiniteWorldPlace(worldExampleText, externalWorldCityMap)
+            gameSettings.place, gameSettings.placeName = getInfiniteWorldPlace(worldExampleText, externalWorldCityMap)
             gameSettings.externalExample = ""
-            if placeName:
-               uiSubmitSlide("Welcome to " + placeName + "...", portrait)
+            if gameSettings.placeName:
+               uiSubmitSlide("Welcome to " + gameSettings.placeName + "...", portrait)
             else:
                uiSubmitSlide("Somewhere in " + worldExampleText + "...", portrait)
             await uiRenderImmediate(loadingPosition, loadingText, False, benchmark, portrait)

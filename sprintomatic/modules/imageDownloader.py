@@ -188,56 +188,73 @@ async def downloadExternalImageData(ownMasterListing):
     return returndata, offline
 
 
-async def downloadMapSurfacesBasedOnUrl(item):
-
+async def downloadMapSurfacesBasedOnDirectUrl(imgname, pngname):
     imgsurf = None
     pngsurf = None
-
     try:
-        name = item["map-url"]
         if sys.platform == 'emscripten':
             import platform
             from pathlib import Path
-            pth = Path(name)
+            pth = Path(ingname)
             async with platform.fopen(pth, "rb") as binfile:
                 imgsurf = pygame.image.load(binfile)
         else:
             import requests
             import io
-            r = requests.get(name)
+            r = requests.get(imgname)
             img = io.BytesIO(r.content)
             imgsurf = pygame.image.load(img) # -> Surface
     except Exception as err:
         imgsurf = None
 
     if imgsurf is None:
-        name = "data/sprint-o-matic-map-image-example-main/" + item["map-url"].rsplit('/', 1)[-1].rsplit('?', 1)[0]
+        name = "data/sprint-o-matic-map-image-example-main/" + imgname.rsplit('/', 1)[-1].rsplit('?', 1)[0]
         img = os.path.join(getPackagePath(), name)
         imgsurf = pygame.image.load(img) # -> Surface
 
     try:
-        name = item["lookup-png-url"]
         if sys.platform == 'emscripten':
             import platform
             from pathlib import Path
-            pth = Path(name)
+            pth = Path(pngname)
             async with platform.fopen(pth, "rb") as binfile:
                 pngsurf = pygame.image.load(binfile)
         else:
             import requests
             import io
-            r = requests.get(name)
+            r = requests.get(pngname)
             png = io.BytesIO(r.content)
             pngsurf = pygame.image.load(png) # -> Surface
     except Exception as err:
         pngsurf = None
 
     if pngsurf is None:
-        name = "data/sprint-o-matic-map-image-example-main/" + item["lookup-png-url"].rsplit('/', 1)[-1].rsplit('?', 1)[0]
+        name = "data/sprint-o-matic-map-image-example-main/" + pngname.rsplit('/', 1)[-1].rsplit('?', 1)[0]
         img = os.path.join(getPackagePath(), name)
         pngsurf = pygame.image.load(img) # -> Surface
 
     return imgsurf, pngsurf
+
+
+async def downloadMapSurfacesBasedOnPlace(place):
+    try:
+        imgname = "https://raw.githubusercontent.com/LemesoftNostalgic/sprint-o-matic-world-maps-cache/main/" + place + ".jpg?raw=true"
+        pngname = "https://raw.githubusercontent.com/LemesoftNostalgic/sprint-o-matic-world-maps-cache/main/mask_" + place + ".png?raw=true"
+    except Exception as err:
+        return None, None
+
+    return await downloadMapSurfacesBasedOnDirectUrl(imgname, pngname)
+
+
+async def downloadMapSurfacesBasedOnUrl(item):
+
+    try:
+        imgname = item["map-url"]
+        pngname = item["lookup-png-url"]
+    except Exception as err:
+        return None, None
+
+    return await downloadMapSurfacesBasedOnDirectUrl(imgname, pngname)
 
 
 async def downloadAds():
