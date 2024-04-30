@@ -195,7 +195,7 @@ async def downloadMapSurfacesBasedOnDirectUrl(imgname, pngname):
         if sys.platform == 'emscripten':
             import platform
             from pathlib import Path
-            pth = Path(ingname)
+            pth = Path(imgname)
             async with platform.fopen(pth, "rb") as binfile:
                 imgsurf = pygame.image.load(binfile)
         else:
@@ -208,9 +208,12 @@ async def downloadMapSurfacesBasedOnDirectUrl(imgname, pngname):
         imgsurf = None
 
     if imgsurf is None:
-        name = "data/sprint-o-matic-map-image-example-main/" + imgname.rsplit('/', 1)[-1].rsplit('?', 1)[0]
-        img = os.path.join(getPackagePath(), name)
-        imgsurf = pygame.image.load(img) # -> Surface
+        try:
+            name = "data/sprint-o-matic-map-image-example-main/" + imgname.rsplit('/', 1)[-1].rsplit('?', 1)[0]
+            img = os.path.join(getPackagePath(), name)
+            imgsurf = pygame.image.load(img) # -> Surface
+        except Exception as err:
+            imgsurf = None
 
     try:
         if sys.platform == 'emscripten':
@@ -229,9 +232,12 @@ async def downloadMapSurfacesBasedOnDirectUrl(imgname, pngname):
         pngsurf = None
 
     if pngsurf is None:
-        name = "data/sprint-o-matic-map-image-example-main/" + pngname.rsplit('/', 1)[-1].rsplit('?', 1)[0]
-        img = os.path.join(getPackagePath(), name)
-        pngsurf = pygame.image.load(img) # -> Surface
+        try:
+            name = "data/sprint-o-matic-map-image-example-main/" + pngname.rsplit('/', 1)[-1].rsplit('?', 1)[0]
+            img = os.path.join(getPackagePath(), name)
+            pngsurf = pygame.image.load(img) # -> Surface
+        except Exception as err:
+            pngsurf = None
 
     return imgsurf, pngsurf
 
