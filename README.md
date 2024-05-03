@@ -190,7 +190,7 @@ use, with launch readiness somewhere around 2026:
 
 * Automatic creation of terrain descriptions for real sprint maps
 * Automatic creation of higher quality spring maps from geometric data
-* Editor for kand-crafted tracks/events for a given map
+* Editor for hand-crafted tracks/events for a given map
 
 ## Misc topics
 
