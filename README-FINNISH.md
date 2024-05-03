@@ -130,7 +130,7 @@ Toiminto käyttää pohjana OpenStreetMap-järjestelmän karttadataa.
 Uusia kaupunkeja tai sijainteja voi ehdottaa yksinkertaisesti
 lähettämällä viesti sähköpostiin sprint.o.matic miukumauku gmail.com.
 
-![Sprint-O-Matic-pelikartta ulkoisella kartalla, kirjoittanut Jyrki Leskelä](/doc/tartu/ExternalMapWithRouteAnalysis.jpg)
+![Sprint-O-Matic-pelikartta ulkoisella kartalla, kirjoittanut Jyrki Leskelä](/doc/tartu/ExternalMapWithRouteAnalysis.png)
 
 Sprint-O-Matic:in voi myös linkittää **ulkoisiin** karttoihin. 
 Sinun tarvitsee vain lähettää tarvittavat tiedot kartasta osoitteeseen
@@ -198,17 +198,22 @@ Ohjelmisto on lisensoitu Apache-2.0-lisenssillä. Voit siis vapaasti
 perustaa oman kehityshaaran sen parantelua tai lisäkehitystä varten.
 Voit myös ehdottaa korjauksia "git pull request" mekanismilla.
 
-Tämänhetkinen idealista on seuraava:
+Tämänhetkinen idealista ilmaisversiolle on seuraava:
 
 * Ohjelma tarjolle sovelluskauppaan (Androis, iPhone)
 * lisää ulkoisia karttoja linkitettynä karttaluetteloon [ohje](/README-MAPS-FINNISH.md)
+* Lisää erilaisia harjoituksia, esim: pistesuunnistus tai knockout sprintti
 * Korkeusmerkinnät -> ylämäestä hitaampi kuin alamäestä
 * Rastien numerointi, rastimääritteet, jne.
-* Score-O -tyyppinen (n.s. rogaining, kerää pisteet missä tahansa järjestyksessä, aikaraja)
-* Salli kuhunkin karttaan liittyvien käsinsuunniteltujen ratojen julkaiseminen
-* tapahtumien/moninpelin tuki (joutuisi olemaan maksullinen toiminto kattaakseen palvelinkulut)
-* automaattinen maastokuvausten luominen.
+* Moninpelin tuki (joutuisi olemaan maksullinen toiminto kattaakseen palvelinkulut)
 * 3d tila
+
+Sprint-O-Maticista on myös PRO-versio, aluksi omaan käyttööni,
+julkaisukelpoisessa muodossa ehkä joskus 2026 tienoilla:
+
+* automaattinen maastokuvausten luominen olemassaolevan sprinttikartan pohjalta.
+* Tarkan resoluution sprinttikarttojen generointi suoraan maastodatasta.
+* Käsinsuunniteltujen ratojen ja tapahtumien editoinnin tuki.
 
 ## Muut aiheet
 

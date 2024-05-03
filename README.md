@@ -174,17 +174,23 @@ game.
 The software is licensed under Apache-2.0 license. You are therefore free to
 branch it for extra development or propose pull requests for it.
 
-The following ideas are next on the table:
+The following ideas are next on the table for the free version:
 
 * Applications to App Store (Android, iPhone)
 * more maps to the map listing [using this procedure](/README-MAPS.md)
+* More exercise types, for example: score-O or knockout
 * Height map -> uphill becomes slower than downhill
-* Add control numbering, control descriptions, etc.
-* Allow hand-crafted track designs for a given map, in addition to random ones
-* events/multiplayer support (might have to be a paid subcription to cover the
+* Control numbering, control descriptions, etc.
+* Multiplayer support (might have to be a paid subcription to cover the
 server costs)
-* Automatic creation of terrain descriptions, making [this procedure](/README-MAPS.md) easier.
 * 3d mode
+
+There exist also a sprint-o-matic professional version, first for my own
+use, with launch readiness somewhere around 2026:
+
+* Automatic creation of terrain descriptions for real sprint maps
+* Automatic creation of higher quality spring maps from geometric data
+* Editor for kand-crafted tracks/events for a given map
 
 ## Misc topics
 
