@@ -28,14 +28,18 @@ from .utils import getPackagePath
 soundUrl = "https://raw.githubusercontent.com/LemesoftNostalgic/sprint-o-matic-sounds/main/"
 listingOfTeamsWithListing = "https://raw.githubusercontent.com/LemesoftNostalgic/sprint-o-matic-external-map-links/main/teams-hosting-their-own-map-listing.json"
 listingOfMapsInCities = "https://raw.githubusercontent.com/LemesoftNostalgic/sprint-o-matic-external-map-links/main/world-city-maps.json"
+mapsCacheUrl = "https://raw.githubusercontent.com/LemesoftNostalgic/sprint-o-matic-world-maps-cache/main/"
+
 advertisementListing = "https://raw.githubusercontent.com/LemesoftNostalgic/sprint-o-matic-external-map-links/main/advertisement-listing.json"
 newsUrl= "https://raw.githubusercontent.com/LemesoftNostalgic/sprint-o-matic-external-map-links/main/NEWS.txt"
 
 offlineNews = "data/sprint-o-matic-external-map-links-main/NEWS.txt"
 offlineTeamsWithListing = "data/sprint-o-matic-external-map-links-main/teams-hosting-their-own-map-listing.json"
 offlineMapsInCities = "data/sprint-o-matic-external-map-links-main/world-city-maps.json"
+offlineTeamMapsPath = "data/sprint-o-matic-external-map-links-main"
 
-offlineExamplePath = "data/sprint-o-matic-map-image-example-main"
+offlineExamplePath = "data"
+offlineSoundPath = "sounds"
 
 
 osmQueryPathBase = "https://overpass-api.de/api/interpreter?data=[out%3Ajson]%3B("
@@ -175,7 +179,7 @@ async def downloadExternalImageData(ownMasterListing):
             teamdata = None
         if teamdata is None:
             offline = True
-            teamMapListingFile = "data/sprint-o-matic-external-map-links-main/" + team["map-listing-url"].rsplit('/', 1)[-1]
+            teamMapListingFile = os.path.join(offlineTeamMapsPath, team["map-listing-url"].rsplit('/', 1)[-1])
             fname = os.path.join(getPackagePath(), teamMapListingFile)
             if os.path.isfile(fname):
                 with open(fname, 'rb') as f:
@@ -209,8 +213,8 @@ async def downloadMapSurfacesBasedOnDirectUrl(imgname, pngname):
 
     if imgsurf is None:
         try:
-            name = "data/sprint-o-matic-map-image-example-main/" + imgname.rsplit('/', 1)[-1].rsplit('?', 1)[0]
-            img = os.path.join(getPackagePath(), name)
+            imgname = os.path.join(offlineExamplePath, imgname.rsplit('/', 3)[-3] + "-" + imgname.rsplit('/', 2)[-2], imgname.rsplit('/', 1)[-1].rsplit('?', 1)[0])
+            img = os.path.join(getPackagePath(), imgname)
             imgsurf = pygame.image.load(img) # -> Surface
         except Exception as err:
             imgsurf = None
@@ -233,8 +237,8 @@ async def downloadMapSurfacesBasedOnDirectUrl(imgname, pngname):
 
     if pngsurf is None:
         try:
-            name = "data/sprint-o-matic-map-image-example-main/" + pngname.rsplit('/', 1)[-1].rsplit('?', 1)[0]
-            img = os.path.join(getPackagePath(), name)
+            pngname = os.path.join(offlineExamplePath, pngname.rsplit('/', 3)[-3] + "-" + pngname.rsplit('/', 2)[-2], pngname.rsplit('/', 1)[-1].rsplit('?', 1)[0])
+            img = os.path.join(getPackagePath(), pngname)
             pngsurf = pygame.image.load(img) # -> Surface
         except Exception as err:
             pngsurf = None
@@ -244,8 +248,8 @@ async def downloadMapSurfacesBasedOnDirectUrl(imgname, pngname):
 
 async def downloadMapSurfacesBasedOnPlace(place):
     try:
-        imgname = "https://raw.githubusercontent.com/LemesoftNostalgic/sprint-o-matic-world-maps-cache/main/" + place + ".jpg?raw=true"
-        pngname = "https://raw.githubusercontent.com/LemesoftNostalgic/sprint-o-matic-world-maps-cache/main/mask_" + place + ".png?raw=true"
+        imgname = mapsCacheUrl + place + ".jpg?raw=true"
+        pngname = mapsCacheUrl + "mask_" + place + ".png?raw=true"
     except Exception as err:
         return None, None
 
@@ -323,4 +327,13 @@ async def downloadSoundBasedOnUrl(name):
             sound = pygame.mixer.Sound(snd) # -> Sound
     except Exception as err:
         sound = None
+
+    if sound is None:
+        try:
+            name = os.path.join(offlineSoundPath, name.rsplit('/', 2)[-2], name.rsplit('/', 1)[-1].rsplit('?', 1)[0])
+            img = os.path.join(getPackagePath(), name)
+            sound = pygame.mixer.Sound(img) # -> Sound
+        except Exception as err:
+            sound = None
+
     return sound
