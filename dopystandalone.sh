@@ -17,6 +17,8 @@
 # specific language governing permissions and limitations
 # under the License.
 
+# Remember to first clone the cloud repos to sprintomatic/data.
+
 python3.10 -m PyInstaller mainstandalone.spec --distpath bin
 mv bin/main bin/sprint-o-matic-standalone
 md5sum bin/sprint-o-matic-standalone >bin/sprint-o-matic-standalone.md5sum
