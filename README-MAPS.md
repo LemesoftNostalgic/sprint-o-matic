@@ -2,7 +2,7 @@
 
 ### Playing with your private maps
 
-Using the [command line](#command-line-usage) parameters **--mapFileName** and **--lookupPngName** you can play with a map stored in your local filesystem. The map file is just an image of the map, preferably in png format, and the lookup file (i.e. terrain description) is an equally sized png image where the terrain characteristics are marked
+Using the [command line](/FINNISH-CMDLINE.md) parameters **--mapFileName** and **--lookupPngName** you can play with a map stored in your local filesystem. The map file is just an image of the map, preferably in png format, and the lookup file (i.e. terrain description) is an equally sized png image where the terrain characteristics are marked
 with specific colors, see chapter [creating the terrain description](#creating-the-terrain-description).
 
 ### Make your map visible to Sprint-O-Matic users

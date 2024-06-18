@@ -2,9 +2,9 @@
 
 ### Pelaaminen yksityisillä kartoillasi
 
-Käyttämällä [komentorivi](#komentorivin-käyttö) parametreja **--mapFileName** ja 
+Käyttämällä [komentorivi](/FINNISH-CMDLINE.md) parametreja **--mapFileName** ja
 **--lookupPngName** voit pelata paikalliseen tiedostojärjestelmääsi tallennetulla kartalla.
-Karttatiedosto on vain kuva kartasta, mieluiten png-muodossa, ja 
+Karttatiedosto on vain kuva kartasta, mieluiten png-muodossa, ja
 "maaston kuvaus" on samankokoinen png-kuva, johon on merkitty 
 maaston ominaisuudet tietyillä väreillä, katso luku
 [maaston kuvauksen luominen](#maaston-kuvauksen-luominen).
