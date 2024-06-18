@@ -32,10 +32,9 @@ alustavan kuvan siitä miten peli toimii:
 
    * [Käyttö](#käyttö)
    * [Asennus](#asennus)
-   * [Uusien karttojen lisääminen Sprint-O-Maticiin](#uusien-karttojen-lisääminen-sprint-o-Maticiin)
+   * [Uusien karttojen käyttäminen Sprint-O-Maticin kanssa](#uusien-karttojen-käyttäminen-sprint-o-maticin-kanssa)
    * [Tietoja tästä ohjelmistosta ja sen lisenssistä](#tietoja-tästä-ohjelmistosta-ja-sen-lisenssistä)
-   * [Sekalaiset aiheet](#sekalaiset-aiheet)
-   * [Komentorivin käyttö](#lomentorivin-käyttö)
+   * [Muut aiheet](#muut-aiheet)
 
 ## Käyttö
 
@@ -78,7 +77,7 @@ optimireittiin. Reittianalyysitiloja on kolme:
 * fast: kaksinkertaistaa juoksijan nopeuden antaakseen hieman enemmän haastetta
 
 On myös mahdollista saada analyysitulokset pelin jälkeen tiedostona levyllesi.
-Tämä edellyttää [komentoriviparametrin](#komentorivin-käyttö) **--analysis** 
+Tämä edellyttää [komentoriviparametrin](/FINNISH-CMDLINE.md) **--analysis**
 käyttöä sovelluksen käynnistyksen yhteydessä. Voit käyttää myös
 komentoriviparametria **--accurate** jos sinulla on nopea Linux PC ja haluat
 parhaan reitin arvion olevan tarkempi.
@@ -132,7 +131,7 @@ lähettämällä viesti sähköpostiin sprint.o.matic miukumauku gmail.com.
 
 ![Sprint-O-Matic-pelikartta ulkoisella kartalla, kirjoittanut Jyrki Leskelä](/doc/tartu/ExternalMapWithRouteAnalysis.png)
 
-Sprint-O-Matic:in voi myös linkittää **ulkoisiin** karttoihin. 
+Sprint-O-Maticin voi myös linkittää **ulkoisiin** karttoihin.
 Sinun tarvitsee vain lähettää tarvittavat tiedot kartasta osoitteeseen
 sprint.o.matic miukumauku gmail.com. Jos kartan lisenssi on riittävän salliva,
 lisään sen linkkilistalle [https://github.com/LemesoftNostalgic/sprint-o-matic-external-map-links](https://github.com/LemesoftNostalgic/sprint-o-matic-external-map-links)
@@ -180,12 +179,12 @@ Windows 10 -laitteissa.  Web-versio tarvitsee suhteellisen modernin selaimen.
 tietokoneen, koska sen hakualgoritmit suoritetaan useissa prosesseissa.
 
 
-## Uusien karttojen käyttäminen Sprint-O-Matic:in kanssa
+## Uusien karttojen käyttäminen Sprint-O-Maticin kanssa
 
-On olemassa kaksi tapaa saata lisää karttoja Sprint-O-Matic:iin
+On olemassa kaksi tapaa saada lisää karttoja Sprint-O-Maticiin
 
 - Etsi kinnostava sijainti vaikkapa Google Maps sovelluksesta ja lähetä ehdotus eli paikan koordinaatit osoitteeseen sprint.o.matic at gmail.com.
-- Oikeiden sprittisuunnistuskarttojen käyttäminen Sprint-O-Maticin kanssa: [ohje](/README-MAPS-FINNISH.md)
+- Oikeiden sprittisuunnistuskarttojen käyttäminen Sprint-O-Maticin kanssa: [ohje](/README-FINNISH-MAPS.md)
 
 ## Tietoja tästä ohjelmistosta ja sen lisenssistä
 
@@ -201,7 +200,7 @@ Voit myös ehdottaa korjauksia "git pull request" mekanismilla.
 Tämänhetkinen idealista ilmaisversiolle on seuraava:
 
 * Ohjelma tarjolle sovelluskauppaan (Androis, iPhone)
-* lisää ulkoisia karttoja linkitettynä karttaluetteloon [ohje](/README-MAPS-FINNISH.md)
+* lisää ulkoisia karttoja linkitettynä karttaluetteloon [ohje](/README-FINNISH-MAPS.md)
 * Lisää erilaisia harjoituksia, esim: pistesuunnistus tai knockout sprintti
 * Korkeusmerkinnät -> ylämäestä hitaampi kuin alamäestä
 * Rastien numerointi, rastimääritteet, jne.

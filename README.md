@@ -6,7 +6,7 @@
 
 _Linkki suomenkieliseen ohjeeseen_: [README-FINNISH.md](/README-FINNISH.md).
 
-_Directly to web-application_: [tinyurl.com/sprint-o-matic-webapp](https://lemesoftnostalgic.github.io/sprint-o-matic/)
+_Directly to web-application_: [tinyurl.com/sprint-o-matic-webapp](https://lemesoftnostalgic.github.io/sprint-o-matic/) (browser hint: Sounds may have issues on Chrome, Firefox is better in this respect)
 
 Sprint-O-Matic is a training application for sprint orienteering, or
 Sprint-O for short. What then is sprint orienteering?
@@ -42,7 +42,6 @@ which have improved a little bit during this winter.
   * [Adding new maps to Sprint-O-Matic](#adding-new-maps-to-sprint-o-matic)
   * [Software developent and license](#software-developent-and-license)
   * [Misc topics](#misc-topics)
-  * [Command-line usage](#command-line-usage)
 
 ## Usage
 
@@ -77,7 +76,7 @@ modes to choose from:
 * fast: doubles the runner speed to give a little bit more challenge
 
 It is also possible to get the analysis results as a file to your disk,
-after the session. This requires using the [command line](#command-line-usage)
+after the session. This requires using the [command line](/CMDLINE.md)
 parameter **--analysis** when starting the application. Use also **--accurate** parameter, if you have a fast Linux PC and you want the shortest-route finder to
 be more accurate.
 
